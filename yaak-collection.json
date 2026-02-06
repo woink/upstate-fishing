@@ -1,0 +1,163 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-02-06T11:30:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_fishing",
+      "_type": "workspace",
+      "name": "Upstate Fishing API",
+      "description": "API for fishing conditions and hatch predictions"
+    },
+    {
+      "_id": "fld_streams",
+      "_type": "request_group",
+      "name": "Streams",
+      "parentId": "wrk_fishing"
+    },
+    {
+      "_id": "fld_hatches",
+      "_type": "request_group",
+      "name": "Hatches",
+      "parentId": "wrk_fishing"
+    },
+    {
+      "_id": "fld_stations",
+      "_type": "request_group",
+      "name": "Stations",
+      "parentId": "wrk_fishing"
+    },
+    {
+      "_id": "fld_predict",
+      "_type": "request_group",
+      "name": "Predictions",
+      "parentId": "wrk_fishing"
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "name": "Local",
+      "parentId": "wrk_fishing",
+      "data": {
+        "baseUrl": "http://localhost:8000"
+      }
+    },
+    {
+      "_id": "req_streams_list",
+      "_type": "request",
+      "name": "List All Streams",
+      "parentId": "fld_streams",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/api/streams"
+    },
+    {
+      "_id": "req_streams_by_region",
+      "_type": "request",
+      "name": "Streams by Region (Catskills)",
+      "parentId": "fld_streams",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/api/streams?region=catskills"
+    },
+    {
+      "_id": "req_streams_by_state",
+      "_type": "request",
+      "name": "Streams by State (NY)",
+      "parentId": "fld_streams",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/api/streams?state=NY"
+    },
+    {
+      "_id": "req_stream_by_id",
+      "_type": "request",
+      "name": "Get Stream (Beaverkill)",
+      "parentId": "fld_streams",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/api/streams/beaverkill"
+    },
+    {
+      "_id": "req_stream_conditions",
+      "_type": "request",
+      "name": "Stream Conditions (Beaverkill)",
+      "parentId": "fld_streams",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/api/streams/beaverkill/conditions"
+    },
+    {
+      "_id": "req_hatches_list",
+      "_type": "request",
+      "name": "List All Hatches",
+      "parentId": "fld_hatches",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/api/hatches"
+    },
+    {
+      "_id": "req_hatches_by_order",
+      "_type": "request",
+      "name": "Hatches by Order (Mayfly)",
+      "parentId": "fld_hatches",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/api/hatches?order=mayfly"
+    },
+    {
+      "_id": "req_hatches_by_month",
+      "_type": "request",
+      "name": "Hatches by Month (April)",
+      "parentId": "fld_hatches",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/api/hatches?month=4"
+    },
+    {
+      "_id": "req_hatch_by_id",
+      "_type": "request",
+      "name": "Get Hatch (Hendrickson)",
+      "parentId": "fld_hatches",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/api/hatches/hendrickson"
+    },
+    {
+      "_id": "req_station",
+      "_type": "request",
+      "name": "Get Station (Beaverkill)",
+      "parentId": "fld_stations",
+      "method": "GET",
+      "url": "{{ _.baseUrl }}/api/stations/01420500"
+    },
+    {
+      "_id": "req_predict",
+      "_type": "request",
+      "name": "Predict Hatches (April Hendrickson)",
+      "parentId": "fld_predict",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/api/predict",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"waterTempF\": 54,\n  \"airTempF\": 58,\n  \"cloudCoverPercent\": 80,\n  \"date\": \"2024-04-15T14:00:00Z\"\n}"
+      }
+    },
+    {
+      "_id": "req_predict_bwo",
+      "_type": "request",
+      "name": "Predict Hatches (Fall BWO)",
+      "parentId": "fld_predict",
+      "method": "POST",
+      "url": "{{ _.baseUrl }}/api/predict",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"waterTempF\": 50,\n  \"airTempF\": 52,\n  \"cloudCoverPercent\": 90,\n  \"precipProbability\": 40,\n  \"date\": \"2024-10-10T14:00:00Z\"\n}"
+      }
+    }
+  ]
+}
