@@ -1,0 +1,439 @@
+openapi: 3.0.3
+info:
+  title: Upstate Fishing API
+  description: API for fishing conditions and hatch predictions in Upstate NY/NJ
+  version: 0.1.0
+  contact:
+    name: Ward Price
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+  - url: http://100.78.158.46:8000
+    description: Tailscale (clawpei)
+
+paths:
+  /api/streams:
+    get:
+      summary: List all streams
+      description: Get all streams, optionally filtered by region or state
+      operationId: getStreams
+      parameters:
+        - name: region
+          in: query
+          schema:
+            type: string
+            enum: [catskills, croton, raritan, delaware]
+          description: Filter by region
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [NY, NJ]
+          description: Filter by state
+      responses:
+        '200':
+          description: List of streams
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamListResponse'
+
+  /api/streams/{id}:
+    get:
+      summary: Get stream by ID
+      operationId: getStreamById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: beaverkill
+      responses:
+        '200':
+          description: Stream details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamResponse'
+        '404':
+          description: Stream not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/streams/{id}/conditions:
+    get:
+      summary: Get current conditions for a stream
+      description: Returns real-time water data, weather, and hatch predictions
+      operationId: getStreamConditions
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: beaverkill
+      responses:
+        '200':
+          description: Current stream conditions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConditionsResponse'
+        '404':
+          description: Stream not found
+        '500':
+          description: Failed to fetch external data
+
+  /api/hatches:
+    get:
+      summary: List all hatches
+      description: Get all known insect hatches, optionally filtered
+      operationId: getHatches
+      parameters:
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [mayfly, caddisfly, stonefly, midge]
+          description: Filter by insect order
+        - name: month
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+          description: Filter by peak month (1-12)
+      responses:
+        '200':
+          description: List of hatches
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HatchListResponse'
+
+  /api/hatches/{id}:
+    get:
+      summary: Get hatch by ID
+      operationId: getHatchById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: hendrickson
+      responses:
+        '200':
+          description: Hatch details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HatchResponse'
+        '404':
+          description: Hatch not found
+
+  /api/stations/{id}:
+    get:
+      summary: Get USGS station data
+      operationId: getStationById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '01420500'
+      responses:
+        '200':
+          description: Station readings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationResponse'
+        '404':
+          description: Station not found or no data
+
+  /api/predict:
+    post:
+      summary: Custom hatch prediction
+      description: Get hatch predictions for custom conditions
+      operationId: predictHatches
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PredictRequest'
+            examples:
+              april-hendrickson:
+                summary: April Hendrickson conditions
+                value:
+                  waterTempF: 54
+                  airTempF: 58
+                  cloudCoverPercent: 80
+                  date: '2024-04-15T14:00:00Z'
+              fall-bwo:
+                summary: Fall BWO conditions
+                value:
+                  waterTempF: 50
+                  airTempF: 52
+                  cloudCoverPercent: 90
+                  precipProbability: 40
+                  date: '2024-10-10T14:00:00Z'
+      responses:
+        '200':
+          description: Hatch predictions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PredictResponse'
+        '400':
+          description: Invalid request body
+
+components:
+  schemas:
+    Stream:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        region:
+          type: string
+          enum: [catskills, croton, raritan, delaware]
+        state:
+          type: string
+          enum: [NY, NJ]
+        stationIds:
+          type: array
+          items:
+            type: string
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+
+    Coordinates:
+      type: object
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+
+    Hatch:
+      type: object
+      properties:
+        id:
+          type: string
+        commonName:
+          type: string
+        scientificName:
+          type: string
+        order:
+          type: string
+          enum: [mayfly, caddisfly, stonefly, midge]
+        minTempF:
+          type: number
+        maxTempF:
+          type: number
+        peakMonths:
+          type: array
+          items:
+            type: integer
+        timeOfDay:
+          type: string
+        prefersOvercast:
+          type: boolean
+        hookSizes:
+          type: array
+          items:
+            type: integer
+        notes:
+          type: string
+
+    StationData:
+      type: object
+      properties:
+        stationId:
+          type: string
+        stationName:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        waterTempF:
+          type: number
+          nullable: true
+        waterTempC:
+          type: number
+          nullable: true
+        dischargeCfs:
+          type: number
+          nullable: true
+        gageHeightFt:
+          type: number
+          nullable: true
+
+    HatchPrediction:
+      type: object
+      properties:
+        hatch:
+          $ref: '#/components/schemas/Hatch'
+        probability:
+          type: number
+          minimum: 0
+          maximum: 1
+        confidence:
+          type: string
+          enum: [low, medium, high]
+        reasoning:
+          type: string
+
+    PredictRequest:
+      type: object
+      properties:
+        waterTempF:
+          type: number
+          description: Water temperature in Fahrenheit
+        airTempF:
+          type: number
+          description: Air temperature in Fahrenheit
+        cloudCoverPercent:
+          type: number
+          minimum: 0
+          maximum: 100
+        precipProbability:
+          type: number
+          minimum: 0
+          maximum: 100
+        date:
+          type: string
+          format: date-time
+          description: Date/time for prediction
+
+    StreamListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stream'
+        count:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    StreamResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Stream'
+        timestamp:
+          type: string
+          format: date-time
+
+    HatchListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hatch'
+        count:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    HatchResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Hatch'
+        timestamp:
+          type: string
+          format: date-time
+
+    StationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/StationData'
+        timestamp:
+          type: string
+          format: date-time
+
+    ConditionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            stream:
+              $ref: '#/components/schemas/Stream'
+            stationData:
+              type: array
+              items:
+                $ref: '#/components/schemas/StationData'
+            weather:
+              type: object
+              nullable: true
+            predictedHatches:
+              type: array
+              items:
+                $ref: '#/components/schemas/HatchPrediction'
+            fishingQuality:
+              type: string
+              enum: [poor, fair, good, excellent]
+            summary:
+              type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    PredictResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/HatchPrediction'
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            error:
+              type: string
+            code:
+              type: string
+        timestamp:
+          type: string
+          format: date-time
