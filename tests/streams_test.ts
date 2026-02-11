@@ -39,8 +39,16 @@ Deno.test('STREAMS - all stream IDs are unique', () => {
 Deno.test('STREAMS - contains iconic Catskills streams', () => {
   const streamNames = STREAMS.map((s) => s.name.toLowerCase());
 
-  assertEquals(streamNames.some((n) => n.includes('beaverkill')), true, 'Should include Beaverkill');
-  assertEquals(streamNames.some((n) => n.includes('willowemoc')), true, 'Should include Willowemoc');
+  assertEquals(
+    streamNames.some((n) => n.includes('beaverkill')),
+    true,
+    'Should include Beaverkill',
+  );
+  assertEquals(
+    streamNames.some((n) => n.includes('willowemoc')),
+    true,
+    'Should include Willowemoc',
+  );
   assertEquals(streamNames.some((n) => n.includes('esopus')), true, 'Should include Esopus');
 });
 

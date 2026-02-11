@@ -38,7 +38,8 @@ export const HATCHES: readonly Hatch[] = [
     timeOfDay: 'any',
     prefersOvercast: true,
     hookSizes: [16, 18, 20],
-    notes: 'Best on overcast, drizzly days. Hatches in spring and fall as temps pass through range.',
+    notes:
+      'Best on overcast, drizzly days. Hatches in spring and fall as temps pass through range.',
   },
   {
     id: 'march-brown',
@@ -51,7 +52,8 @@ export const HATCHES: readonly Hatch[] = [
     timeOfDay: 'midday',
     prefersOvercast: false,
     hookSizes: [10, 12],
-    notes: 'Despite name, hatches in May. Not a blanket hatch - steady trickle. Good for blind casting.',
+    notes:
+      'Despite name, hatches in May. Not a blanket hatch - steady trickle. Good for blind casting.',
   },
   {
     id: 'sulphur-big',
@@ -245,8 +247,7 @@ export const HATCHES: readonly Hatch[] = [
     timeOfDay: 'any',
     prefersOvercast: false,
     hookSizes: [18, 20, 22, 24],
-    notes:
-      'Year-round. Primary food source when nothing else hatches. Cluster patterns work well.',
+    notes: 'Year-round. Primary food source when nothing else hatches. Cluster patterns work well.',
   },
 ] as const;
 

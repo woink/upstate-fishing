@@ -169,7 +169,9 @@ Deno.test('POST /predict - returns predictions for Hendrickson conditions', asyn
   assertEquals(data.success, true);
 
   // Should predict Hendrickson in these conditions
-  const hendrickson = data.data.find((p: { hatch: { id: string } }) => p.hatch.id === 'hendrickson');
+  const hendrickson = data.data.find((p: { hatch: { id: string } }) =>
+    p.hatch.id === 'hendrickson'
+  );
   assertExists(hendrickson, 'Should predict Hendrickson at 54°F in April');
 });
 

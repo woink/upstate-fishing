@@ -35,7 +35,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "streams"],
               "query": [
-                {"key": "region", "value": "catskills"}
+                { "key": "region", "value": "catskills" }
               ]
             }
           }
@@ -49,7 +49,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "streams"],
               "query": [
-                {"key": "state", "value": "NY"}
+                { "key": "state", "value": "NY" }
               ]
             }
           }
@@ -101,7 +101,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "hatches"],
               "query": [
-                {"key": "order", "value": "mayfly"}
+                { "key": "order", "value": "mayfly" }
               ]
             }
           }
@@ -115,7 +115,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "hatches"],
               "query": [
-                {"key": "month", "value": "4"}
+                { "key": "month", "value": "4" }
               ]
             }
           }
