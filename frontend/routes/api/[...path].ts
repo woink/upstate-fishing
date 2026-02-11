@@ -6,9 +6,9 @@
  * that work regardless of where the user accesses the frontend from.
  */
 
-import { Handlers } from "$fresh/server.ts";
+import { Handlers } from '$fresh/server.ts';
 
-const BACKEND_URL = Deno.env.get("API_URL") ?? "http://localhost:8000";
+const BACKEND_URL = Deno.env.get('API_URL') ?? 'http://localhost:8000';
 
 export const handler: Handlers = {
   async GET(req, ctx) {
@@ -19,7 +19,7 @@ export const handler: Handlers = {
     try {
       const res = await fetch(backendUrl, {
         headers: {
-          "Accept": "application/json",
+          'Accept': 'application/json',
         },
       });
 
@@ -28,7 +28,7 @@ export const handler: Handlers = {
       return new Response(body, {
         status: res.status,
         headers: {
-          "Content-Type": res.headers.get("Content-Type") ?? "application/json",
+          'Content-Type': res.headers.get('Content-Type') ?? 'application/json',
         },
       });
     } catch (error) {
@@ -36,12 +36,12 @@ export const handler: Handlers = {
       return new Response(
         JSON.stringify({
           success: false,
-          error: "Backend unavailable",
+          error: 'Backend unavailable',
         }),
         {
           status: 502,
-          headers: { "Content-Type": "application/json" },
-        }
+          headers: { 'Content-Type': 'application/json' },
+        },
       );
     }
   },
@@ -54,10 +54,10 @@ export const handler: Handlers = {
     try {
       const body = await req.text();
       const res = await fetch(backendUrl, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": req.headers.get("Content-Type") ?? "application/json",
-          "Accept": "application/json",
+          'Content-Type': req.headers.get('Content-Type') ?? 'application/json',
+          'Accept': 'application/json',
         },
         body,
       });
@@ -67,7 +67,7 @@ export const handler: Handlers = {
       return new Response(responseBody, {
         status: res.status,
         headers: {
-          "Content-Type": res.headers.get("Content-Type") ?? "application/json",
+          'Content-Type': res.headers.get('Content-Type') ?? 'application/json',
         },
       });
     } catch (error) {
@@ -75,12 +75,12 @@ export const handler: Handlers = {
       return new Response(
         JSON.stringify({
           success: false,
-          error: "Backend unavailable",
+          error: 'Backend unavailable',
         }),
         {
           status: 502,
-          headers: { "Content-Type": "application/json" },
-        }
+          headers: { 'Content-Type': 'application/json' },
+        },
       );
     }
   },

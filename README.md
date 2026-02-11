@@ -1,11 +1,11 @@
 # Upstate NY/NJ Fishing Conditions App
 
-**Goal:** Help Ward know where to fish in upstate NY and NJ, combining stream conditions, hatch predictions, and local intel.
+**Goal:** Help Ward know where to fish in upstate NY and NJ, combining stream conditions, hatch
+predictions, and local intel.
 
 ## Status: MVP Frontend In Progress 🚧
 
-**Backend:** Complete ✓
-**Frontend:** Deno Fresh scaffold ready
+**Backend:** Complete ✓ **Frontend:** Deno Fresh scaffold ready
 
 ## Tech Stack
 
@@ -50,33 +50,35 @@ upstate-fishing-backend/
 
 ## API Endpoints
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/streams` | List all streams (filter by `?region=` or `?state=`) |
-| `GET /api/streams/:id` | Get stream details |
-| `GET /api/streams/:id/conditions` | Get current conditions + hatch predictions |
-| `GET /api/hatches` | List all hatches (filter by `?order=` or `?month=`) |
-| `GET /api/hatches/:id` | Get hatch details |
-| `GET /api/stations/:id` | Get USGS station readings |
-| `POST /api/predict` | Custom hatch prediction |
+| Endpoint                          | Description                                          |
+| --------------------------------- | ---------------------------------------------------- |
+| `GET /api/streams`                | List all streams (filter by `?region=` or `?state=`) |
+| `GET /api/streams/:id`            | Get stream details                                   |
+| `GET /api/streams/:id/conditions` | Get current conditions + hatch predictions           |
+| `GET /api/hatches`                | List all hatches (filter by `?order=` or `?month=`)  |
+| `GET /api/hatches/:id`            | Get hatch details                                    |
+| `GET /api/stations/:id`           | Get USGS station readings                            |
+| `POST /api/predict`               | Custom hatch prediction                              |
 
 ## Frontend Pages
 
-| Route | Description |
-|-------|-------------|
-| `/` | Today's top picks + quick links |
-| `/streams` | Browse all streams with conditions |
+| Route          | Description                        |
+| -------------- | ---------------------------------- |
+| `/`            | Today's top picks + quick links    |
+| `/streams`     | Browse all streams with conditions |
 | `/streams/:id` | Stream detail with full conditions |
-| `/map` | Interactive map with USGS sensors |
+| `/map`         | Interactive map with USGS sensors  |
 
 ## Covered Waters
 
 ### New York
+
 - **Catskills:** Beaverkill, Willowemoc, Esopus, Neversink
 - **Delaware:** East Branch, West Branch
 - **Croton:** East Branch, West Branch, Middle Branch
 
 ### New Jersey
+
 - **Raritan:** South Branch, North Branch, Main Stem
 - **Other:** Flat Brook, Pequest River
 

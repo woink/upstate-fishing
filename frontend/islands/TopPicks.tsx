@@ -1,23 +1,23 @@
-import { useSignal } from "@preact/signals";
-import { useEffect } from "preact/hooks";
-import type { StreamConditions } from "@shared/models/types.ts";
+import { useSignal } from '@preact/signals';
+import { useEffect } from 'preact/hooks';
+import type { StreamConditions } from '@shared/models/types.ts';
 
 interface TopPicksProps {
   apiUrl: string;
 }
 
 const qualityColors = {
-  excellent: "bg-green-100 border-green-500 text-green-800",
-  good: "bg-blue-100 border-blue-500 text-blue-800",
-  fair: "bg-yellow-100 border-yellow-500 text-yellow-800",
-  poor: "bg-red-100 border-red-500 text-red-800",
+  excellent: 'bg-green-100 border-green-500 text-green-800',
+  good: 'bg-blue-100 border-blue-500 text-blue-800',
+  fair: 'bg-yellow-100 border-yellow-500 text-yellow-800',
+  poor: 'bg-red-100 border-red-500 text-red-800',
 };
 
 const qualityLabels = {
-  excellent: "🎯 Excellent",
-  good: "👍 Good",
-  fair: "⚠️ Fair",
-  poor: "❌ Poor",
+  excellent: '🎯 Excellent',
+  good: '👍 Good',
+  fair: '⚠️ Fair',
+  poor: '❌ Poor',
 };
 
 export default function TopPicks({ apiUrl }: TopPicksProps) {
@@ -36,7 +36,7 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
         const streamsJson = await streamsRes.json();
 
         if (!streamsJson.success || !streamsJson.data) {
-          throw new Error("Failed to fetch streams");
+          throw new Error('Failed to fetch streams');
         }
 
         // Fetch conditions for each stream (in parallel, limited)
@@ -62,7 +62,7 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
 
         conditions.value = validConditions.slice(0, 3); // Top 3
       } catch (err) {
-        error.value = err instanceof Error ? err.message : "Failed to load";
+        error.value = err instanceof Error ? err.message : 'Failed to load';
       } finally {
         loading.value = false;
       }
@@ -73,24 +73,24 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
 
   if (loading.value) {
     return (
-      <div class="bg-white rounded-lg shadow p-8 text-center">
-        <div class="animate-pulse flex flex-col items-center">
-          <div class="w-12 h-12 bg-slate-200 rounded-full mb-4"></div>
-          <div class="h-4 bg-slate-200 rounded w-48"></div>
+      <div class='bg-white rounded-lg shadow p-8 text-center'>
+        <div class='animate-pulse flex flex-col items-center'>
+          <div class='w-12 h-12 bg-slate-200 rounded-full mb-4'></div>
+          <div class='h-4 bg-slate-200 rounded w-48'></div>
         </div>
-        <p class="text-slate-500 mt-4">Checking conditions...</p>
+        <p class='text-slate-500 mt-4'>Checking conditions...</p>
       </div>
     );
   }
 
   if (error.value) {
     return (
-      <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <p class="text-red-700">{error.value}</p>
+      <div class='bg-red-50 border border-red-200 rounded-lg p-6 text-center'>
+        <p class='text-red-700'>{error.value}</p>
         <button
-          type="button"
+          type='button'
           onClick={() => globalThis.location.reload()}
-          class="mt-2 text-red-600 underline"
+          class='mt-2 text-red-600 underline'
         >
           Retry
         </button>
@@ -100,16 +100,16 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
 
   if (conditions.value.length === 0) {
     return (
-      <div class="bg-slate-100 rounded-lg p-6 text-center">
-        <p class="text-slate-600">No conditions data available</p>
+      <div class='bg-slate-100 rounded-lg p-6 text-center'>
+        <p class='text-slate-600'>No conditions data available</p>
       </div>
     );
   }
 
   return (
     <div>
-      <h2 class="text-xl font-semibold text-slate-800 mb-4">🎣 Today's Top Picks</h2>
-      <div class="grid md:grid-cols-3 gap-4">
+      <h2 class='text-xl font-semibold text-slate-800 mb-4'>🎣 Today's Top Picks</h2>
+      <div class='grid md:grid-cols-3 gap-4'>
         {conditions.value.map((cond, i) => (
           <a
             key={cond.stream.id}
@@ -118,12 +118,12 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
               qualityColors[cond.fishingQuality]
             }`}
           >
-            <div class="flex items-start justify-between mb-2">
-              <h3 class="font-semibold">{cond.stream.name}</h3>
-              {i === 0 && <span class="text-lg">⭐</span>}
+            <div class='flex items-start justify-between mb-2'>
+              <h3 class='font-semibold'>{cond.stream.name}</h3>
+              {i === 0 && <span class='text-lg'>⭐</span>}
             </div>
 
-            <div class="text-sm space-y-1 mb-3">
+            <div class='text-sm space-y-1 mb-3'>
               {cond.stationData[0]?.waterTempF && (
                 <p>💧 Water: {cond.stationData[0].waterTempF}°F</p>
               )}
@@ -134,16 +134,16 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
             </div>
 
             {cond.predictedHatches.length > 0 && (
-              <div class="text-xs">
-                <span class="font-medium">Likely hatches: </span>
+              <div class='text-xs'>
+                <span class='font-medium'>Likely hatches:</span>
                 {cond.predictedHatches
                   .slice(0, 2)
                   .map((p) => p.hatch.commonName)
-                  .join(", ")}
+                  .join(', ')}
               </div>
             )}
 
-            <div class="mt-2 text-xs font-medium">
+            <div class='mt-2 text-xs font-medium'>
               {qualityLabels[cond.fishingQuality]}
             </div>
           </a>

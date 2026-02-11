@@ -1,6 +1,6 @@
-import { useSignal } from "@preact/signals";
-import { useEffect, useRef } from "preact/hooks";
-import type { Stream, StreamConditions } from "@shared/models/types.ts";
+import { useSignal } from '@preact/signals';
+import { useEffect, useRef } from 'preact/hooks';
+import type { Stream, StreamConditions } from '@shared/models/types.ts';
 
 interface StationMapProps {
   streams: Stream[];
@@ -8,10 +8,10 @@ interface StationMapProps {
 }
 
 const qualityColors = {
-  excellent: "#22c55e",
-  good: "#3b82f6",
-  fair: "#eab308",
-  poor: "#ef4444",
+  excellent: '#22c55e',
+  good: '#3b82f6',
+  fair: '#eab308',
+  poor: '#ef4444',
 };
 
 export default function StationMap({ streams, apiUrl }: StationMapProps) {
@@ -23,10 +23,10 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
   useEffect(() => {
     // Dynamically load Leaflet
     const loadLeaflet = async () => {
-      if (typeof L === "undefined") {
+      if (typeof L === 'undefined') {
         await new Promise<void>((resolve) => {
-          const script = document.createElement("script");
-          script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
           script.onload = () => resolve();
           document.head.appendChild(script);
         });
@@ -38,8 +38,8 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
       const map = L.map(mapRef.current).setView([41.8, -74.5], 8);
       mapInstance.current = map;
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap contributors",
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
       }).addTo(map);
 
       loaded.value = true;
@@ -69,12 +69,12 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
         [stream.coordinates.latitude, stream.coordinates.longitude],
         {
           radius: 10,
-          fillColor: "#64748b", // Default gray
-          color: "#475569",
+          fillColor: '#64748b', // Default gray
+          color: '#475569',
           weight: 2,
           opacity: 1,
           fillOpacity: 0.8,
-        }
+        },
       ).addTo(map);
 
       // Initial popup
@@ -115,9 +115,9 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
               <span style="color: #64748b; font-size: 12px">${stream.region} • ${stream.state}</span>
               <hr style="margin: 8px 0; border: none; border-top: 1px solid #e2e8f0">
               <div style="font-size: 13px">
-                ${waterTemp ? `💧 Water: <strong>${waterTemp}°F</strong><br>` : ""}
-                ${flow ? `🌊 Flow: <strong>${flow} cfs</strong><br>` : ""}
-                ${topHatch ? `🪰 ${topHatch}<br>` : ""}
+                ${waterTemp ? `💧 Water: <strong>${waterTemp}°F</strong><br>` : ''}
+                ${flow ? `🌊 Flow: <strong>${flow} cfs</strong><br>` : ''}
+                ${topHatch ? `🪰 ${topHatch}<br>` : ''}
               </div>
               <div style="margin-top: 8px">
                 <span style="
@@ -143,10 +143,10 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
   }, [loaded.value, streams, apiUrl]);
 
   return (
-    <div ref={mapRef} style={{ width: "100%", height: "100%" }}>
+    <div ref={mapRef} style={{ width: '100%', height: '100%' }}>
       {!loaded.value && (
-        <div class="flex items-center justify-center h-full bg-slate-100">
-          <div class="text-slate-500">Loading map...</div>
+        <div class='flex items-center justify-center h-full bg-slate-100'>
+          <div class='text-slate-500'>Loading map...</div>
         </div>
       )}
     </div>
@@ -155,5 +155,5 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
 
 // Declare Leaflet types
 declare global {
-  const L: typeof import("leaflet");
+  const L: typeof import('leaflet');
 }

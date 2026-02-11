@@ -1,6 +1,6 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
-import type { Stream } from "@shared/models/types.ts";
-import StreamList from "../../islands/StreamList.tsx";
+import { Handlers, PageProps } from '$fresh/server.ts';
+import type { Stream } from '@shared/models/types.ts';
+import StreamList from '../../islands/StreamList.tsx';
 
 interface StreamsPageData {
   streams: Stream[];
@@ -12,10 +12,10 @@ interface StreamsPageData {
 export const handler: Handlers<StreamsPageData> = {
   async GET(req, ctx) {
     const url = new URL(req.url);
-    const region = url.searchParams.get("region") ?? undefined;
-    const state = url.searchParams.get("state") ?? undefined;
+    const region = url.searchParams.get('region') ?? undefined;
+    const state = url.searchParams.get('state') ?? undefined;
 
-    const backendUrl = Deno.env.get("API_URL") ?? "http://localhost:8000";
+    const backendUrl = Deno.env.get('API_URL') ?? 'http://localhost:8000';
 
     let apiEndpoint = `${backendUrl}/api/streams`;
     if (region) {
@@ -32,25 +32,25 @@ export const handler: Handlers<StreamsPageData> = {
         streams: json.data ?? [],
         region,
         state,
-        apiUrl: "", // Relative URL for client-side fetches via proxy
+        apiUrl: '', // Relative URL for client-side fetches via proxy
       });
     } catch (error) {
-      console.error("Failed to fetch streams:", error);
+      console.error('Failed to fetch streams:', error);
       return ctx.render({
         streams: [],
         region,
         state,
-        apiUrl: "", // Relative URL for client-side fetches via proxy
+        apiUrl: '', // Relative URL for client-side fetches via proxy
       });
     }
   },
 };
 
 const regionLabels: Record<string, string> = {
-  catskills: "Catskills",
-  delaware: "Delaware System",
-  croton: "Croton Watershed",
-  raritan: "Raritan / NJ",
+  catskills: 'Catskills',
+  delaware: 'Delaware System',
+  croton: 'Croton Watershed',
+  raritan: 'Raritan / NJ',
 };
 
 export default function StreamsPage({ data }: PageProps<StreamsPageData>) {
@@ -60,17 +60,17 @@ export default function StreamsPage({ data }: PageProps<StreamsPageData>) {
     ? `${regionLabels[region] ?? region} Streams`
     : state
     ? `${state} Streams`
-    : "All Streams";
+    : 'All Streams';
 
   return (
     <div>
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-slate-800">{title}</h1>
-        <div class="flex gap-2">
+      <div class='flex items-center justify-between mb-6'>
+        <h1 class='text-2xl font-bold text-slate-800'>{title}</h1>
+        <div class='flex gap-2'>
           <a
-            href="/streams"
+            href='/streams'
             class={`px-3 py-1 rounded text-sm ${
-              !region && !state ? "bg-forest-600 text-white" : "bg-slate-200 text-slate-700"
+              !region && !state ? 'bg-forest-600 text-white' : 'bg-slate-200 text-slate-700'
             }`}
           >
             All
@@ -80,7 +80,7 @@ export default function StreamsPage({ data }: PageProps<StreamsPageData>) {
               key={key}
               href={`/streams?region=${key}`}
               class={`px-3 py-1 rounded text-sm ${
-                region === key ? "bg-forest-600 text-white" : "bg-slate-200 text-slate-700"
+                region === key ? 'bg-forest-600 text-white' : 'bg-slate-200 text-slate-700'
               }`}
             >
               {label}
