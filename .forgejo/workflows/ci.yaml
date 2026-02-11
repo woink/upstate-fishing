@@ -6,7 +6,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Step 1
-        run: echo "Step 1"
-      - name: Step 2
-        run: echo "Step 2"
+      - name: Clone repo
+        run: git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git
+      - name: List files
+        run: ls -la upstate-fishing/
