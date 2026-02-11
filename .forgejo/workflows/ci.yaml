@@ -12,12 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout (manual)
+      - name: Checkout
         run: |
-          git clone --depth 1 \
-            https://forgejo.yak-solfeggio.ts.net/${{ github.repository }}.git .
-          git fetch origin ${{ github.sha }}
-          git checkout ${{ github.sha }}
+          git clone --depth 1 http://100.78.158.46:3000/${{ github.repository }}.git .
+          git fetch origin ${{ github.sha }} || true
+          git checkout ${{ github.sha }} || git checkout ${{ github.ref_name }}
 
       - name: Check Deno version
         run: deno --version
