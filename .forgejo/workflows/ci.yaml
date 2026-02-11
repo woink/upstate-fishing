@@ -12,8 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout
-        uses: https://github.com/actions/checkout@v4
+      - name: Checkout (manual)
+        run: |
+          git clone --depth 1 --branch ${{ github.head_ref || github.ref_name }} \
+            http://localhost:3000/${{ github.repository }}.git .
+          git checkout ${{ github.sha }}
 
       - name: Check Deno version
         run: deno --version
