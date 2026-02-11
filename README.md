@@ -110,5 +110,7 @@ deno task lint
 # Frontend
 API_URL=http://localhost:8000   # Backend URL
 ```
+
 # CI test 1770818435
+
 # CI test 1770818440
