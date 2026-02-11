@@ -22,3 +22,14 @@ Thumbs.db
 *.log
 
 # Lock files (optional - Deno uses deno.lock which we'll keep)
+
+# OpenClaw workspace files
+AGENTS.md
+BOOTSTRAP.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TOOLS.md
+USER.md
+MEMORY.md
+memory/
