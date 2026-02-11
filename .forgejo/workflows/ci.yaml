@@ -9,4 +9,6 @@ jobs:
       - name: Checkout
         run: |
           git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git .
-          ls -la
+
+      - name: Deno version
+        run: deno --version
