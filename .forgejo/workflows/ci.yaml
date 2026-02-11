@@ -3,6 +3,14 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: repo
     steps:
       - run: git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
-      - run: ls -la repo/
+        working-directory: .
+      - run: deno --version
+      - run: deno fmt --check
+      - run: deno lint
+      - run: deno check src/**/*.ts
+      - run: deno test --allow-net --allow-env --allow-read
