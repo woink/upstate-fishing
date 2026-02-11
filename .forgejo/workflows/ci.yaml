@@ -1,7 +1,30 @@
 name: CI
-on: [push]
+
+on:
+  push:
+    branches: [main, epic/*, feature/*]
+  pull_request:
+    branches: [main, epic/*]
+
 jobs:
   test:
+    name: Test & Lint
     runs-on: ubuntu-latest
     steps:
-      - run: git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo && cd repo && deno fmt --check
+      - name: Checkout
+        run: git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
+
+      - name: Deno version
+        run: deno --version
+
+      - name: Format check
+        run: cd repo && deno fmt --check
+
+      - name: Lint
+        run: cd repo && deno lint
+
+      - name: Type check
+        run: cd repo && deno check src/**/*.ts
+
+      - name: Tests
+        run: cd repo && deno test --allow-net --allow-env --allow-read
