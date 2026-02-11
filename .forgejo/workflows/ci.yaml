@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        run: git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git .
 
       - name: Deno version
         run: deno --version
