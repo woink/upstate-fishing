@@ -4,6 +4,7 @@
   "exports": "./src/mod.ts",
   "tasks": {
     "dev": "deno run --watch --allow-net --allow-env --allow-read --allow-write --unstable-kv src/main.ts",
+    "dev:frontend": "cd frontend && deno task dev",
     "test": "deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv",
     "check": "deno check src/**/*.ts",
     "lint": "deno lint",
