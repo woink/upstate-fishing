@@ -12,7 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        run: git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
+        run: |
+          git clone http://100.78.158.46:3000/ward/upstate-fishing.git repo
+          cd repo
+          git fetch origin $GITHUB_SHA --depth=1 || git fetch origin $GITHUB_REF --depth=1 || true
+          git checkout $GITHUB_SHA || git checkout $GITHUB_HEAD_REF || git checkout main
 
       - name: Deno version
         run: deno --version
