@@ -12,22 +12,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        run: |
-          git clone http://100.78.158.46:3000/ward/upstate-fishing.git repo
-          cd repo
-          git checkout $GITHUB_HEAD_REF 2>/dev/null || git checkout $GITHUB_REF_NAME 2>/dev/null || true
+        uses: actions/checkout@v4
 
-      - name: Deno version
-        run: deno --version
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/deno
+            ~/.deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.json', 'deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
 
       - name: Format check
-        run: cd repo && deno fmt --check
+        run: deno fmt --check
 
       - name: Lint
-        run: cd repo && deno lint
+        run: deno lint
 
       - name: Type check
-        run: cd repo && deno check src/**/*.ts
+        run: deno check src/**/*.ts
 
       - name: Tests
-        run: cd repo && deno test --allow-net --allow-env --allow-read
+        run: deno test --allow-net --allow-env --allow-read
