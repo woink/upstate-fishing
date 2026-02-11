@@ -4,6 +4,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
+      - run: git clone http://100.78.158.46:3000/ward/upstate-fishing.git repo && cd repo && git checkout $GITHUB_REF_NAME
       - run: cd repo && deno fmt --check
       - run: cd repo && deno lint
