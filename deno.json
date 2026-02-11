@@ -33,6 +33,7 @@
   "lint": {
     "rules": {
       "tags": ["recommended"]
-    }
+    },
+    "exclude": ["frontend/_fresh"]
   }
 }

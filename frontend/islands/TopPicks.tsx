@@ -88,7 +88,8 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
       <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
         <p class="text-red-700">{error.value}</p>
         <button
-          onClick={() => window.location.reload()}
+          type="button"
+          onClick={() => globalThis.location.reload()}
           class="mt-2 text-red-600 underline"
         >
           Retry

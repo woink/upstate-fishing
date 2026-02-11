@@ -55,6 +55,7 @@ export default function StreamConditionsCard({
             </p>
           </div>
           <button
+            type="button"
             onClick={refresh}
             disabled={refreshing.value}
             class="p-2 rounded-full hover:bg-white/50 transition disabled:opacity-50"
@@ -162,8 +163,8 @@ export default function StreamConditionsCard({
                   <p class="text-sm text-slate-600 mt-1">{pred.reasoning}</p>
                   <div class="text-xs text-slate-500 mt-2">
                     <span class="capitalize">{pred.hatch.order}</span>
-                    {" • "}Hook sizes: {pred.hatch.hookSizes.join(", ")}
-                    {" • "}{pred.hatch.timeOfDay} emergence
+                    {" "}• Hook sizes: {pred.hatch.hookSizes.join(", ")}
+                    {" "}• {pred.hatch.timeOfDay} emergence
                   </div>
                 </div>
                 <div class="text-right">
