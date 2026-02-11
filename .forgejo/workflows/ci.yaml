@@ -6,9 +6,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git .
-      - run: deno --version
-      - run: deno fmt --check
-      - run: deno lint
-      - run: deno check src/**/*.ts
-      - run: deno test --allow-net --allow-env --allow-read
+      - run: |
+          git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
+          cd repo
+          deno --version
+          deno fmt --check
+          deno lint
+          deno check src/**/*.ts
+          deno test --allow-net --allow-env --allow-read
