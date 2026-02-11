@@ -6,17 +6,19 @@ on:
   pull_request:
     branches: [main, epic/*]
 
+env:
+  REPO_URL: http://100.78.158.46:3000/ward/upstate-fishing.git
+
 jobs:
   test:
     name: Test & Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
+        env:
+          REF: ${{ github.head_ref || github.ref_name }}
         run: |
-          git clone http://100.78.158.46:3000/ward/upstate-fishing.git repo
-          cd repo
-          git fetch origin $GITHUB_SHA --depth=1 || git fetch origin $GITHUB_REF --depth=1 || true
-          git checkout $GITHUB_SHA || git checkout $GITHUB_HEAD_REF || git checkout main
+          git clone --branch "$REF" --depth 1 "$REPO_URL" repo || git clone --depth 1 "$REPO_URL" repo
 
       - name: Deno version
         run: deno --version
