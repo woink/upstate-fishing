@@ -1,9 +1,37 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, epic/*, feature/*]
+  pull_request:
+    branches: [main, epic/*]
 
 jobs:
   test:
+    name: Test & Lint
     runs-on: ubuntu-latest
+    
     steps:
-      - run: echo "Hello World"
+      - name: Checkout code
+        run: |
+          git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git .
+          git fetch origin "$GITHUB_SHA" --depth=1 || true
+          git checkout "$GITHUB_SHA" || git checkout "$GITHUB_REF_NAME"
+
+      - name: Show files
+        run: ls -la
+
+      - name: Check Deno
+        run: deno --version
+
+      - name: Verify formatting
+        run: deno fmt --check
+
+      - name: Run linter
+        run: deno lint
+
+      - name: Type check
+        run: deno check src/**/*.ts
+
+      - name: Run tests
+        run: deno test --allow-net --allow-env --allow-read
