@@ -12,31 +12,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        run: |
+          git clone "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git" repo
+          cd repo
+          git fetch origin "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          git checkout "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}" 2>/dev/null || git checkout "$GITHUB_SHA" || true
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
-      - name: Cache Deno dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/deno
-            ~/.deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('deno.json', 'deno.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-
+      - name: Deno version
+        run: deno --version
 
       - name: Format check
-        run: deno fmt --check
+        run: cd repo && deno fmt --check
 
       - name: Lint
-        run: deno lint
+        run: cd repo && deno lint
 
       - name: Type check
-        run: deno check src/**/*.ts
+        run: cd repo && deno check src/**/*.ts
 
       - name: Tests
-        run: deno test --allow-net --allow-env --allow-read
+        run: cd repo && deno test --allow-net --allow-env --allow-read
