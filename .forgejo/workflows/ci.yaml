@@ -6,6 +6,5 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo "Hello"
-          echo "World"
+      - run: echo "Step 1"
+      - run: echo "Step 2"
