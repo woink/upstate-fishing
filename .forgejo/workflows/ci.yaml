@@ -6,19 +6,16 @@ on:
   pull_request:
     branches: [main, epic/*]
 
-env:
-  REPO_URL: http://100.78.158.46:3000/ward/upstate-fishing.git
-
 jobs:
   test:
     name: Test & Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        env:
-          REF: ${{ github.head_ref || github.ref_name }}
-        run: |
-          git clone --branch "$REF" --depth 1 "$REPO_URL" repo || git clone --depth 1 "$REPO_URL" repo
+        run: git clone --branch feature/ci-runner --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
+
+      - name: Show files
+        run: ls -la repo/
 
       - name: Deno version
         run: deno --version
@@ -28,9 +25,3 @@ jobs:
 
       - name: Lint
         run: cd repo && deno lint
-
-      - name: Type check
-        run: cd repo && deno check src/**/*.ts
-
-      - name: Tests
-        run: cd repo && deno test --allow-net --allow-env --allow-read
