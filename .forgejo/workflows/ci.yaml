@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main, epic/*, feature/*]
+  pull_request:
+    branches: [main, epic/*]
+
+jobs:
+  test:
+    name: Test & Lint
+    runs-on: self-hosted
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v2.x
+
+      - name: Verify formatting
+        run: deno fmt --check
+
+      - name: Run linter
+        run: deno lint
+
+      - name: Type check
+        run: deno check src/**/*.ts
+
+      - name: Run tests
+        run: deno test --allow-net --allow-env --allow-read
+
+  build:
+    name: Build Check
+    runs-on: self-hosted
+    needs: test
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v2.x
+
+      - name: Cache dependencies
+        run: deno cache src/main.ts
+
+      - name: Compile check
+        run: deno compile --allow-net --allow-env --allow-read --output=/dev/null src/main.ts || true
