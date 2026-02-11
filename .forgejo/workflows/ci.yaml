@@ -6,13 +6,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Show environment
-        run: |
-          echo "GITHUB_SHA: $GITHUB_SHA"
-          echo "GITHUB_REF: $GITHUB_REF"
-          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
-      
-      - name: Test git clone
-        run: |
-          git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git test-repo
-          ls -la test-repo/
+      - run: |
+          echo "Hello"
+          echo "World"
