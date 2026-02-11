@@ -1,8 +1,18 @@
 name: CI
-on: push
+
+on:
+  push:
+    branches: [main, epic/*, feature/*]
+  pull_request:
+    branches: [main, epic/*]
+
 jobs:
   test:
+    name: Test & Lint
     runs-on: ubuntu-latest
     steps:
-      - run: git clone --branch feature/ci-runner --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
+      - run: git clone --branch ${GITHUB_HEAD_REF:-$GITHUB_REF_NAME} --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo || git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
       - run: cd repo && deno fmt --check
+      - run: cd repo && deno lint
+      - run: cd repo && deno check src/**/*.ts
+      - run: cd repo && deno test --allow-net --allow-env --allow-read
