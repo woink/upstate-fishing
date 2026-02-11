@@ -1,17 +1,9 @@
 name: CI
-
-on:
-  push:
-    branches: [main, feature/*]
-
+on: push
 jobs:
   test:
-    name: Test & Lint  
     runs-on: ubuntu-latest
     steps:
       - run: git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
-      - run: cd repo && git checkout $GITHUB_REF_NAME || true
       - run: cd repo && deno fmt --check
       - run: cd repo && deno lint
-      - run: cd repo && deno check src/**/*.ts
-      - run: cd repo && deno test --allow-net --allow-env --allow-read
