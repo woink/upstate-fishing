@@ -5,4 +5,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
-      - run: which deno && deno --version
+      - run: deno --version
+      - run: cd repo && deno fmt --check
