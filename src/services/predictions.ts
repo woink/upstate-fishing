@@ -75,8 +75,7 @@ export class PredictionService {
       const timeScore = this.scoreTimeOfDay(hour, hatch);
 
       // Combined probability
-      const rawProbability =
-        tempScore * this.config.tempWeight +
+      const rawProbability = tempScore * this.config.tempWeight +
         monthScore * this.config.monthWeight +
         weatherScore * this.config.weatherWeight;
 
@@ -232,9 +231,13 @@ export class PredictionService {
 
     // Temperature reasoning
     if (waterTempF >= hatch.minTempF && waterTempF <= hatch.maxTempF) {
-      parts.push(`Water temp (${waterTempF}°F) is in optimal range (${hatch.minTempF}-${hatch.maxTempF}°F)`);
+      parts.push(
+        `Water temp (${waterTempF}°F) is in optimal range (${hatch.minTempF}-${hatch.maxTempF}°F)`,
+      );
     } else {
-      parts.push(`Water temp (${waterTempF}°F) is near range (${hatch.minTempF}-${hatch.maxTempF}°F)`);
+      parts.push(
+        `Water temp (${waterTempF}°F) is near range (${hatch.minTempF}-${hatch.maxTempF}°F)`,
+      );
     }
 
     // Month reasoning

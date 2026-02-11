@@ -1,11 +1,11 @@
 # Upstate NY/NJ Fishing Conditions API
 
-**Goal:** Build an app to help Ward know where to fish in upstate NY and NJ, combining stream conditions, hatch predictions, and local intel.
+**Goal:** Build an app to help Ward know where to fish in upstate NY and NJ, combining stream
+conditions, hatch predictions, and local intel.
 
 ## Status: MVP Backend Complete ✓
 
-**Last session:** 2026-02-06
-**Next up:** Fresh frontend for "where should I fish today?"
+**Last session:** 2026-02-06 **Next up:** Fresh frontend for "where should I fish today?"
 
 ## Tech Stack
 
@@ -36,24 +36,26 @@ deno task fmt
 
 ## API Endpoints
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/streams` | List all streams (filter by `?region=` or `?state=`) |
-| `GET /api/streams/:id` | Get stream details |
-| `GET /api/streams/:id/conditions` | Get current conditions + hatch predictions |
-| `GET /api/hatches` | List all hatches (filter by `?order=` or `?month=`) |
-| `GET /api/hatches/:id` | Get hatch details |
-| `GET /api/stations/:id` | Get USGS station readings |
-| `POST /api/predict` | Custom hatch prediction |
+| Endpoint                          | Description                                          |
+| --------------------------------- | ---------------------------------------------------- |
+| `GET /api/streams`                | List all streams (filter by `?region=` or `?state=`) |
+| `GET /api/streams/:id`            | Get stream details                                   |
+| `GET /api/streams/:id/conditions` | Get current conditions + hatch predictions           |
+| `GET /api/hatches`                | List all hatches (filter by `?order=` or `?month=`)  |
+| `GET /api/hatches/:id`            | Get hatch details                                    |
+| `GET /api/stations/:id`           | Get USGS station readings                            |
+| `POST /api/predict`               | Custom hatch prediction                              |
 
 ## Covered Waters
 
 ### New York
+
 - **Catskills:** Beaverkill, Willowemoc, Esopus, Neversink
 - **Delaware:** East Branch, West Branch
 - **Croton:** East Branch, West Branch, Middle Branch
 
 ### New Jersey
+
 - **Raritan:** South Branch, North Branch, Main Stem
 - **Other:** Flat Brook, Pequest River
 
@@ -62,6 +64,7 @@ deno task fmt
 ### ✅ Confirmed APIs
 
 #### USGS Water Data API
+
 - **URL:** https://api.waterdata.usgs.gov/
 - **Cost:** Free
 - **Data:** Real-time streamflow, gage height, water temperature, historical stats
@@ -69,12 +72,14 @@ deno task fmt
 - **Format:** REST API, JSON
 
 Key endpoints:
+
 - `/observations` — real-time measurements
 - `/daily-data` — historical daily values
 - `/monitoring-locations` — site metadata
 - `/time-series-metadata` — thresholds, units, date ranges
 
 #### NY DEC Open Data (Socrata)
+
 - **URL:** https://data.ny.gov
 - **Cost:** Free
 - **Data:** Trout stocking schedules (brook, brown, rainbow)
@@ -87,20 +92,26 @@ Also: DECinfo Locator for wild/stocked stream classifications
 ### 🔍 Needs More Research
 
 #### Hatch Information
+
 No centralized API exists. Options:
+
 1. Build predictive model from water temp + time of year + region
 2. Scrape regional fly shop reports
 3. Static hatch chart data per watershed
 4. Partner with local shops
 
 #### Fly Shop Directory
+
 No API. Options:
+
 - Google Places API
 - Yelp Fusion API
 - Manual curation (finite number in upstate NY)
 
 #### Weather Data
+
 Needed for hatch prediction. Options:
+
 - OpenWeatherMap
 - Weather.gov API (free, official)
 - Tomorrow.io
@@ -118,6 +129,7 @@ Needed for hatch prediction. Options:
 ## Key Insight: Hatch Prediction is Buildable
 
 No API exists for hatch data, but we can BUILD a prediction model from:
+
 1. **USGS water temp** (real-time)
 2. **Weather.gov forecast** (air temp, cloud cover, precip)
 3. **Time of year**
@@ -128,6 +140,7 @@ See `research/hatch-data.md` for threshold data.
 ## Architecture Ideas
 
 ### v1 MVP
+
 ```
 ┌─────────────┐     ┌──────────────┐     ┌─────────────────┐
 │ USGS API    │────▶│              │     │                 │
@@ -147,6 +160,7 @@ See `research/hatch-data.md` for threshold data.
 ```
 
 ### Tech Stack Options
+
 - **Backend:** Deno/TypeScript (familiar), or Rust (learning)
 - **Data:** SQLite for caching, JSON for hatch rules
 - **Frontend:** Simple web app or CLI first

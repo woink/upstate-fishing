@@ -4,7 +4,7 @@
 
 import { Hono } from '@hono/hono';
 import { z } from 'zod';
-import { STREAMS, getStreamById, getStreamsByRegion, getStreamsByState } from '../data/streams.ts';
+import { getStreamById, getStreamsByRegion, getStreamsByState, STREAMS } from '../data/streams.ts';
 import { HATCHES } from '../data/hatches.ts';
 import { cachedUSGSService } from '../services/cached-usgs.ts';
 import { cachedWeatherService } from '../services/cached-weather.ts';
@@ -299,27 +299,27 @@ api.post('/predict', async (c) => {
     // Build mock station data if temp provided
     const stationData = waterTempF
       ? [{
-          stationId: 'custom',
-          stationName: 'Custom Input',
-          timestamp: new Date().toISOString(),
-          waterTempF,
-          waterTempC: (waterTempF - 32) * 5 / 9,
-          dischargeCfs: null,
-          gageHeightFt: null,
-        }]
+        stationId: 'custom',
+        stationName: 'Custom Input',
+        timestamp: new Date().toISOString(),
+        waterTempF,
+        waterTempC: (waterTempF - 32) * 5 / 9,
+        dischargeCfs: null,
+        gageHeightFt: null,
+      }]
       : [];
 
     // Build mock weather if provided
     const weather = airTempF
       ? {
-          timestamp: new Date().toISOString(),
-          airTempF,
-          cloudCoverPercent: cloudCoverPercent ?? 50,
-          precipProbability: precipProbability ?? 0,
-          windSpeedMph: 5,
-          shortForecast: 'Custom conditions',
-          isDaylight: true,
-        }
+        timestamp: new Date().toISOString(),
+        airTempF,
+        cloudCoverPercent: cloudCoverPercent ?? 50,
+        precipProbability: precipProbability ?? 0,
+        windSpeedMph: 5,
+        shortForecast: 'Custom conditions',
+        isDaylight: true,
+      }
       : null;
 
     const predictions = predictionService.predictHatches(

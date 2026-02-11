@@ -77,13 +77,14 @@ export class WeatherService {
    */
   async getHourlyForecast(coords: Coordinates): Promise<HourlyForecast> {
     const grid = await this.getGridpoint(coords);
-    const forecastUrl = `${this.baseUrl}/gridpoints/${grid.gridId}/${grid.gridX},${grid.gridY}/forecast/hourly`;
+    const forecastUrl =
+      `${this.baseUrl}/gridpoints/${grid.gridId}/${grid.gridX},${grid.gridY}/forecast/hourly`;
 
     const response = await this.fetch(forecastUrl);
     const parsed = NWSForecastResponseSchema.parse(response);
 
     // Also fetch gridpoints for sky cover data
-    let skyCoverMap: Map<string, number> = new Map();
+    const skyCoverMap: Map<string, number> = new Map();
     try {
       const gridpointsUrl = `${this.baseUrl}/gridpoints/${grid.gridId}/${grid.gridX},${grid.gridY}`;
       const gridpointsResponse = await this.fetch(gridpointsUrl);
@@ -104,11 +105,14 @@ export class WeatherService {
 
     const periods: WeatherConditions[] = parsed.properties.periods.map((period) => {
       const startTime = period.startTime;
-      const cloudCover = skyCoverMap.get(startTime) ?? this.estimateCloudCover(period.shortForecast);
+      const cloudCover = skyCoverMap.get(startTime) ??
+        this.estimateCloudCover(period.shortForecast);
 
       return {
         timestamp: startTime,
-        airTempF: period.temperatureUnit === 'F' ? period.temperature : this.celsiusToFahrenheit(period.temperature),
+        airTempF: period.temperatureUnit === 'F'
+          ? period.temperature
+          : this.celsiusToFahrenheit(period.temperature),
         cloudCoverPercent: cloudCover,
         precipProbability: period.probabilityOfPrecipitation?.value ?? 0,
         windSpeedMph: this.parseWindSpeed(period.windSpeed),
@@ -143,7 +147,9 @@ export class WeatherService {
     const cached = this.gridCache.get(cacheKey);
     if (cached) return cached;
 
-    const url = `${this.baseUrl}/points/${coords.latitude.toFixed(4)},${coords.longitude.toFixed(4)}`;
+    const url = `${this.baseUrl}/points/${coords.latitude.toFixed(4)},${
+      coords.longitude.toFixed(4)
+    }`;
     const response = await this.fetch(url);
     const parsed = NWSPointsResponseSchema.parse(response);
 
