@@ -219,7 +219,7 @@ describe('CachedWeatherService', () => {
   it('should use coordinate-based cache key', () => {
     const coords = { latitude: 41.9628, longitude: -74.3051 };
     const key = `weather:${coords.latitude.toFixed(4)},${coords.longitude.toFixed(4)}`;
-    
+
     assertEquals(key, 'weather:41.9628,-74.3051');
   });
 });

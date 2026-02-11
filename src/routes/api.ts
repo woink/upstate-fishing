@@ -121,17 +121,25 @@ api.get('/streams/:id/conditions', async (c) => {
     );
 
     // Add cache headers - use shorter TTL (USGS)
-    const cacheHeaders = makeCacheHeaders(allCached, TTL.USGS_SECONDS, allCached ? earliestCachedAt : null);
+    const cacheHeaders = makeCacheHeaders(
+      allCached,
+      TTL.USGS_SECONDS,
+      allCached ? earliestCachedAt : null,
+    );
 
-    return c.json({
-      success: true,
-      data: conditions,
-      cache: {
-        usgs: usgsResult.cached ? 'HIT' : 'MISS',
-        weather: stream.coordinates ? (weatherCached ? 'HIT' : 'MISS') : 'N/A',
+    return c.json(
+      {
+        success: true,
+        data: conditions,
+        cache: {
+          usgs: usgsResult.cached ? 'HIT' : 'MISS',
+          weather: stream.coordinates ? (weatherCached ? 'HIT' : 'MISS') : 'N/A',
+        },
+        timestamp: new Date().toISOString(),
       },
-      timestamp: new Date().toISOString(),
-    }, 200, cacheHeaders);
+      200,
+      cacheHeaders,
+    );
   } catch (err) {
     console.error(`Error fetching conditions for ${stream.name}:`, err);
     return c.json(
@@ -236,12 +244,16 @@ api.get('/stations/:id', async (c) => {
     // Add cache headers
     const cacheHeaders = makeCacheHeaders(result.cached, TTL.USGS_SECONDS, result.cachedAt);
 
-    return c.json({
-      success: true,
-      data: result.data[0],
-      cache: result.cached ? 'HIT' : 'MISS',
-      timestamp: new Date().toISOString(),
-    }, 200, cacheHeaders);
+    return c.json(
+      {
+        success: true,
+        data: result.data[0],
+        cache: result.cached ? 'HIT' : 'MISS',
+        timestamp: new Date().toISOString(),
+      },
+      200,
+      cacheHeaders,
+    );
   } catch (err) {
     return c.json(
       {

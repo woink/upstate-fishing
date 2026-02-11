@@ -7,7 +7,7 @@
 
 import type { StationData } from '../models/types.ts';
 import { cacheService, makeUSGSKey, TTL } from './cache.ts';
-import { USGSService, USGS_PARAMS } from './usgs.ts';
+import { USGS_PARAMS, USGSService } from './usgs.ts';
 
 export interface CachedUSGSResult {
   data: StationData[];
