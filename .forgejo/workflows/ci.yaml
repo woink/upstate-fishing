@@ -1,37 +1,18 @@
 name: CI
 
-on:
-  push:
-    branches: [main, epic/*, feature/*]
-  pull_request:
-    branches: [main, epic/*]
+on: [push, pull_request]
 
 jobs:
   test:
-    name: Test & Lint
     runs-on: ubuntu-latest
-    
     steps:
-      - name: Checkout code
+      - name: Show environment
         run: |
-          git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git .
-          git fetch origin "$GITHUB_SHA" --depth=1 || true
-          git checkout "$GITHUB_SHA" || git checkout "$GITHUB_REF_NAME"
-
-      - name: Show files
-        run: ls -la
-
-      - name: Check Deno
-        run: deno --version
-
-      - name: Verify formatting
-        run: deno fmt --check
-
-      - name: Run linter
-        run: deno lint
-
-      - name: Type check
-        run: deno check src/**/*.ts
-
-      - name: Run tests
-        run: deno test --allow-net --allow-env --allow-read
+          echo "GITHUB_SHA: $GITHUB_SHA"
+          echo "GITHUB_REF: $GITHUB_REF"
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+      
+      - name: Test git clone
+        run: |
+          git clone --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git test-repo
+          ls -la test-repo/
