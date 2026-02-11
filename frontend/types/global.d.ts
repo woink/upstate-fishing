@@ -1,7 +1,18 @@
 /**
  * Global type declarations for the frontend
+ *
+ * This file contains type declarations for global variables and external
+ * libraries loaded via CDN that are not available at compile time.
  */
 
+/**
+ * Leaflet Map Library Types
+ *
+ * Leaflet is loaded dynamically via CDN in the browser.
+ * These type stubs provide basic type safety for our usage.
+ *
+ * @see https://leafletjs.com/reference.html
+ */
 declare namespace L {
   interface LatLngExpression {
     lat?: number;
@@ -53,7 +64,27 @@ declare namespace L {
     addTo(map: Map): this;
   }
 
-  function map(element: unknown, options?: MapOptions): Map;
+  /**
+   * Create a new Leaflet map instance
+   */
+  function map(element: HTMLElement | string, options?: MapOptions): Map;
+
+  /**
+   * Create a tile layer (e.g., OpenStreetMap tiles)
+   */
   function tileLayer(urlTemplate: string, options?: TileLayerOptions): TileLayer;
-  function circleMarker(latlng: [number, number], options?: CircleMarkerOptions): CircleMarker;
+
+  /**
+   * Create a circle marker at a position
+   */
+  function circleMarker(
+    latlng: [number, number],
+    options?: CircleMarkerOptions,
+  ): CircleMarker;
 }
+
+/**
+ * Declare L as a global constant
+ * This allows TypeScript to recognize `L.map()`, `L.tileLayer()`, etc.
+ */
+declare const L: typeof L;
