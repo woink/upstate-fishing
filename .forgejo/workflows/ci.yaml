@@ -12,23 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        run: |
-          git clone "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git" repo
-          cd repo
-          git fetch origin "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-          git checkout "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}" 2>/dev/null || git checkout "$GITHUB_SHA" || true
+        uses: actions/checkout@v4
 
       - name: Deno version
         run: deno --version
 
       - name: Format check
-        run: cd repo && deno fmt --check
+        run: deno fmt --check
 
       - name: Lint
-        run: cd repo && deno lint
+        run: deno lint
 
       - name: Type check
-        run: cd repo && deno check src/**/*.ts
+        run: deno check src/**/*.ts
 
       - name: Tests
-        run: cd repo && deno test --allow-net --allow-env --allow-read
+        run: deno test --allow-net --allow-env --allow-read
