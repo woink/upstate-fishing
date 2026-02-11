@@ -84,7 +84,7 @@ export class WeatherService {
     const parsed = NWSForecastResponseSchema.parse(response);
 
     // Also fetch gridpoints for sky cover data
-    let skyCoverMap: Map<string, number> = new Map();
+    const skyCoverMap: Map<string, number> = new Map();
     try {
       const gridpointsUrl = `${this.baseUrl}/gridpoints/${grid.gridId}/${grid.gridX},${grid.gridY}`;
       const gridpointsResponse = await this.fetch(gridpointsUrl);
