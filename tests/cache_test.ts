@@ -2,8 +2,8 @@
  * Cache service tests
  */
 
-import { assertEquals, assertExists } from 'jsr:@std/assert';
-import { afterAll, beforeAll, describe, it } from 'jsr:@std/testing/bdd';
+import { assertEquals, assertExists } from '@std/assert';
+import { afterAll, beforeAll, describe, it } from '@std/testing/bdd';
 import {
   CacheService,
   makeCacheHeaders,
@@ -135,7 +135,7 @@ describe('CacheService with Deno KV', () => {
     assertEquals(after, null);
   });
 
-  it('should calculate hit rate', async () => {
+  it('should calculate hit rate', () => {
     const stats = cache.getStats();
     if (stats.hits + stats.misses > 0) {
       assertEquals(stats.hitRate, stats.hits / (stats.hits + stats.misses));

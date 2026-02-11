@@ -2,8 +2,8 @@
  * Cached services tests
  */
 
-import { assertEquals, assertExists } from 'jsr:@std/assert';
-import { afterAll, beforeAll, describe, it } from 'jsr:@std/testing/bdd';
+import { assertEquals, assertExists } from '@std/assert';
+import { afterAll, beforeAll, describe, it } from '@std/testing/bdd';
 import { CachedUSGSService } from '../src/services/cached-usgs.ts';
 import { CachedWeatherService } from '../src/services/cached-weather.ts';
 import { cacheService, makeUSGSKey, makeWeatherKey } from '../src/services/cache.ts';
@@ -27,12 +27,12 @@ class MockUSGSService {
     },
   ];
 
-  async getInstantaneousValues(
+  getInstantaneousValues(
     stationIds: string[],
     _params: string[],
   ): Promise<StationData[]> {
     this.callCount++;
-    return this.mockData.filter((d) => stationIds.includes(d.stationId));
+    return Promise.resolve(this.mockData.filter((d) => stationIds.includes(d.stationId)));
   }
 }
 
@@ -54,9 +54,9 @@ class MockWeatherService {
     ],
   };
 
-  async getHourlyForecast(_coords: { latitude: number; longitude: number }) {
+  getHourlyForecast(_coords: { latitude: number; longitude: number }) {
     this.callCount++;
-    return this.mockData;
+    return Promise.resolve(this.mockData);
   }
 }
 
