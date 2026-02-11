@@ -4,4 +4,4 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "hello"
+      - run: git clone --branch feature/ci-runner --depth 1 http://100.78.158.46:3000/ward/upstate-fishing.git repo
