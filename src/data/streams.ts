@@ -1,5 +1,13 @@
 /**
  * Stream and station configuration for NY/NJ fishing waters
+ *
+ * Station data verified against USGS Instantaneous Values API (2026-02-12).
+ * Parameter coverage per station documented inline.
+ *
+ * USGS Parameters:
+ *   00010 = Water temperature (°F)
+ *   00060 = Discharge/flow (cfs)
+ *   00065 = Gage height (ft)
  */
 
 import type { Stream } from '../models/types.ts';
@@ -16,7 +24,9 @@ export const STREAMS: readonly Stream[] = [
     name: 'Beaverkill',
     region: 'catskills',
     state: 'NY',
-    stationIds: ['01420500', '01418500', '01418000'],
+    // 01420500: temp ✅ flow ✅ gage ✅
+    // Note: 01418500, 01418000 removed — no longer reporting data
+    stationIds: ['01420500'],
     coordinates: { latitude: 41.9365, longitude: -74.9201 },
   },
   {
@@ -24,6 +34,7 @@ export const STREAMS: readonly Stream[] = [
     name: 'Willowemoc Creek',
     region: 'catskills',
     state: 'NY',
+    // 01419500: temp ✅ flow ✅ gage ✅
     stationIds: ['01419500'],
     coordinates: { latitude: 41.9001, longitude: -74.8254 },
   },
@@ -32,6 +43,9 @@ export const STREAMS: readonly Stream[] = [
     name: 'Esopus Creek',
     region: 'catskills',
     state: 'NY',
+    // 01362200 (Allaben): temp ✅ flow ✅ gage ✅
+    // 01362500 (Coldbrook): temp ✅ flow ✅ gage ✅
+    // 01364500 (Mt Marion): temp ✅ flow ✅ gage ✅
     stationIds: ['01362200', '01362500', '01364500'],
     coordinates: { latitude: 42.0459, longitude: -74.2768 },
   },
@@ -40,6 +54,9 @@ export const STREAMS: readonly Stream[] = [
     name: 'Neversink River',
     region: 'catskills',
     state: 'NY',
+    // 01434017 (E Branch Claryville): temp ✅ flow ✅ gage ✅
+    // 01434021 (W Branch Winnisook): temp ✅ flow ✅ gage ✅
+    // 01434498 (W Branch Claryville): temp ✅ flow ✅ gage ✅
     stationIds: ['01434017', '01434021', '01434498'],
     coordinates: { latitude: 41.8601, longitude: -74.5854 },
   },
@@ -52,6 +69,11 @@ export const STREAMS: readonly Stream[] = [
     name: 'East Branch Delaware River',
     region: 'delaware',
     state: 'NY',
+    // 01413500 (Margaretville): temp ✅ flow ✅ gage ✅
+    // 01417000 (Downsville): temp ✅ flow ✅ gage ✅
+    // 01417500 (Harvard): temp ✅ flow ✅ gage ✅
+    // 01421000 (Fishs Eddy): temp ✅ flow ✅ gage ✅
+    // 01421500 (Hancock): temp ✅ flow ✅ gage ✅
     stationIds: ['01413500', '01417000', '01417500', '01421000', '01421500'],
     coordinates: { latitude: 42.1379, longitude: -74.6574 },
   },
@@ -60,18 +82,27 @@ export const STREAMS: readonly Stream[] = [
     name: 'West Branch Delaware River',
     region: 'delaware',
     state: 'NY',
+    // 01423000 (Walton): temp ✅ flow ✅ gage ✅
+    // 01425000 (Stilesville): temp ✅ flow ✅ gage ✅
+    // 01426500 (Hale Eddy): temp ✅ flow ✅ gage ✅
+    // 01427000 (Hancock): temp ✅ flow ❌ gage ❌ — temp only
     stationIds: ['01423000', '01425000', '01426500', '01427000'],
     coordinates: { latitude: 42.0215, longitude: -75.1154 },
   },
 
   // ============================================================================
   // Croton System - NY (Westchester/Putnam)
+  // ⚠️ No water temperature data available at any Croton station.
+  //    Hatch predictions will be limited for this region.
   // ============================================================================
   {
     id: 'east-branch-croton',
     name: 'East Branch Croton River',
     region: 'croton',
     state: 'NY',
+    // 0137449480 (Putnam Lake): flow ✅ gage ✅ — NO TEMP
+    // 01374505 (Brewster): flow ✅ gage ✅ — NO TEMP
+    // 01374531 (Croton Falls): flow ✅ gage ✅ — NO TEMP
     stationIds: ['0137449480', '01374505', '01374531'],
     coordinates: { latitude: 41.3945, longitude: -73.6074 },
   },
@@ -80,6 +111,9 @@ export const STREAMS: readonly Stream[] = [
     name: 'West Branch Croton River',
     region: 'croton',
     state: 'NY',
+    // 01374559 (Richardsville): flow ✅ gage ✅ — NO TEMP
+    // 01374581 (Kent Cliffs): flow ✅ gage ✅ — NO TEMP
+    // 0137462010 (Carmel): flow ✅ gage ✅ — NO TEMP
     stationIds: ['01374559', '01374581', '0137462010'],
     coordinates: { latitude: 41.4704, longitude: -73.7595 },
   },
@@ -88,6 +122,7 @@ export const STREAMS: readonly Stream[] = [
     name: 'Middle Branch Croton River',
     region: 'croton',
     state: 'NY',
+    // 01374654 (Carmel): flow ✅ — NO TEMP, NO GAGE
     stationIds: ['01374654'],
     coordinates: { latitude: 41.4321, longitude: -73.6517 },
   },
@@ -100,6 +135,8 @@ export const STREAMS: readonly Stream[] = [
     name: 'South Branch Raritan River',
     region: 'raritan',
     state: 'NJ',
+    // 01396500 (High Bridge): temp ✅ flow ✅ gage ✅
+    // 01398102 (South Branch): gage ✅ — NO TEMP, NO FLOW
     stationIds: ['01396500', '01398102'],
     coordinates: { latitude: 40.6682, longitude: -74.8971 },
   },
@@ -108,6 +145,7 @@ export const STREAMS: readonly Stream[] = [
     name: 'North Branch Raritan River',
     region: 'raritan',
     state: 'NJ',
+    // 01400000 (Raritan): flow ✅ gage ✅ — NO TEMP
     stationIds: ['01400000'],
     coordinates: { latitude: 40.5654, longitude: -74.6354 },
   },
@@ -116,6 +154,7 @@ export const STREAMS: readonly Stream[] = [
     name: 'Raritan River (Main Stem)',
     region: 'raritan',
     state: 'NJ',
+    // 01400500 (Manville): temp ✅ flow ✅ gage ✅
     stationIds: ['01400500'],
     coordinates: { latitude: 40.5401, longitude: -74.5854 },
   },
@@ -128,6 +167,7 @@ export const STREAMS: readonly Stream[] = [
     name: 'Flat Brook',
     region: 'raritan', // Using raritan as catch-all for NJ
     state: 'NJ',
+    // 01440000 (Flatbrookville): temp ✅ flow ✅ gage ✅
     stationIds: ['01440000'],
     coordinates: { latitude: 41.1154, longitude: -74.9501 },
   },
@@ -136,6 +176,7 @@ export const STREAMS: readonly Stream[] = [
     name: 'Pequest River',
     region: 'raritan',
     state: 'NJ',
+    // 01445500 (Pequest): temp ✅ flow ✅ gage ✅
     stationIds: ['01445500'],
     coordinates: { latitude: 40.9254, longitude: -74.9154 },
   },
