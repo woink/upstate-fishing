@@ -2,12 +2,16 @@ name: Deploy to Staging
 
 on:
   push:
-    branches:
+    branches: 
       - main
       - 'epic/*'
       - 'feature/*'
   pull_request:
     types: [opened, synchronize]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   deploy:
