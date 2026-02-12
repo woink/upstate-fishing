@@ -1,26 +1,13 @@
 import { useSignal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import type { Stream, StreamConditions } from '@shared/models/types.ts';
-<<<<<<< HEAD
-=======
 import { qualityHexColors, defaultMarkerColor, defaultBorderColor } from '../lib/colors.ts';
->>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
 
 interface StationMapProps {
   streams: Stream[];
   apiUrl: string;
 }
 
-<<<<<<< HEAD
-const qualityColors = {
-  excellent: '#22c55e',
-  good: '#3b82f6',
-  fair: '#eab308',
-  poor: '#ef4444',
-};
-
-=======
->>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
 export default function StationMap({ streams, apiUrl }: StationMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
@@ -76,13 +63,8 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
         [stream.coordinates.latitude, stream.coordinates.longitude],
         {
           radius: 10,
-<<<<<<< HEAD
-          fillColor: '#64748b', // Default gray
-          color: '#475569',
-=======
           fillColor: defaultMarkerColor, // Default gray
           color: defaultBorderColor,
->>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
           weight: 2,
           opacity: 1,
           fillOpacity: 0.8,
@@ -112,13 +94,8 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
 
           // Update marker color
           marker.setStyle({
-<<<<<<< HEAD
-            fillColor: qualityColors[cond.fishingQuality],
-            color: qualityColors[cond.fishingQuality],
-=======
             fillColor: qualityHexColors[cond.fishingQuality],
             color: qualityHexColors[cond.fishingQuality],
->>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
           });
 
           // Update popup content
@@ -138,11 +115,7 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
               </div>
               <div style="margin-top: 8px">
                 <span style="
-<<<<<<< HEAD
-                  background: ${qualityColors[cond.fishingQuality]};
-=======
                   background: ${qualityHexColors[cond.fishingQuality]};
->>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
                   color: white;
                   padding: 2px 8px;
                   border-radius: 4px;
@@ -174,11 +147,7 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
   );
 }
 
-<<<<<<< HEAD
-// Note: Leaflet types are defined in frontend/types/global.d.ts
-=======
 // Declare Leaflet types
 declare global {
   const L: typeof import('leaflet');
 }
->>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)

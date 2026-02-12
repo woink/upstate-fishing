@@ -1,8 +1,4 @@
 import { type PageProps } from '$fresh/server.ts';
-<<<<<<< HEAD
-=======
-import ExternalLink from '../components/ExternalLink.tsx';
->>>>>>> 9444dce (feat: add ExternalLink component with security attributes)
 
 export default function App({ Component }: PageProps) {
   return (
@@ -39,18 +35,7 @@ export default function App({ Component }: PageProps) {
         </main>
         <footer class='bg-slate-800 text-slate-400 py-4 mt-8'>
           <div class='max-w-6xl mx-auto px-4 text-center text-sm'>
-<<<<<<< HEAD
             Data from USGS and Weather.gov
-=======
-            Data from{' '}
-            <ExternalLink href='https://waterdata.usgs.gov/' class='text-slate-300 hover:text-white underline'>
-              USGS
-            </ExternalLink>
-            {' '}and{' '}
-            <ExternalLink href='https://www.weather.gov/' class='text-slate-300 hover:text-white underline'>
-              Weather.gov
-            </ExternalLink>
->>>>>>> 9444dce (feat: add ExternalLink component with security attributes)
           </div>
         </footer>
       </body>
