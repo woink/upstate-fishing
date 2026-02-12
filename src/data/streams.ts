@@ -180,6 +180,53 @@ export const STREAMS: readonly Stream[] = [
     stationIds: ['01445500'],
     coordinates: { latitude: 40.9254, longitude: -74.9154 },
   },
+
+  // ============================================================================
+  // Connecticut Trout Waters
+  // ============================================================================
+  {
+    id: 'farmington',
+    name: 'Farmington River',
+    region: 'connecticut',
+    state: 'CT',
+    // 01186000 (W Branch @ Riverton): temp ✅ flow ✅ gage ✅
+    // 01188090 (Unionville): flow ✅ gage ✅ — NO TEMP
+    // 01189995 (Tariffville): flow ✅ gage ✅ — NO TEMP
+    stationIds: ['01186000', '01188090', '01189995'],
+    coordinates: { latitude: 41.9628, longitude: -73.0176 },
+  },
+  {
+    id: 'housatonic',
+    name: 'Housatonic River',
+    region: 'connecticut',
+    state: 'CT',
+    // 01199000 (Falls Village): flow ✅ gage ✅ — NO TEMP
+    // 01200500 (Gaylordsville): flow ✅ gage ✅ — NO TEMP
+    // 01200600 (New Milford): temp ✅ flow ✅ gage ✅
+    stationIds: ['01199000', '01200500', '01200600'],
+    coordinates: { latitude: 41.9572, longitude: -73.3693 },
+  },
+  {
+    id: 'naugatuck',
+    name: 'Naugatuck River',
+    region: 'connecticut',
+    state: 'CT',
+    // 01206900 (Thomaston): flow ✅ gage ✅ — NO TEMP
+    // 01208500 (Beacon Falls): temp ✅ flow ✅ gage ✅
+    stationIds: ['01206900', '01208500'],
+    coordinates: { latitude: 41.6736, longitude: -73.0695 },
+  },
+  {
+    id: 'shetucket',
+    name: 'Shetucket River',
+    region: 'connecticut',
+    state: 'CT',
+    // 01122500 (Willimantic): flow ✅ gage ✅ — NO TEMP
+    // 011230695 (Taftville): flow ✅ gage ✅ — NO TEMP
+    // ⚠️ No water temperature data at any station
+    stationIds: ['01122500', '011230695'],
+    coordinates: { latitude: 41.7003, longitude: -72.1820 },
+  },
 ] as const;
 
 /**
