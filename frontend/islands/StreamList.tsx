@@ -1,12 +1,17 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import type { Stream, StreamConditions } from '@shared/models/types.ts';
+<<<<<<< HEAD
+=======
+import { qualityClasses, qualityBadgeClasses } from '../lib/colors.ts';
+>>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
 
 interface StreamListProps {
   streams: Stream[];
   apiUrl: string;
 }
 
+<<<<<<< HEAD
 const qualityColors = {
   excellent: 'border-green-500 bg-green-50',
   good: 'border-blue-500 bg-blue-50',
@@ -21,6 +26,8 @@ const qualityBadges = {
   poor: 'bg-red-500',
 };
 
+=======
+>>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
 export default function StreamList({ streams, apiUrl }: StreamListProps) {
   const conditionsMap = useSignal<Record<string, StreamConditions>>({});
   const loadingIds = useSignal<Set<string>>(new Set());
@@ -72,7 +79,11 @@ export default function StreamList({ streams, apiUrl }: StreamListProps) {
             key={stream.id}
             href={`/streams/${stream.id}`}
             class={`block bg-white rounded-lg border-l-4 p-4 shadow hover:shadow-md transition ${
+<<<<<<< HEAD
               conditions ? qualityColors[conditions.fishingQuality] : 'border-slate-300'
+=======
+              conditions ? qualityClasses[conditions.fishingQuality] : 'border-slate-300'
+>>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
             }`}
           >
             <div class='flex items-start justify-between'>
@@ -91,7 +102,11 @@ export default function StreamList({ streams, apiUrl }: StreamListProps) {
               {conditions && (
                 <span
                   class={`px-2 py-1 rounded text-xs text-white font-medium ${
+<<<<<<< HEAD
                     qualityBadges[conditions.fishingQuality]
+=======
+                    qualityBadgeClasses[conditions.fishingQuality]
+>>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
                   }`}
                 >
                   {conditions.fishingQuality}

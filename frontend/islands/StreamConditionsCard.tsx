@@ -1,11 +1,16 @@
 import { useSignal } from '@preact/signals';
 import type { StreamConditions } from '@shared/models/types.ts';
+<<<<<<< HEAD
+=======
+import { qualityClasses, confidenceClasses } from '../lib/colors.ts';
+>>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
 
 interface StreamConditionsCardProps {
   conditions: StreamConditions;
   apiUrl: string;
 }
 
+<<<<<<< HEAD
 const qualityColors = {
   excellent: 'bg-green-100 border-green-500',
   good: 'bg-blue-100 border-blue-500',
@@ -19,6 +24,8 @@ const confidenceColors = {
   low: 'bg-slate-400',
 };
 
+=======
+>>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
 export default function StreamConditionsCard({
   conditions: initial,
   apiUrl,
@@ -44,7 +51,11 @@ export default function StreamConditionsCard({
   const cond = conditions.value;
 
   return (
+<<<<<<< HEAD
     <div class={`rounded-lg border-l-4 shadow-lg ${qualityColors[cond.fishingQuality]}`}>
+=======
+    <div class={`rounded-lg border-l-4 shadow-lg ${qualityClasses[cond.fishingQuality]}`}>
+>>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
       {/* Header */}
       <div class='p-6 border-b border-slate-200'>
         <div class='flex items-start justify-between'>
@@ -151,7 +162,11 @@ export default function StreamConditionsCard({
                     <h3 class='font-semibold'>{pred.hatch.commonName}</h3>
                     <span
                       class={`px-2 py-0.5 rounded text-xs text-white ${
+<<<<<<< HEAD
                         confidenceColors[pred.confidence]
+=======
+                        confidenceClasses[pred.confidence]
+>>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
                       }`}
                     >
                       {pred.confidence}
