@@ -20,14 +20,19 @@
     "@std/assert": "jsr:@std/assert@1",
     "@std/testing/bdd": "jsr:@std/testing@1/bdd",
     "leaflet": "https://esm.sh/leaflet@1.9.4",
-    "@shared/": "../src/"
+    "@shared/": "../src/",
+    "zod": "npm:zod@^3.23"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "strict": true,
-    "types": ["./types/global.d.ts"]
+    "types": [
+      "./types/global.d.ts"
+    ]
   },
   "nodeModulesDir": "auto",
-  "exclude": ["**/_fresh/*"]
+  "exclude": [
+    "**/_fresh/*"
+  ]
 }
