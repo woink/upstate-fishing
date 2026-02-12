@@ -30,6 +30,7 @@
       "jsr:@hono/hono@4",
       "jsr:@std/assert@1",
       "jsr:@std/datetime@0.225",
+      "jsr:@std/testing@1",
       "npm:zod@^3.23.0"
     ]
   }

@@ -3,7 +3,7 @@
  */
 
 import { assertEquals } from '@std/assert';
-import { USGSService, USGS_PARAMS } from '../src/services/usgs.ts';
+import { USGS_PARAMS, USGSService } from '../src/services/usgs.ts';
 
 // ============================================================================
 // USGS_PARAMS Tests
