@@ -1,0 +1,13 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to staging
+        run: |
+          ssh -o StrictHostKeyChecking=no wardprice_gmail_com@100.108.15.81 '~/apps/upstate-fishing/deploy.sh'
