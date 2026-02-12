@@ -13,3 +13,15 @@ export { getHatchesByMonth, getHatchesByOrder, getHatchesByTemp, HATCHES } from 
 export { USGS_PARAMS, USGSService, usgsService } from './services/usgs.ts';
 export { WeatherService, weatherService } from './services/weather.ts';
 export { PredictionService, predictionService } from './services/predictions.ts';
+
+// Cache
+export {
+  CacheService,
+  cacheService,
+  makeCacheHeaders,
+  makeUSGSKey,
+  makeWeatherKey,
+  TTL,
+} from './services/cache.ts';
+export { CachedUSGSService, cachedUSGSService } from './services/cached-usgs.ts';
+export { CachedWeatherService, cachedWeatherService } from './services/cached-weather.ts';

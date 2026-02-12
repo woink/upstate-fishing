@@ -9,6 +9,10 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

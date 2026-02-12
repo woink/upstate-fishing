@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 .deno/
+frontend/_fresh/
 
 # Environment
 .env

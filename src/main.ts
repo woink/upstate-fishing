@@ -10,6 +10,39 @@ import { prettyJSON } from '@hono/hono/pretty-json';
 import { api } from './routes/api.ts';
 
 // ============================================================================
+// CORS Configuration
+// ============================================================================
+
+/**
+ * Parse allowed origins from environment variable.
+ * CORS_ORIGINS can be:
+ * - "*" for all origins (not recommended for production)
+ * - Comma-separated list of origins: "http://localhost:8001,https://fishing.example.com"
+ */
+function getCorsOrigins(): string | string[] {
+  const originsEnv = Deno.env.get('CORS_ORIGINS');
+
+  // Default: allow common development origins
+  if (!originsEnv) {
+    return [
+      'http://localhost:8001', // Fresh dev server
+      'http://localhost:3000', // Alternative dev port
+      'http://127.0.0.1:8001',
+    ];
+  }
+
+  // Allow all origins (use with caution)
+  if (originsEnv === '*') {
+    return '*';
+  }
+
+  // Parse comma-separated list
+  return originsEnv.split(',').map((origin) => origin.trim());
+}
+
+const corsOrigins = getCorsOrigins();
+
+// ============================================================================
 // App Configuration
 // ============================================================================
 
@@ -17,7 +50,24 @@ const app = new Hono();
 
 // Middleware
 app.use('*', logger());
-app.use('*', cors());
+app.use(
+  '*',
+  cors({
+    origin: corsOrigins,
+    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowHeaders: [
+      'Content-Type',
+      'Accept',
+      'X-Forwarded-For',
+      'X-Real-IP',
+      'X-Forwarded-Proto',
+      'X-Forwarded-Host',
+    ],
+    exposeHeaders: ['Content-Type', 'Content-Length'],
+    maxAge: 86400, // 24 hours
+    credentials: false,
+  }),
+);
 app.use('*', prettyJSON());
 
 // ============================================================================

@@ -6,9 +6,10 @@ import { Hono } from '@hono/hono';
 import { z } from 'zod';
 import { getStreamById, getStreamsByRegion, getStreamsByState, STREAMS } from '../data/streams.ts';
 import { HATCHES } from '../data/hatches.ts';
-import { usgsService } from '../services/usgs.ts';
-import { weatherService } from '../services/weather.ts';
+import { cachedUSGSService } from '../services/cached-usgs.ts';
+import { cachedWeatherService } from '../services/cached-weather.ts';
 import { predictionService } from '../services/predictions.ts';
+import { makeCacheHeaders, TTL } from '../services/cache.ts';
 import type { Region, State } from '../models/types.ts';
 
 // ============================================================================
@@ -91,27 +92,54 @@ api.get('/streams/:id/conditions', async (c) => {
   }
 
   try {
-    // Fetch USGS data
-    const stationData = await usgsService.getInstantaneousValues(stream.stationIds);
+    // Fetch USGS data (cached)
+    const usgsResult = await cachedUSGSService.getInstantaneousValues(stream.stationIds);
 
-    // Fetch weather if coordinates available
+    // Fetch weather if coordinates available (cached)
     let weather = null;
+    let weatherCached = false;
+    let weatherCachedAt: number | null = null;
     if (stream.coordinates) {
       try {
-        weather = await weatherService.getCurrentConditions(stream.coordinates);
+        const weatherResult = await cachedWeatherService.getCurrentConditions(stream.coordinates);
+        weather = weatherResult.data;
+        weatherCached = weatherResult.cached;
+        weatherCachedAt = weatherResult.cachedAt;
       } catch (err) {
         console.warn(`Failed to fetch weather for ${stream.name}:`, err);
       }
     }
 
     // Generate predictions
-    const conditions = predictionService.generateConditions(stream, stationData, weather);
+    const conditions = predictionService.generateConditions(stream, usgsResult.data, weather);
 
-    return c.json({
-      success: true,
-      data: conditions,
-      timestamp: new Date().toISOString(),
-    });
+    // Determine cache status (both must be cached for overall HIT)
+    const allCached = usgsResult.cached && (stream.coordinates ? weatherCached : true);
+    const earliestCachedAt = Math.min(
+      usgsResult.cachedAt ?? Date.now(),
+      weatherCachedAt ?? Date.now(),
+    );
+
+    // Add cache headers - use shorter TTL (USGS)
+    const cacheHeaders = makeCacheHeaders(
+      allCached,
+      TTL.USGS_SECONDS,
+      allCached ? earliestCachedAt : null,
+    );
+
+    return c.json(
+      {
+        success: true,
+        data: conditions,
+        cache: {
+          usgs: usgsResult.cached ? 'HIT' : 'MISS',
+          weather: stream.coordinates ? (weatherCached ? 'HIT' : 'MISS') : 'N/A',
+        },
+        timestamp: new Date().toISOString(),
+      },
+      200,
+      cacheHeaders,
+    );
   } catch (err) {
     console.error(`Error fetching conditions for ${stream.name}:`, err);
     return c.json(
@@ -200,9 +228,9 @@ api.get('/stations/:id', async (c) => {
   const id = c.req.param('id');
 
   try {
-    const data = await usgsService.getInstantaneousValues([id]);
+    const result = await cachedUSGSService.getInstantaneousValues([id]);
 
-    if (data.length === 0) {
+    if (result.data.length === 0) {
       return c.json(
         {
           success: false,
@@ -213,11 +241,19 @@ api.get('/stations/:id', async (c) => {
       );
     }
 
-    return c.json({
-      success: true,
-      data: data[0],
-      timestamp: new Date().toISOString(),
-    });
+    // Add cache headers
+    const cacheHeaders = makeCacheHeaders(result.cached, TTL.USGS_SECONDS, result.cachedAt);
+
+    return c.json(
+      {
+        success: true,
+        data: result.data[0],
+        cache: result.cached ? 'HIT' : 'MISS',
+        timestamp: new Date().toISOString(),
+      },
+      200,
+      cacheHeaders,
+    );
   } catch (err) {
     return c.json(
       {
