@@ -1,0 +1,18 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: 
+      - main
+      - 'epic/*'
+      - 'feature/*'
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to staging
+        run: |
+          ssh -o StrictHostKeyChecking=no wardprice_gmail_com@100.108.15.81 'cd ~/apps/upstate-fishing/repo && git fetch origin && git checkout ${{ github.head_ref || github.ref_name }} && git pull origin ${{ github.head_ref || github.ref_name }} && cd .. && docker compose restart'
