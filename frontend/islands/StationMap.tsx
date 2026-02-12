@@ -152,3 +152,8 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
     </div>
   );
 }
+
+// Declare Leaflet types
+declare global {
+  const L: typeof import('leaflet');
+}

@@ -12,8 +12,7 @@
     "npm:autoprefixer@10.4.17": "10.4.17_postcss@8.4.35",
     "npm:cssnano@6.0.3": "6.0.3_postcss@8.4.35",
     "npm:postcss@8.4.35": "8.4.35",
-    "npm:tailwindcss@3.4.16": "3.4.16_postcss@8.5.6",
-    "npm:zod@^3.23.0": "3.25.76"
+    "npm:tailwindcss@3.4.16": "3.4.16_postcss@8.5.6"
   },
   "jsr": {
     "@luca/esbuild-deno-loader@0.11.0": {
@@ -894,9 +893,6 @@
     "yaml@2.8.2": {
       "integrity": "sha512-mplynKqc1C2hTVYxd0PU2xQAc22TI1vShAYGksCCfxbn/dFwnHTNi1bvYsBTkhdUNtGIf5xNOg938rrSSYvS9A==",
       "bin": true
-    },
-    "zod@3.25.76": {
-      "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
     }
   },
   "redirects": {
@@ -1265,8 +1261,7 @@
     "dependencies": [
       "jsr:@std/assert@1",
       "jsr:@std/testing@1",
-      "npm:tailwindcss@3.4.16",
-      "npm:zod@^3.23.0"
+      "npm:tailwindcss@3.4.16"
     ]
   }
 }
