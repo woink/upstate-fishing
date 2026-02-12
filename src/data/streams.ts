@@ -227,6 +227,100 @@ export const STREAMS: readonly Stream[] = [
     stationIds: ['01122500', '011230695'],
     coordinates: { latitude: 41.7003, longitude: -72.1820 },
   },
+
+  // ============================================================================
+  // NC High Country (Boone / Blowing Rock / Valle Crucis)
+  // ============================================================================
+  {
+    id: 'watauga',
+    name: 'Watauga River',
+    region: 'nc-highcountry',
+    state: 'NC',
+    // 03479000 (Sugar Grove): flow ✅ gage ✅ — NO TEMP
+    // Runs through Valle Crucis — premier NC trout water
+    stationIds: ['03479000'],
+    coordinates: { latitude: 36.2392, longitude: -81.8222 },
+  },
+  {
+    id: 'south-fork-new',
+    name: 'South Fork New River',
+    region: 'nc-highcountry',
+    state: 'NC',
+    // 03161000 (Jefferson): flow ✅ gage ✅ — NO TEMP
+    stationIds: ['03161000'],
+    coordinates: { latitude: 36.3933, longitude: -81.4069 },
+  },
+  {
+    id: 'elk-creek-nc',
+    name: 'Elk Creek',
+    region: 'nc-highcountry',
+    state: 'NC',
+    // 02111180 (Elkville): flow ✅ gage ✅ — NO TEMP
+    stationIds: ['02111180'],
+    coordinates: { latitude: 36.0714, longitude: -81.4031 },
+  },
+
+  // ============================================================================
+  // NC Foothills / Charlotte Region
+  // ============================================================================
+  {
+    id: 'linville',
+    name: 'Linville River',
+    region: 'nc-foothills',
+    state: 'NC',
+    // 02138500 (Nebo): flow ✅ gage ✅ — NO TEMP
+    stationIds: ['02138500'],
+    coordinates: { latitude: 35.7956, longitude: -81.8911 },
+  },
+  {
+    id: 'wilson-creek',
+    name: 'Wilson Creek',
+    region: 'nc-foothills',
+    state: 'NC',
+    // 02140510 (Adako): gage ✅ — NO TEMP, NO FLOW
+    // Wild trout water in Pisgah National Forest
+    stationIds: ['02140510'],
+    coordinates: { latitude: 35.8989, longitude: -81.7159 },
+  },
+  {
+    id: 'johns-river',
+    name: 'Johns River',
+    region: 'nc-foothills',
+    state: 'NC',
+    // 02140991 (Arneys Store): flow ✅ gage ✅ — NO TEMP
+    stationIds: ['02140991'],
+    coordinates: { latitude: 35.8336, longitude: -81.7119 },
+  },
+  {
+    id: 'south-fork-catawba',
+    name: 'South Fork Catawba River',
+    region: 'nc-foothills',
+    state: 'NC',
+    // 02145000 (Lowell): flow ✅ gage ✅ — NO TEMP
+    // Closest monitored trout water to Charlotte
+    stationIds: ['02145000'],
+    coordinates: { latitude: 35.2853, longitude: -81.1011 },
+  },
+  {
+    id: 'catawba-upper',
+    name: 'Catawba River (Upper)',
+    region: 'nc-foothills',
+    state: 'NC',
+    // 02137727 (Pleasant Gardens): temp ✅ flow ✅ gage ✅
+    // 02138520 (Below Lake James): temp ✅ flow ✅ gage ✅
+    stationIds: ['02137727', '02138520'],
+    coordinates: { latitude: 35.6858, longitude: -82.0603 },
+  },
+  {
+    id: 'south-toe',
+    name: 'South Toe River',
+    region: 'nc-foothills',
+    state: 'NC',
+    // 03463300 (Celo): flow ✅ gage ✅ — NO TEMP
+    // Excellent wild trout stream near Mt. Mitchell
+    stationIds: ['03463300'],
+    coordinates: { latitude: 35.8314, longitude: -82.1842 },
+  },
 ] as const;
 
 /**
