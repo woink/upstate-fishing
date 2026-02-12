@@ -1,32 +1,12 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import type { StreamConditions } from '@shared/models/types.ts';
-<<<<<<< HEAD
-=======
 import { qualityClasses, qualityLabels, qualityOrder } from '../lib/colors.ts';
->>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
 
 interface TopPicksProps {
   apiUrl: string;
 }
 
-<<<<<<< HEAD
-const qualityColors = {
-  excellent: 'bg-green-100 border-green-500 text-green-800',
-  good: 'bg-blue-100 border-blue-500 text-blue-800',
-  fair: 'bg-yellow-100 border-yellow-500 text-yellow-800',
-  poor: 'bg-red-100 border-red-500 text-red-800',
-};
-
-const qualityLabels = {
-  excellent: '🎯 Excellent',
-  good: '👍 Good',
-  fair: '⚠️ Fair',
-  poor: '❌ Poor',
-};
-
-=======
->>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
 export default function TopPicks({ apiUrl }: TopPicksProps) {
   const conditions = useSignal<StreamConditions[]>([]);
   const loading = useSignal(true);
@@ -62,10 +42,6 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
         const validConditions = results.filter((c): c is StreamConditions => c !== null);
 
         // Sort by fishing quality
-<<<<<<< HEAD
-        const qualityOrder = { excellent: 0, good: 1, fair: 2, poor: 3 };
-=======
->>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
         validConditions.sort((a, b) =>
           qualityOrder[a.fishingQuality] - qualityOrder[b.fishingQuality]
         );
@@ -125,11 +101,7 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
             key={cond.stream.id}
             href={`/streams/${cond.stream.id}`}
             class={`block rounded-lg border-l-4 p-4 shadow hover:shadow-md transition ${
-<<<<<<< HEAD
-              qualityColors[cond.fishingQuality]
-=======
               qualityClasses[cond.fishingQuality]
->>>>>>> cad4c60 (refactor: extract repeated colors to shared constants)
             }`}
           >
             <div class='flex items-start justify-between mb-2'>
