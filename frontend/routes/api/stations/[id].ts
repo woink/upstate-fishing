@@ -14,7 +14,11 @@ export const handler: Handlers = {
         return apiError('Station not found or no data available', 'NOT_FOUND', 404);
       }
 
-      const cacheHeaders = makeCacheHeaders(result.cached, TTL.USGS_SECONDS, result.cachedAt);
+      const { 'Cache-Control': _, ...cacheMetaHeaders } = makeCacheHeaders(
+        result.cached,
+        TTL.USGS_SECONDS,
+        result.cachedAt,
+      );
 
       return Response.json(
         {
@@ -23,7 +27,7 @@ export const handler: Handlers = {
           cache: result.cached ? 'HIT' : 'MISS',
           timestamp: new Date().toISOString(),
         },
-        { headers: { ...cacheHeaders, 'Cache-Control': CACHE_DYNAMIC } },
+        { headers: { ...cacheMetaHeaders, 'Cache-Control': CACHE_DYNAMIC } },
       );
     } catch (err) {
       return apiError(

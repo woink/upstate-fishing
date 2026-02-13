@@ -13,8 +13,14 @@
  */
 
 import { assertEquals, assertExists } from '@std/assert';
-import { HATCHES, getHatchesByMonth, getHatchesByOrder } from '@shared/data/hatches.ts';
-import { STREAMS, getStreamsByRegion, getStreamsByState, getStreamById } from '@shared/data/streams.ts';
+import { getHatchesByMonth, getHatchesByOrder, HATCHES } from '@shared/data/hatches.ts';
+import {
+  getStreamById,
+  getStreamsByRegion,
+  getStreamsByState,
+  STREAMS,
+} from '@shared/data/streams.ts';
+import { fahrenheitToCelsius } from '@shared/utils/temperature.ts';
 import type { InsectOrder, Region, State } from '@shared/models/types.ts';
 
 // ============================================================================
@@ -275,7 +281,7 @@ Deno.test('predict - builds station data from waterTempF', () => {
       stationName: 'Custom Input',
       timestamp: new Date().toISOString(),
       waterTempF,
-      waterTempC: (waterTempF - 32) * 5 / 9,
+      waterTempC: fahrenheitToCelsius(waterTempF),
       dischargeCfs: null,
       gageHeightFt: null,
     }]
@@ -283,8 +289,7 @@ Deno.test('predict - builds station data from waterTempF', () => {
 
   assertEquals(stationData.length, 1);
   assertEquals(stationData[0].waterTempF, 54);
-  // 54°F = 12.22°C
-  assertEquals(Math.abs(stationData[0].waterTempC - 12.222) < 0.01, true);
+  assertEquals(stationData[0].waterTempC, 12.2);
   assertEquals(stationData[0].stationId, 'custom');
   assertEquals(stationData[0].dischargeCfs, null);
   assertEquals(stationData[0].gageHeightFt, null);
@@ -298,7 +303,7 @@ Deno.test('predict - empty station data when no waterTempF', () => {
       stationName: 'Custom Input',
       timestamp: new Date().toISOString(),
       waterTempF,
-      waterTempC: (waterTempF - 32) * 5 / 9,
+      waterTempC: fahrenheitToCelsius(waterTempF),
       dischargeCfs: null,
       gageHeightFt: null,
     }]
@@ -372,12 +377,9 @@ Deno.test('predict - null weather when no airTempF', () => {
 });
 
 Deno.test('predict - temperature conversion is correct', () => {
-  // 32°F = 0°C
-  assertEquals((32 - 32) * 5 / 9, 0);
-  // 212°F = 100°C
-  assertEquals((212 - 32) * 5 / 9, 100);
-  // 50°F = 10°C
-  assertEquals((50 - 32) * 5 / 9, 10);
+  assertEquals(fahrenheitToCelsius(32), 0);
+  assertEquals(fahrenheitToCelsius(212), 100);
+  assertEquals(fahrenheitToCelsius(50), 10);
 });
 
 // ============================================================================

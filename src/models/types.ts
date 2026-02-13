@@ -124,10 +124,17 @@ export type StreamConditions = z.infer<typeof StreamConditionsSchema>;
 // API Response Types
 // ============================================================================
 
+export type ApiErrorDetails = Array<{ message: string }> | string;
+
+export const ApiErrorDetailsSchema = z.union([
+  z.array(z.object({ message: z.string() }).passthrough()),
+  z.string(),
+]);
+
 export const ApiErrorSchema = z.object({
   error: z.string(),
   code: z.string(),
-  details: z.unknown().optional(),
+  details: ApiErrorDetailsSchema.optional(),
 });
 export type ApiError = z.infer<typeof ApiErrorSchema>;
 

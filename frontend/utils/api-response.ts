@@ -1,4 +1,5 @@
 import type { CacheHeaders } from '@shared/services/cache.ts';
+import type { ApiErrorDetails } from '@shared/models/types.ts';
 
 export const CACHE_STATIC = 'public, max-age=3600, stale-while-revalidate=7200';
 export const CACHE_DYNAMIC = 'public, max-age=300, stale-while-revalidate=600';
@@ -27,7 +28,7 @@ export function apiError(
   error: string,
   code: string,
   status: number,
-  details?: unknown,
+  details?: ApiErrorDetails,
 ): Response {
   return Response.json(
     {
