@@ -23,7 +23,7 @@ export const handler: Handlers = {
           cache: result.cached ? 'HIT' : 'MISS',
           timestamp: new Date().toISOString(),
         },
-        { headers: { 'Cache-Control': CACHE_DYNAMIC, ...cacheHeaders } },
+        { headers: { ...cacheHeaders, 'Cache-Control': CACHE_DYNAMIC } },
       );
     } catch (err) {
       return apiError(

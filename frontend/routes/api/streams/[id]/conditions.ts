@@ -55,7 +55,7 @@ export const handler: Handlers = {
           },
           timestamp: new Date().toISOString(),
         },
-        { headers: { 'Cache-Control': CACHE_DYNAMIC, ...cacheHeaders } },
+        { headers: { ...cacheHeaders, 'Cache-Control': CACHE_DYNAMIC } },
       );
     } catch (err) {
       console.error(`Error fetching conditions for ${stream.name}:`, err);
