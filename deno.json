@@ -8,7 +8,6 @@
     "test": "deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv",
     "check": "deno check src/**/*.ts",
     "lint": "deno lint",
-    "build": "cd frontend && deno task build",
     "fmt": "deno fmt"
   },
   "imports": {
