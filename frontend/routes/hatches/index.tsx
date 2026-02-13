@@ -1,5 +1,6 @@
 import { Handlers, PageProps } from '$fresh/server.ts';
 import type { Hatch, InsectOrder } from '@shared/models/types.ts';
+import { HATCHES } from '@shared/data/hatches.ts';
 import HatchChart from '../../islands/HatchChart.tsx';
 
 interface HatchesPageData {
@@ -10,48 +11,31 @@ interface HatchesPageData {
 }
 
 export const handler: Handlers<HatchesPageData> = {
-  async GET(req, ctx) {
+  GET(req, ctx) {
     const url = new URL(req.url);
     const orderParam = url.searchParams.get('order') as InsectOrder | null;
     const monthParam = url.searchParams.get('month');
 
-    // Validate order filter
     const validOrders: InsectOrder[] = ['mayfly', 'caddisfly', 'stonefly', 'midge'];
     const filterOrder = orderParam && validOrders.includes(orderParam) ? orderParam : null;
 
-    // Validate month filter
     const monthNum = monthParam ? parseInt(monthParam, 10) : null;
     const filterMonth = monthNum && monthNum >= 1 && monthNum <= 12 ? monthNum : null;
 
-    const backendUrl = Deno.env.get('API_URL') ?? 'http://localhost:8000';
-
-    try {
-      // Build query string for backend
-      const params = new URLSearchParams();
-      if (filterOrder) params.set('order', filterOrder);
-      if (filterMonth) params.set('month', filterMonth.toString());
-
-      const queryString = params.toString();
-      const apiUrl = `${backendUrl}/api/hatches${queryString ? `?${queryString}` : ''}`;
-
-      const response = await fetch(apiUrl);
-      const json = await response.json();
-
-      return ctx.render({
-        hatches: json.data ?? [],
-        filterOrder,
-        filterMonth,
-        error: null,
-      });
-    } catch (error) {
-      console.error('Failed to fetch hatches:', error);
-      return ctx.render({
-        hatches: [],
-        filterOrder,
-        filterMonth,
-        error: 'Failed to load hatch data',
-      });
+    let hatches = [...HATCHES];
+    if (filterOrder) {
+      hatches = hatches.filter((h) => h.order === filterOrder);
     }
+    if (filterMonth) {
+      hatches = hatches.filter((h) => h.peakMonths.includes(filterMonth));
+    }
+
+    return ctx.render({
+      hatches,
+      filterOrder,
+      filterMonth,
+      error: null,
+    });
   },
 };
 
