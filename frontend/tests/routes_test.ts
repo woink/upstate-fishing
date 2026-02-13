@@ -4,6 +4,8 @@
  */
 
 import { assertEquals, assertExists } from '@std/assert';
+import { STREAMS, getStreamsByRegion, getStreamsByState } from '@shared/data/streams.ts';
+import { HATCHES } from '@shared/data/hatches.ts';
 
 // ============================================================================
 // Route Parameter Tests
@@ -118,45 +120,34 @@ Deno.test('API response - handles missing data gracefully', () => {
 });
 
 // ============================================================================
-// Environment Variable Tests
+// Stream Filter Logic Tests (direct data imports)
 // ============================================================================
 
-Deno.test('API_URL - defaults to localhost', () => {
-  const apiUrl = Deno.env.get('API_URL') ?? 'http://localhost:8000';
-  assertEquals(apiUrl.includes('localhost') || apiUrl.includes('127.0.0.1'), true);
+Deno.test('filter logic - getStreamsByRegion returns correct streams', () => {
+  const streams = getStreamsByRegion('catskills');
+
+  assertEquals(streams.length > 0, true, 'Should have catskills streams');
+  for (const stream of streams) {
+    assertEquals(stream.region, 'catskills');
+  }
 });
 
-// ============================================================================
-// Stream Filter Logic Tests
-// ============================================================================
+Deno.test('filter logic - getStreamsByState returns correct streams', () => {
+  const streams = getStreamsByState('NJ');
 
-Deno.test('filter logic - region takes precedence', () => {
+  assertEquals(streams.length > 0, true, 'Should have NJ streams');
+  for (const stream of streams) {
+    assertEquals(stream.state, 'NJ');
+  }
+});
+
+Deno.test('filter logic - region takes precedence over state', () => {
   const region = 'catskills';
   const state = 'NY';
 
-  // In the handler, we check region first
-  let endpoint = '/api/streams';
-  if (region) {
-    endpoint += `?region=${region}`;
-  } else if (state) {
-    endpoint += `?state=${state}`;
-  }
-
-  assertEquals(endpoint, '/api/streams?region=catskills');
-});
-
-Deno.test('filter logic - state used when no region', () => {
-  const region = undefined;
-  const state = 'NJ';
-
-  let endpoint = '/api/streams';
-  if (region) {
-    endpoint += `?region=${region}`;
-  } else if (state) {
-    endpoint += `?state=${state}`;
-  }
-
-  assertEquals(endpoint, '/api/streams?state=NJ');
+  // In the handler, we check region first, then state
+  const filterUsed = region ? 'region' : state ? 'state' : 'none';
+  assertEquals(filterUsed, 'region');
 });
 
 // ============================================================================
@@ -203,4 +194,99 @@ Deno.test('map page - extracts coordinates correctly', () => {
   const { latitude, longitude } = stream.coordinates;
   assertEquals(latitude, 41.9365);
   assertEquals(longitude, -74.9201);
+});
+
+Deno.test('map page - uses STREAMS data directly', () => {
+  // After the merge, the map handler imports STREAMS directly
+  assertEquals(STREAMS.length > 0, true);
+  // At least some streams should have coordinates for map markers
+  const withCoords = STREAMS.filter((s) => s.coordinates !== undefined);
+  assertEquals(withCoords.length > 0, true, 'Some streams should have coordinates');
+});
+
+// ============================================================================
+// Hatches Page Handler Logic Tests (direct data imports)
+// ============================================================================
+
+Deno.test('hatches page handler - filters hatches by order', () => {
+  const filterOrder = 'mayfly';
+  let hatches = [...HATCHES];
+  hatches = hatches.filter((h) => h.order === filterOrder);
+
+  assertEquals(hatches.length > 0, true);
+  for (const h of hatches) {
+    assertEquals(h.order, 'mayfly');
+  }
+});
+
+Deno.test('hatches page handler - filters hatches by month', () => {
+  const filterMonth = 4;
+  let hatches = [...HATCHES];
+  hatches = hatches.filter((h) => h.peakMonths.includes(filterMonth));
+
+  assertEquals(hatches.length > 0, true);
+  for (const h of hatches) {
+    assertEquals(h.peakMonths.includes(4), true);
+  }
+});
+
+Deno.test('hatches page handler - validates order param', () => {
+  const validOrders = ['mayfly', 'caddisfly', 'stonefly', 'midge'];
+  const orderParam = 'invalid_order';
+  const filterOrder = orderParam && validOrders.includes(orderParam) ? orderParam : null;
+  assertEquals(filterOrder, null);
+});
+
+Deno.test('hatches page handler - validates month param range', () => {
+  const monthParam = '13';
+  const monthNum = monthParam ? parseInt(monthParam, 10) : null;
+  const filterMonth = monthNum && monthNum >= 1 && monthNum <= 12 ? monthNum : null;
+  assertEquals(filterMonth, null);
+});
+
+Deno.test('hatches page handler - no filters returns all hatches', () => {
+  const filterOrder = null;
+  const filterMonth = null;
+
+  let hatches = [...HATCHES];
+  if (filterOrder) {
+    hatches = hatches.filter((h) => h.order === filterOrder);
+  }
+  if (filterMonth) {
+    hatches = hatches.filter((h) => h.peakMonths.includes(filterMonth));
+  }
+
+  assertEquals(hatches.length, HATCHES.length);
+});
+
+// ============================================================================
+// Streams Page Handler Logic Tests (direct data imports)
+// ============================================================================
+
+Deno.test('streams page handler - filters by region using direct import', () => {
+  const region = 'catskills';
+  const streams = getStreamsByRegion(region);
+
+  assertEquals(streams.length > 0, true);
+  // Verify all returned streams are from catskills
+  for (const s of streams) {
+    assertEquals(s.region, 'catskills');
+  }
+});
+
+Deno.test('streams page handler - state filter when no region', () => {
+  const region = undefined;
+  const state = 'NJ' as const;
+
+  let streams = [...STREAMS];
+  if (region) {
+    streams = getStreamsByRegion(region);
+  } else if (state) {
+    streams = getStreamsByState(state);
+  }
+
+  assertEquals(streams.length > 0, true);
+  for (const s of streams) {
+    assertEquals(s.state, 'NJ');
+  }
 });

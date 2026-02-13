@@ -1,3 +1,5 @@
+/// <reference lib="deno.unstable" />
+
 /**
  * Caching layer using Deno KV
  *

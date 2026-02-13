@@ -5,6 +5,7 @@
 
 import { z } from 'zod';
 import type { Coordinates, HourlyForecast, WeatherConditions } from '../models/types.ts';
+import { celsiusToFahrenheit } from '../utils/temperature.ts';
 
 // ============================================================================
 // NWS API Response Types
@@ -112,7 +113,7 @@ export class WeatherService {
         timestamp: startTime,
         airTempF: period.temperatureUnit === 'F'
           ? period.temperature
-          : this.celsiusToFahrenheit(period.temperature),
+          : celsiusToFahrenheit(period.temperature, 0),
         cloudCoverPercent: cloudCover,
         precipProbability: period.probabilityOfPrecipitation?.value ?? 0,
         windSpeedMph: this.parseWindSpeed(period.windSpeed),
@@ -215,13 +216,6 @@ export class WeatherService {
     if (lower.includes('rain') || lower.includes('storm') || lower.includes('shower')) return 85;
 
     return 50; // Default to partly cloudy
-  }
-
-  /**
-   * Convert Celsius to Fahrenheit
-   */
-  private celsiusToFahrenheit(celsius: number): number {
-    return Math.round(celsius * 9 / 5 + 32);
   }
 }
 

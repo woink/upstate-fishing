@@ -2,10 +2,10 @@
   "name": "@fishing/frontend",
   "version": "0.1.0",
   "tasks": {
-    "check": "deno check **/*.ts **/*.tsx",
-    "dev": "deno run -A --watch=static/,routes/ dev.ts",
-    "build": "deno run -A dev.ts build",
-    "preview": "deno run -A main.ts"
+    "check": "deno check --unstable-kv **/*.ts **/*.tsx",
+    "dev": "deno run -A --unstable-kv --watch=static/,routes/ dev.ts",
+    "build": "deno run -A --unstable-kv dev.ts build",
+    "preview": "deno run -A --unstable-kv main.ts"
   },
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.7.3/",

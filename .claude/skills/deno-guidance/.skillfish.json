@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "deno-guidance",
+  "owner": "donjo",
+  "repo": "denoland",
+  "path": "skills/deno-guidance",
+  "branch": "main",
+  "sha": "755badd99f7dc50a42851991b31b745165825fdc",
+  "source": "manual"
+}
