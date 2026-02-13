@@ -13,7 +13,7 @@
  */
 
 import { assertEquals, assertExists } from '@std/assert';
-import { getHatchesByMonth, getHatchesByOrder, HATCHES } from '@shared/data/hatches.ts';
+import { HATCHES } from '@shared/data/hatches.ts';
 import {
   getStreamById,
   getStreamsByRegion,

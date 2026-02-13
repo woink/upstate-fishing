@@ -41,9 +41,7 @@ export const handler: Handlers = {
       const cachedTimes = [usgsResult.cachedAt, weatherCachedAt].filter(
         (t): t is number => t !== null,
       );
-      const earliestCachedAt = cachedTimes.length > 0
-        ? Math.min(...cachedTimes)
-        : Date.now();
+      const earliestCachedAt = cachedTimes.length > 0 ? Math.min(...cachedTimes) : Date.now();
 
       const { 'Cache-Control': _, ...cacheMetaHeaders } = makeCacheHeaders(
         allCached,
