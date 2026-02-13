@@ -4,16 +4,12 @@ Real-time fishing conditions for NY/NJ/CT trout streams — combines USGS water 
 
 ## Tech Stack
 
-Deno · TypeScript · Hono (backend) · Fresh + Preact + Tailwind (frontend) · Zod · Leaflet
+Deno · TypeScript · Fresh + Preact + Tailwind · Zod · Leaflet
 
 ## Quick Start
 
 ```bash
-# Backend (port 8000)
-deno task dev
-
-# Frontend (port 8001)
-cd frontend && deno task dev
+deno task dev:frontend
 ```
 
 ## Data Sources
