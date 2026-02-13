@@ -15,6 +15,10 @@ frontend/_fresh/
 .vscode/
 .idea/
 
+# AI tooling
+.claude/
+.serena/
+
 # OS
 .DS_Store
 Thumbs.db
