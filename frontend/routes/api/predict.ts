@@ -1,7 +1,26 @@
 import { Handlers } from '$fresh/server.ts';
 import { z } from 'zod';
 import { predictionService } from '@shared/services/predictions.ts';
+import { fahrenheitToCelsius } from '@shared/utils/temperature.ts';
 import { apiError } from '../../utils/api-response.ts';
+
+const CUSTOM_STATION_ID = 'custom';
+const CUSTOM_STATION_NAME = 'Custom Input';
+
+/**
+ * Default weather values when the user supplies airTempF but omits
+ * individual weather fields.
+ */
+const WEATHER_DEFAULTS = {
+  /** Partly cloudy; neutral baseline that neither boosts nor penalises overcast-preferring hatches. */
+  cloudCoverPercent: 50,
+  /** No rain; avoids false suppression of hatches sensitive to precipitation. */
+  precipProbability: 0,
+  /** Light breeze; typical calm trout-stream conditions. */
+  windSpeedMph: 5,
+  /** Most user queries target daytime fishing windows. */
+  isDaylight: true,
+} as const;
 
 const PredictRequestSchema = z.object({
   waterTempF: z.number().optional(),
@@ -25,11 +44,11 @@ export const handler: Handlers = {
 
       const stationData = waterTempF
         ? [{
-          stationId: 'custom',
-          stationName: 'Custom Input',
+          stationId: CUSTOM_STATION_ID,
+          stationName: CUSTOM_STATION_NAME,
           timestamp: new Date().toISOString(),
           waterTempF,
-          waterTempC: (waterTempF - 32) * 5 / 9,
+          waterTempC: fahrenheitToCelsius(waterTempF),
           dischargeCfs: null,
           gageHeightFt: null,
         }]
@@ -39,11 +58,11 @@ export const handler: Handlers = {
         ? {
           timestamp: new Date().toISOString(),
           airTempF,
-          cloudCoverPercent: cloudCoverPercent ?? 50,
-          precipProbability: precipProbability ?? 0,
-          windSpeedMph: 5,
+          cloudCoverPercent: cloudCoverPercent ?? WEATHER_DEFAULTS.cloudCoverPercent,
+          precipProbability: precipProbability ?? WEATHER_DEFAULTS.precipProbability,
+          windSpeedMph: WEATHER_DEFAULTS.windSpeedMph,
           shortForecast: 'Custom conditions',
-          isDaylight: true,
+          isDaylight: WEATHER_DEFAULTS.isDaylight,
         }
         : null;
 
