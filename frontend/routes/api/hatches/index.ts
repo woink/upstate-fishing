@@ -11,7 +11,14 @@ export const handler: Handlers = {
     let hatches = [...HATCHES];
 
     if (order) {
+    if (order) {
+      // Validate order parameter against schema
+      const validOrder = InsectOrderSchema.safeParse(order);
+      if (!validOrder.success) {
+        return apiError('Invalid order parameter', 'VALIDATION_ERROR', 400);
+      }
       hatches = hatches.filter((h) => h.order === order);
+    }
     }
 
     if (month) {

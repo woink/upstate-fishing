@@ -4,6 +4,7 @@ import { cachedUSGSService } from '@shared/services/cached-usgs.ts';
 import { cachedWeatherService } from '@shared/services/cached-weather.ts';
 import { predictionService } from '@shared/services/predictions.ts';
 import { makeCacheHeaders, TTL } from '@shared/services/cache.ts';
+import { logger } from '@shared/utils/logger.ts';
 import { apiError, CACHE_DYNAMIC } from '../../../../utils/api-response.ts';
 
 export const handler: Handlers = {
@@ -27,7 +28,10 @@ export const handler: Handlers = {
           weatherCached = weatherResult.cached;
           weatherCachedAt = weatherResult.cachedAt;
         } catch (err) {
-          console.warn(`Failed to fetch weather for ${stream.name}:`, err);
+          logger.warn('Failed to fetch weather', {
+            stream: stream.name,
+            error: err instanceof Error ? err.message : String(err),
+          });
         }
       }
 
@@ -58,7 +62,10 @@ export const handler: Handlers = {
         { headers: { ...cacheMetaHeaders, 'Cache-Control': CACHE_DYNAMIC } },
       );
     } catch (err) {
-      console.error(`Error fetching conditions for ${stream.name}:`, err);
+      logger.error('Failed to fetch conditions', {
+        stream: stream.name,
+        error: err instanceof Error ? err.message : String(err),
+      });
       return apiError(
         'Failed to fetch conditions',
         'FETCH_ERROR',

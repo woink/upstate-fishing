@@ -5,6 +5,7 @@
 
 import { z } from 'zod';
 import type { StationData } from '../models/types.ts';
+import { celsiusToFahrenheit } from '../utils/temperature.ts';
 
 // ============================================================================
 // USGS API Response Types (Zod schemas for runtime validation)
@@ -153,7 +154,7 @@ export class USGSService {
       switch (paramCode) {
         case USGS_PARAMS.WATER_TEMP:
           stationData.waterTempC = isNaN(value) ? null : value;
-          stationData.waterTempF = isNaN(value) ? null : this.celsiusToFahrenheit(value);
+          stationData.waterTempF = isNaN(value) ? null : celsiusToFahrenheit(value);
           break;
         case USGS_PARAMS.DISCHARGE:
           stationData.dischargeCfs = isNaN(value) ? null : value;
@@ -187,13 +188,6 @@ export class USGSService {
 
     // Values are typically in chronological order, get last one
     return values[values.length - 1] ?? null;
-  }
-
-  /**
-   * Convert Celsius to Fahrenheit
-   */
-  private celsiusToFahrenheit(celsius: number): number {
-    return Math.round((celsius * 9 / 5 + 32) * 10) / 10;
   }
 }
 
