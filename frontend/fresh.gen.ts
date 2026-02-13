@@ -4,10 +4,12 @@
 
 import * as $_app from './routes/_app.tsx';
 import * as $api_path_ from './routes/api/[...path].ts';
+import * as $hatches_index from './routes/hatches/index.tsx';
 import * as $index from './routes/index.tsx';
 import * as $map from './routes/map.tsx';
 import * as $streams_id_ from './routes/streams/[id].tsx';
 import * as $streams_index from './routes/streams/index.tsx';
+import * as $HatchChart from './islands/HatchChart.tsx';
 import * as $StationMap from './islands/StationMap.tsx';
 import * as $StreamConditionsCard from './islands/StreamConditionsCard.tsx';
 import * as $StreamList from './islands/StreamList.tsx';
@@ -18,12 +20,14 @@ const manifest = {
   routes: {
     './routes/_app.tsx': $_app,
     './routes/api/[...path].ts': $api_path_,
+    './routes/hatches/index.tsx': $hatches_index,
     './routes/index.tsx': $index,
     './routes/map.tsx': $map,
     './routes/streams/[id].tsx': $streams_id_,
     './routes/streams/index.tsx': $streams_index,
   },
   islands: {
+    './islands/HatchChart.tsx': $HatchChart,
     './islands/StationMap.tsx': $StationMap,
     './islands/StreamConditionsCard.tsx': $StreamConditionsCard,
     './islands/StreamList.tsx': $StreamList,

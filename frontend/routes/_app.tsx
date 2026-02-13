@@ -25,6 +25,7 @@ export default function App({ Component }: PageProps) {
               <div class='flex gap-4'>
                 <a href='/' class='hover:text-forest-200 transition'>Today</a>
                 <a href='/streams' class='hover:text-forest-200 transition'>Streams</a>
+                <a href='/hatches' class='hover:text-forest-200 transition'>Hatches</a>
                 <a href='/map' class='hover:text-forest-200 transition'>Map</a>
               </div>
             </div>

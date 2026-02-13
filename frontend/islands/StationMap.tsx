@@ -13,30 +13,63 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
   const mapInstance = useRef<L.Map | null>(null);
   const conditionsMap = useSignal<Record<string, StreamConditions>>({});
   const loaded = useSignal(false);
+  const error = useSignal<string | null>(null);
 
   useEffect(() => {
     // Dynamically load Leaflet
     const loadLeaflet = async () => {
-      if (typeof L === 'undefined') {
-        await new Promise<void>((resolve) => {
-          const script = document.createElement('script');
-          script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-          script.onload = () => resolve();
-          document.head.appendChild(script);
+      try {
+        if (typeof L === 'undefined') {
+          // Load Leaflet CSS if not already present
+          if (!document.querySelector('link[href*="leaflet"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            document.head.appendChild(link);
+          }
+
+          // Load Leaflet JS
+          await new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load Leaflet'));
+            document.head.appendChild(script);
+          });
+        }
+
+        // Wait for next frame to ensure DOM is ready
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+
+        if (!mapRef.current) {
+          error.value = 'Map container not found';
+          return;
+        }
+
+        // Prevent double initialization
+        if (mapInstance.current) return;
+
+        // Center on upstate NY
+        const map = L.map(mapRef.current, {
+          center: [41.8, -74.5],
+          zoom: 8,
         });
+        mapInstance.current = map;
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors',
+        }).addTo(map);
+
+        // Force a resize after initialization to fix rendering issues
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 100);
+
+        loaded.value = true;
+      } catch (err) {
+        console.error('Failed to initialize map:', err);
+        error.value = err instanceof Error ? err.message : 'Failed to load map';
       }
-
-      if (!mapRef.current || mapInstance.current) return;
-
-      // Center on upstate NY
-      const map = L.map(mapRef.current).setView([41.8, -74.5], 8);
-      mapInstance.current = map;
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-      }).addTo(map);
-
-      loaded.value = true;
     };
 
     loadLeaflet();
@@ -63,7 +96,7 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
         [stream.coordinates.latitude, stream.coordinates.longitude],
         {
           radius: 10,
-          fillColor: defaultMarkerColor, // Default gray
+          fillColor: defaultMarkerColor,
           color: defaultBorderColor,
           weight: 2,
           opacity: 1,
@@ -136,11 +169,37 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
     });
   }, [loaded.value, streams, apiUrl]);
 
+  // Error state
+  if (error.value) {
+    return (
+      <div class="flex items-center justify-center h-full bg-red-50">
+        <div class="text-center">
+          <div class="text-red-500 text-lg mb-2">⚠️ Map Error</div>
+          <div class="text-red-400 text-sm">{error.value}</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div ref={mapRef} style={{ width: '100%', height: '100%' }}>
+    <div class="relative w-full h-full">
+      {/* Map container - always rendered */}
+      <div
+        ref={mapRef}
+        class="absolute inset-0"
+        style={{ zIndex: 1 }}
+      />
+      
+      {/* Loading overlay - positioned above map container */}
       {!loaded.value && (
-        <div class='flex items-center justify-center h-full bg-slate-100'>
-          <div class='text-slate-500'>Loading map...</div>
+        <div
+          class="absolute inset-0 flex items-center justify-center bg-slate-100"
+          style={{ zIndex: 2 }}
+        >
+          <div class="text-center">
+            <div class="animate-pulse text-slate-500 text-lg">🗺️</div>
+            <div class="text-slate-500 mt-2">Loading map...</div>
+          </div>
         </div>
       )}
     </div>
