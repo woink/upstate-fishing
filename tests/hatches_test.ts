@@ -4,6 +4,7 @@
 
 import { assertEquals, assertExists } from '@std/assert';
 import {
+  filterHatchesByQuery,
   getHatchesByMonth,
   getHatchesByOrder,
   getHatchesByTemp,
@@ -198,4 +199,79 @@ Deno.test('getHatchesByOrder - mayflies + caddis + stones + midges equals total'
 
   const total = mayflies.length + caddis.length + stones.length + midges.length;
   assertEquals(total, HATCHES.length, 'Sum of all orders should equal total hatches');
+});
+
+// ============================================================================
+// filterHatchesByQuery Tests
+// ============================================================================
+
+Deno.test('filterHatchesByQuery - no params returns all hatches', () => {
+  const result = filterHatchesByQuery({});
+  assertEquals(result.hatches.length, HATCHES.length);
+  assertEquals(result.order, null);
+  assertEquals(result.month, null);
+});
+
+Deno.test('filterHatchesByQuery - null params returns all hatches', () => {
+  const result = filterHatchesByQuery({ order: null, month: null });
+  assertEquals(result.hatches.length, HATCHES.length);
+});
+
+Deno.test('filterHatchesByQuery - empty string params returns all hatches', () => {
+  const result = filterHatchesByQuery({ order: '', month: '' });
+  assertEquals(result.hatches.length, HATCHES.length);
+});
+
+Deno.test('filterHatchesByQuery - valid order filters correctly', () => {
+  const result = filterHatchesByQuery({ order: 'mayfly' });
+  assertEquals(result.hatches.length, 9);
+  assertEquals(result.order, 'mayfly');
+  assertEquals(result.month, null);
+  assertEquals(result.hatches.every((h) => h.order === 'mayfly'), true);
+});
+
+Deno.test('filterHatchesByQuery - valid month filters correctly', () => {
+  const result = filterHatchesByQuery({ month: '5' });
+  assertEquals(result.hatches.length, 12);
+  assertEquals(result.month, 5);
+  assertEquals(result.order, null);
+  assertEquals(result.hatches.every((h) => h.peakMonths.includes(5)), true);
+});
+
+Deno.test('filterHatchesByQuery - both order and month applies AND filter', () => {
+  const result = filterHatchesByQuery({ order: 'mayfly', month: '5' });
+  assertEquals(result.hatches.length, 6);
+  assertEquals(result.order, 'mayfly');
+  assertEquals(result.month, 5);
+  assertEquals(result.hatches.every((h) => h.order === 'mayfly' && h.peakMonths.includes(5)), true);
+});
+
+Deno.test('filterHatchesByQuery - invalid order returns all hatches', () => {
+  const result = filterHatchesByQuery({ order: 'dragonfly' });
+  assertEquals(result.hatches.length, HATCHES.length);
+  assertEquals(result.order, null);
+});
+
+Deno.test('filterHatchesByQuery - non-numeric month returns all hatches', () => {
+  const result = filterHatchesByQuery({ month: 'abc' });
+  assertEquals(result.hatches.length, HATCHES.length);
+  assertEquals(result.month, null);
+});
+
+Deno.test('filterHatchesByQuery - month out of range (13) returns all hatches', () => {
+  const result = filterHatchesByQuery({ month: '13' });
+  assertEquals(result.hatches.length, HATCHES.length);
+  assertEquals(result.month, null);
+});
+
+Deno.test('filterHatchesByQuery - month out of range (0) returns all hatches', () => {
+  const result = filterHatchesByQuery({ month: '0' });
+  assertEquals(result.hatches.length, HATCHES.length);
+  assertEquals(result.month, null);
+});
+
+Deno.test('filterHatchesByQuery - negative month returns all hatches', () => {
+  const result = filterHatchesByQuery({ month: '-1' });
+  assertEquals(result.hatches.length, HATCHES.length);
+  assertEquals(result.month, null);
 });

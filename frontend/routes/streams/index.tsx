@@ -1,7 +1,6 @@
 import { Handlers, PageProps } from '$fresh/server.ts';
 import type { Stream } from '@shared/models/types.ts';
-import { getStreamsByRegion, getStreamsByState, STREAMS } from '@shared/data/streams.ts';
-import { RegionSchema, StateSchema } from '@shared/models/types.ts';
+import { filterStreamsByQuery } from '@shared/data/streams.ts';
 import StreamList from '../../islands/StreamList.tsx';
 
 interface StreamsPageData {
@@ -14,25 +13,12 @@ interface StreamsPageData {
 export const handler: Handlers<StreamsPageData> = {
   GET(req, ctx) {
     const url = new URL(req.url);
-    const regionParsed = RegionSchema.safeParse(url.searchParams.get('region'));
-    const stateParsed = StateSchema.safeParse(url.searchParams.get('state'));
-
-    const region = regionParsed.success ? regionParsed.data : undefined;
-    const state = stateParsed.success ? stateParsed.data : undefined;
-
-    let streams = [...STREAMS];
-    if (region) {
-      streams = getStreamsByRegion(region);
-    } else if (state) {
-      streams = getStreamsByState(state);
-    }
-
-    return ctx.render({
-      streams,
-      region,
-      state,
-      apiUrl: '',
+    const { streams, region, state } = filterStreamsByQuery({
+      region: url.searchParams.get('region'),
+      state: url.searchParams.get('state'),
     });
+
+    return ctx.render({ streams, region, state, apiUrl: '' });
   },
 };
 

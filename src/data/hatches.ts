@@ -3,7 +3,8 @@
  * Temperature thresholds based on research and regional fly shop data
  */
 
-import type { Hatch } from '../models/types.ts';
+import type { Hatch, InsectOrder } from '../models/types.ts';
+import { InsectOrderSchema } from '../models/types.ts';
 
 /**
  * Curated hatch data for Northeast streams
@@ -270,4 +271,25 @@ export function getHatchesByTemp(tempF: number): Hatch[] {
  */
 export function getHatchesByOrder(order: Hatch['order']): Hatch[] {
   return HATCHES.filter((h) => h.order === order);
+}
+
+/**
+ * Filter hatches by query parameters (order and/or month).
+ * Accepts raw string | null values from URL search params.
+ * Invalid values are silently ignored (treated as no filter).
+ */
+export function filterHatchesByQuery(params: {
+  order?: string | null;
+  month?: string | null;
+}): { hatches: Hatch[]; order: InsectOrder | null; month: number | null } {
+  const orderParsed = InsectOrderSchema.safeParse(params.order);
+  const monthNum = params.month ? parseInt(params.month, 10) : NaN;
+  const validMonth = monthNum >= 1 && monthNum <= 12 ? monthNum : null;
+
+  const order = orderParsed.success ? orderParsed.data : null;
+  let hatches = [...HATCHES];
+  if (order) hatches = hatches.filter((h) => h.order === order);
+  if (validMonth) hatches = hatches.filter((h) => h.peakMonths.includes(validMonth));
+
+  return { hatches, order, month: validMonth };
 }

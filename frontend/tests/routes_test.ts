@@ -4,7 +4,7 @@
  */
 
 import { assertEquals, assertExists } from '@std/assert';
-import { STREAMS, getStreamsByRegion, getStreamsByState } from '@shared/data/streams.ts';
+import { getStreamsByRegion, getStreamsByState, STREAMS } from '@shared/data/streams.ts';
 import { HATCHES } from '@shared/data/hatches.ts';
 
 // ============================================================================

@@ -4,6 +4,7 @@
 
 import { assertEquals, assertExists } from '@std/assert';
 import {
+  filterStreamsByQuery,
   getAllStationIds,
   getStreamById,
   getStreamsByRegion,
@@ -178,4 +179,67 @@ Deno.test('getAllStationIds - includes known USGS stations', () => {
   const stationIds = getAllStationIds();
   // Beaverkill station
   assertEquals(stationIds.includes('01420500'), true, 'Should include Beaverkill station');
+});
+
+// ============================================================================
+// filterStreamsByQuery Tests
+// ============================================================================
+
+Deno.test('filterStreamsByQuery - no params returns all streams', () => {
+  const result = filterStreamsByQuery({});
+  assertEquals(result.streams.length, STREAMS.length);
+  assertEquals(result.region, undefined);
+  assertEquals(result.state, undefined);
+});
+
+Deno.test('filterStreamsByQuery - null params returns all streams', () => {
+  const result = filterStreamsByQuery({ region: null, state: null });
+  assertEquals(result.streams.length, STREAMS.length);
+});
+
+Deno.test('filterStreamsByQuery - undefined params returns all streams', () => {
+  const result = filterStreamsByQuery({ region: undefined, state: undefined });
+  assertEquals(result.streams.length, STREAMS.length);
+});
+
+Deno.test('filterStreamsByQuery - empty string params returns all streams', () => {
+  const result = filterStreamsByQuery({ region: '', state: '' });
+  assertEquals(result.streams.length, STREAMS.length);
+});
+
+Deno.test('filterStreamsByQuery - valid region filters correctly', () => {
+  const result = filterStreamsByQuery({ region: 'catskills' });
+  assertEquals(result.streams.length, 4);
+  assertEquals(result.region, 'catskills');
+  assertEquals(result.state, undefined);
+  assertEquals(result.streams.every((s) => s.region === 'catskills'), true);
+});
+
+Deno.test('filterStreamsByQuery - valid state filters correctly', () => {
+  const result = filterStreamsByQuery({ state: 'NJ' });
+  assertEquals(result.streams.length, 5);
+  assertEquals(result.state, 'NJ');
+  assertEquals(result.region, undefined);
+  assertEquals(result.streams.every((s) => s.state === 'NJ'), true);
+});
+
+Deno.test('filterStreamsByQuery - region takes precedence over state', () => {
+  const result = filterStreamsByQuery({ region: 'catskills', state: 'NJ' });
+  assertEquals(result.streams.length, 4);
+  assertEquals(result.region, 'catskills');
+  assertEquals(result.state, undefined, 'State should not be set when region matches');
+});
+
+Deno.test('filterStreamsByQuery - invalid region falls through to valid state', () => {
+  const result = filterStreamsByQuery({ region: 'invalid', state: 'CT' });
+  assertEquals(result.streams.length, 4);
+  assertEquals(result.state, 'CT');
+  assertEquals(result.region, undefined);
+});
+
+Deno.test('filterStreamsByQuery - both invalid returns all streams', () => {
+  const result = filterStreamsByQuery({ region: 'invalid', state: 'XX' });
+  assertEquals(result.streams.length, STREAMS.length);
+  assertEquals(result.region, undefined);
+  assertEquals(result.state, undefined);
 });

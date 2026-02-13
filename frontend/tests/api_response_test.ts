@@ -4,7 +4,13 @@
  */
 
 import { assertEquals, assertExists } from '@std/assert';
-import { apiSuccess, apiSuccessList, apiError, CACHE_STATIC, CACHE_DYNAMIC } from '../utils/api-response.ts';
+import {
+  apiError,
+  apiSuccess,
+  apiSuccessList,
+  CACHE_DYNAMIC,
+  CACHE_STATIC,
+} from '../utils/api-response.ts';
 
 // ============================================================================
 // Cache Constants Tests
@@ -22,7 +28,7 @@ Deno.test('CACHE_DYNAMIC - has correct value', () => {
 // apiSuccess Tests
 // ============================================================================
 
-Deno.test('apiSuccess - returns 200 status', async () => {
+Deno.test('apiSuccess - returns 200 status', () => {
   const response = apiSuccess({ id: 'test' });
   assertEquals(response.status, 200);
 });
@@ -68,7 +74,7 @@ Deno.test('apiSuccess - custom headers can override Cache-Control', () => {
 // apiSuccessList Tests
 // ============================================================================
 
-Deno.test('apiSuccessList - returns 200 status', async () => {
+Deno.test('apiSuccessList - returns 200 status', () => {
   const response = apiSuccessList([{ id: '1' }, { id: '2' }]);
   assertEquals(response.status, 200);
 });
@@ -114,17 +120,17 @@ Deno.test('apiSuccessList - merges custom headers', () => {
 // apiError Tests
 // ============================================================================
 
-Deno.test('apiError - returns correct status code', async () => {
+Deno.test('apiError - returns correct status code', () => {
   const response = apiError('Not Found', 'NOT_FOUND', 404);
   assertEquals(response.status, 404);
 });
 
-Deno.test('apiError - returns 400 for validation errors', async () => {
+Deno.test('apiError - returns 400 for validation errors', () => {
   const response = apiError('Invalid input', 'VALIDATION_ERROR', 400);
   assertEquals(response.status, 400);
 });
 
-Deno.test('apiError - returns 500 for server errors', async () => {
+Deno.test('apiError - returns 500 for server errors', () => {
   const response = apiError('Internal error', 'SERVER_ERROR', 500);
   assertEquals(response.status, 500);
 });

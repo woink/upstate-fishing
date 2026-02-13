@@ -1,6 +1,6 @@
 import { Handlers } from '$fresh/server.ts';
 import { HATCHES } from '@shared/data/hatches.ts';
-import { apiSuccess, apiError } from '../../../utils/api-response.ts';
+import { apiError, apiSuccess } from '../../../utils/api-response.ts';
 
 export const handler: Handlers = {
   GET(_req, ctx) {
