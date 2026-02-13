@@ -11,6 +11,7 @@
  */
 
 import type { Stream } from '../models/types.ts';
+import { RegionSchema, StateSchema } from '../models/types.ts';
 
 /**
  * Curated list of trout streams with their USGS monitoring stations
@@ -349,4 +350,25 @@ export function getStreamById(id: string): Stream | undefined {
  */
 export function getAllStationIds(): string[] {
   return [...new Set(STREAMS.flatMap((s) => s.stationIds))];
+}
+
+/**
+ * Filter streams by query parameters (region or state).
+ * Accepts raw string | null values from URL search params.
+ * Returns filtered streams along with the validated filter values.
+ */
+export function filterStreamsByQuery(params: {
+  region?: string | null;
+  state?: string | null;
+}): { streams: Stream[]; region?: string; state?: string } {
+  const regionParsed = RegionSchema.safeParse(params.region);
+  const stateParsed = StateSchema.safeParse(params.state);
+
+  if (regionParsed.success) {
+    return { streams: getStreamsByRegion(regionParsed.data), region: regionParsed.data };
+  }
+  if (stateParsed.success) {
+    return { streams: getStreamsByState(stateParsed.data), state: stateParsed.data };
+  }
+  return { streams: [...STREAMS] };
 }

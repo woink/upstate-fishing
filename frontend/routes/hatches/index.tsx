@@ -1,6 +1,6 @@
 import { Handlers, PageProps } from '$fresh/server.ts';
 import type { Hatch, InsectOrder } from '@shared/models/types.ts';
-import { HATCHES } from '@shared/data/hatches.ts';
+import { filterHatchesByQuery } from '@shared/data/hatches.ts';
 import HatchChart from '../../islands/HatchChart.tsx';
 
 interface HatchesPageData {
@@ -13,29 +13,12 @@ interface HatchesPageData {
 export const handler: Handlers<HatchesPageData> = {
   GET(req, ctx) {
     const url = new URL(req.url);
-    const orderParam = url.searchParams.get('order') as InsectOrder | null;
-    const monthParam = url.searchParams.get('month');
-
-    const validOrders: InsectOrder[] = ['mayfly', 'caddisfly', 'stonefly', 'midge'];
-    const filterOrder = orderParam && validOrders.includes(orderParam) ? orderParam : null;
-
-    const monthNum = monthParam ? parseInt(monthParam, 10) : null;
-    const filterMonth = monthNum && monthNum >= 1 && monthNum <= 12 ? monthNum : null;
-
-    let hatches = [...HATCHES];
-    if (filterOrder) {
-      hatches = hatches.filter((h) => h.order === filterOrder);
-    }
-    if (filterMonth) {
-      hatches = hatches.filter((h) => h.peakMonths.includes(filterMonth));
-    }
-
-    return ctx.render({
-      hatches,
-      filterOrder,
-      filterMonth,
-      error: null,
+    const { hatches, order: filterOrder, month: filterMonth } = filterHatchesByQuery({
+      order: url.searchParams.get('order'),
+      month: url.searchParams.get('month'),
     });
+
+    return ctx.render({ hatches, filterOrder, filterMonth, error: null });
   },
 };
 
