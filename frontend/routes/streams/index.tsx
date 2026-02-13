@@ -1,5 +1,7 @@
 import { Handlers, PageProps } from '$fresh/server.ts';
 import type { Stream } from '@shared/models/types.ts';
+import { getStreamsByRegion, getStreamsByState, STREAMS } from '@shared/data/streams.ts';
+import { RegionSchema, StateSchema } from '@shared/models/types.ts';
 import StreamList from '../../islands/StreamList.tsx';
 
 interface StreamsPageData {
@@ -10,39 +12,27 @@ interface StreamsPageData {
 }
 
 export const handler: Handlers<StreamsPageData> = {
-  async GET(req, ctx) {
+  GET(req, ctx) {
     const url = new URL(req.url);
-    const region = url.searchParams.get('region') ?? undefined;
-    const state = url.searchParams.get('state') ?? undefined;
+    const regionParsed = RegionSchema.safeParse(url.searchParams.get('region'));
+    const stateParsed = StateSchema.safeParse(url.searchParams.get('state'));
 
-    const backendUrl = Deno.env.get('API_URL') ?? 'http://localhost:8000';
+    const region = regionParsed.success ? regionParsed.data : undefined;
+    const state = stateParsed.success ? stateParsed.data : undefined;
 
-    let apiEndpoint = `${backendUrl}/api/streams`;
+    let streams = [...STREAMS];
     if (region) {
-      apiEndpoint += `?region=${region}`;
+      streams = getStreamsByRegion(region);
     } else if (state) {
-      apiEndpoint += `?state=${state}`;
+      streams = getStreamsByState(state);
     }
 
-    try {
-      const response = await fetch(apiEndpoint);
-      const json = await response.json();
-
-      return ctx.render({
-        streams: json.data ?? [],
-        region,
-        state,
-        apiUrl: '', // Relative URL for client-side fetches via proxy
-      });
-    } catch (error) {
-      console.error('Failed to fetch streams:', error);
-      return ctx.render({
-        streams: [],
-        region,
-        state,
-        apiUrl: '', // Relative URL for client-side fetches via proxy
-      });
-    }
+    return ctx.render({
+      streams,
+      region,
+      state,
+      apiUrl: '',
+    });
   },
 };
 

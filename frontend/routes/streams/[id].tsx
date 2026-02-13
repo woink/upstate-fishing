@@ -1,5 +1,10 @@
 import { Handlers, PageProps } from '$fresh/server.ts';
 import type { StreamConditions } from '@shared/models/types.ts';
+import { getStreamById } from '@shared/data/streams.ts';
+import { cachedUSGSService } from '@shared/services/cached-usgs.ts';
+import { cachedWeatherService } from '@shared/services/cached-weather.ts';
+import { predictionService } from '@shared/services/predictions.ts';
+import { logger } from '@shared/utils/logger.ts';
 import StreamConditionsCard from '../../islands/StreamConditionsCard.tsx';
 
 interface StreamDetailData {
@@ -11,31 +16,37 @@ interface StreamDetailData {
 export const handler: Handlers<StreamDetailData> = {
   async GET(_req, ctx) {
     const { id } = ctx.params;
-    const backendUrl = Deno.env.get('API_URL') ?? 'http://localhost:8000';
+    const stream = getStreamById(id);
+
+    if (!stream) {
+      return ctx.render({ conditions: null, error: 'Stream not found', apiUrl: '' });
+    }
 
     try {
-      const response = await fetch(`${backendUrl}/api/streams/${id}/conditions`);
-      const json = await response.json();
+      const usgsResult = await cachedUSGSService.getInstantaneousValues(stream.stationIds);
 
-      if (!json.success) {
-        return ctx.render({
-          conditions: null,
-          error: json.error?.error ?? 'Failed to load stream',
-          apiUrl: '', // Relative URL for client-side fetches
-        });
+      let weather = null;
+      if (stream.coordinates) {
+        try {
+          const weatherResult = await cachedWeatherService.getCurrentConditions(stream.coordinates);
+          weather = weatherResult.data;
+        } catch (err) {
+          logger.warn('Failed to fetch weather', {
+            stream: stream.name,
+            error: err instanceof Error ? err.message : String(err),
+          });
+        }
       }
 
-      return ctx.render({
-        conditions: json.data,
-        apiUrl: '', // Relative URL for client-side fetches
-      });
+      const conditions = predictionService.generateConditions(stream, usgsResult.data, weather);
+
+      return ctx.render({ conditions, apiUrl: '' });
     } catch (error) {
-      console.error('Failed to fetch stream conditions:', error);
-      return ctx.render({
-        conditions: null,
-        error: 'Failed to connect to API',
-        apiUrl: '', // Relative URL for client-side fetches
+      logger.error('Failed to fetch stream conditions', {
+        stream: stream.name,
+        error: error instanceof Error ? error.message : String(error),
       });
+      return ctx.render({ conditions: null, error: 'Failed to fetch conditions', apiUrl: '' });
     }
   },
 };

@@ -1,5 +1,6 @@
 import { Handlers, PageProps } from '$fresh/server.ts';
 import type { Stream } from '@shared/models/types.ts';
+import { STREAMS } from '@shared/data/streams.ts';
 import StationMap from '../islands/StationMap.tsx';
 
 interface MapPageData {
@@ -8,24 +9,11 @@ interface MapPageData {
 }
 
 export const handler: Handlers<MapPageData> = {
-  async GET(_req, ctx) {
-    const backendUrl = Deno.env.get('API_URL') ?? 'http://localhost:8000';
-
-    try {
-      const response = await fetch(`${backendUrl}/api/streams`);
-      const json = await response.json();
-
-      return ctx.render({
-        streams: json.data ?? [],
-        apiUrl: '', // Relative URL for client-side fetches via proxy
-      });
-    } catch (error) {
-      console.error('Failed to fetch streams:', error);
-      return ctx.render({
-        streams: [],
-        apiUrl: '', // Relative URL for client-side fetches via proxy
-      });
-    }
+  GET(_req, ctx) {
+    return ctx.render({
+      streams: [...STREAMS],
+      apiUrl: '',
+    });
   },
 };
 

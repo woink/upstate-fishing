@@ -6,11 +6,31 @@ import { Hono } from '@hono/hono';
 import { z } from 'zod';
 import { getStreamById, getStreamsByRegion, getStreamsByState, STREAMS } from '../data/streams.ts';
 import { HATCHES } from '../data/hatches.ts';
+import { InsectOrderSchema, RegionSchema, StateSchema } from '../models/types.ts';
 import { cachedUSGSService } from '../services/cached-usgs.ts';
 import { cachedWeatherService } from '../services/cached-weather.ts';
 import { predictionService } from '../services/predictions.ts';
 import { makeCacheHeaders, TTL } from '../services/cache.ts';
-import type { Region, State } from '../models/types.ts';
+import { fahrenheitToCelsius } from '../utils/temperature.ts';
+import { logger } from '../utils/logger.ts';
+
+const CUSTOM_STATION_ID = 'custom';
+const CUSTOM_STATION_NAME = 'Custom Input';
+
+/**
+ * Default weather values when the user supplies airTempF but omits
+ * individual weather fields.
+ */
+const WEATHER_DEFAULTS = {
+  /** Partly cloudy; neutral baseline that neither boosts nor penalises overcast-preferring hatches. */
+  cloudCoverPercent: 50,
+  /** No rain; avoids false suppression of hatches sensitive to precipitation. */
+  precipProbability: 0,
+  /** Light breeze; typical calm trout-stream conditions. */
+  windSpeedMph: 5,
+  /** Most user queries target daytime fishing windows. */
+  isDaylight: true,
+} as const;
 
 // ============================================================================
 // API Router
@@ -27,15 +47,15 @@ export const api = new Hono();
  * List all streams, optionally filtered by region or state
  */
 api.get('/streams', (c) => {
-  const region = c.req.query('region') as Region | undefined;
-  const state = c.req.query('state') as State | undefined;
+  const regionParsed = RegionSchema.safeParse(c.req.query('region'));
+  const stateParsed = StateSchema.safeParse(c.req.query('state'));
 
   let streams = [...STREAMS];
 
-  if (region) {
-    streams = getStreamsByRegion(region);
-  } else if (state) {
-    streams = getStreamsByState(state);
+  if (regionParsed.success) {
+    streams = getStreamsByRegion(regionParsed.data);
+  } else if (stateParsed.success) {
+    streams = getStreamsByState(stateParsed.data);
   }
 
   return c.json({
@@ -106,7 +126,10 @@ api.get('/streams/:id/conditions', async (c) => {
         weatherCached = weatherResult.cached;
         weatherCachedAt = weatherResult.cachedAt;
       } catch (err) {
-        console.warn(`Failed to fetch weather for ${stream.name}:`, err);
+        logger.warn('Failed to fetch weather', {
+          stream: stream.name,
+          error: err instanceof Error ? err.message : String(err),
+        });
       }
     }
 
@@ -141,7 +164,10 @@ api.get('/streams/:id/conditions', async (c) => {
       cacheHeaders,
     );
   } catch (err) {
-    console.error(`Error fetching conditions for ${stream.name}:`, err);
+    logger.error('Failed to fetch conditions', {
+      stream: stream.name,
+      error: err instanceof Error ? err.message : String(err),
+    });
     return c.json(
       {
         success: false,
@@ -172,7 +198,10 @@ api.get('/hatches', (c) => {
   let hatches = [...HATCHES];
 
   if (order) {
-    hatches = hatches.filter((h) => h.order === order);
+    const validOrder = InsectOrderSchema.safeParse(order);
+    if (validOrder.success) {
+      hatches = hatches.filter((h) => h.order === validOrder.data);
+    }
   }
 
   if (month) {
@@ -311,11 +340,11 @@ api.post('/predict', async (c) => {
     // Build mock station data if temp provided
     const stationData = waterTempF
       ? [{
-        stationId: 'custom',
-        stationName: 'Custom Input',
+        stationId: CUSTOM_STATION_ID,
+        stationName: CUSTOM_STATION_NAME,
         timestamp: new Date().toISOString(),
         waterTempF,
-        waterTempC: (waterTempF - 32) * 5 / 9,
+        waterTempC: fahrenheitToCelsius(waterTempF),
         dischargeCfs: null,
         gageHeightFt: null,
       }]
@@ -326,11 +355,11 @@ api.post('/predict', async (c) => {
       ? {
         timestamp: new Date().toISOString(),
         airTempF,
-        cloudCoverPercent: cloudCoverPercent ?? 50,
-        precipProbability: precipProbability ?? 0,
-        windSpeedMph: 5,
+        cloudCoverPercent: cloudCoverPercent ?? WEATHER_DEFAULTS.cloudCoverPercent,
+        precipProbability: precipProbability ?? WEATHER_DEFAULTS.precipProbability,
+        windSpeedMph: WEATHER_DEFAULTS.windSpeedMph,
         shortForecast: 'Custom conditions',
-        isDaylight: true,
+        isDaylight: WEATHER_DEFAULTS.isDaylight,
       }
       : null;
 
