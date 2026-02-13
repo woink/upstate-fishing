@@ -28,12 +28,21 @@ const PredictRequestSchema = z.object({
   cloudCoverPercent: z.number().min(0).max(100).optional(),
   precipProbability: z.number().min(0).max(100).optional(),
   date: z.string().datetime().optional(),
-});
+}).refine(
+  (data) => data.waterTempF !== undefined || data.airTempF !== undefined,
+  { message: 'At least one of waterTempF or airTempF is required' },
+);
 
 export const handler: Handlers = {
   async POST(req, _ctx) {
+    let body;
     try {
-      const body = await req.json();
+      body = await req.json();
+    } catch {
+      return apiError('Invalid JSON in request body', 'INVALID_JSON', 400);
+    }
+
+    try {
       const parsed = PredictRequestSchema.safeParse(body);
 
       if (!parsed.success) {

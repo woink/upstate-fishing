@@ -4,6 +4,7 @@ import { getStreamById } from '@shared/data/streams.ts';
 import { cachedUSGSService } from '@shared/services/cached-usgs.ts';
 import { cachedWeatherService } from '@shared/services/cached-weather.ts';
 import { predictionService } from '@shared/services/predictions.ts';
+import { logger } from '@shared/utils/logger.ts';
 import StreamConditionsCard from '../../islands/StreamConditionsCard.tsx';
 
 interface StreamDetailData {
@@ -30,7 +31,10 @@ export const handler: Handlers<StreamDetailData> = {
           const weatherResult = await cachedWeatherService.getCurrentConditions(stream.coordinates);
           weather = weatherResult.data;
         } catch (err) {
-          console.warn(`Failed to fetch weather for ${stream.name}:`, err);
+          logger.warn('Failed to fetch weather', {
+            stream: stream.name,
+            error: err instanceof Error ? err.message : String(err),
+          });
         }
       }
 
@@ -38,7 +42,10 @@ export const handler: Handlers<StreamDetailData> = {
 
       return ctx.render({ conditions, apiUrl: '' });
     } catch (error) {
-      console.error('Failed to fetch stream conditions:', error);
+      logger.error('Failed to fetch stream conditions', {
+        stream: stream.name,
+        error: error instanceof Error ? error.message : String(error),
+      });
       return ctx.render({ conditions: null, error: 'Failed to fetch conditions', apiUrl: '' });
     }
   },

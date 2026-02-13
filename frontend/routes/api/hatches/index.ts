@@ -21,9 +21,10 @@ export const handler: Handlers = {
 
     if (month) {
       const monthNum = parseInt(month, 10);
-      if (!isNaN(monthNum) && monthNum >= 1 && monthNum <= 12) {
-        hatches = hatches.filter((h) => h.peakMonths.includes(monthNum));
+      if (isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+        return apiError('Invalid month parameter (must be 1-12)', 'VALIDATION_ERROR', 400);
       }
+      hatches = hatches.filter((h) => h.peakMonths.includes(monthNum));
     }
 
     return apiSuccessList(hatches);

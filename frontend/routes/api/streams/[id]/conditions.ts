@@ -38,10 +38,12 @@ export const handler: Handlers = {
       const conditions = predictionService.generateConditions(stream, usgsResult.data, weather);
 
       const allCached = usgsResult.cached && (stream.coordinates ? weatherCached : true);
-      const earliestCachedAt = Math.min(
-        usgsResult.cachedAt ?? Date.now(),
-        weatherCachedAt ?? Date.now(),
+      const cachedTimes = [usgsResult.cachedAt, weatherCachedAt].filter(
+        (t): t is number => t !== null,
       );
+      const earliestCachedAt = cachedTimes.length > 0
+        ? Math.min(...cachedTimes)
+        : Date.now();
 
       const { 'Cache-Control': _, ...cacheMetaHeaders } = makeCacheHeaders(
         allCached,
