@@ -1,7 +1,7 @@
 import { useSignal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import type { Stream, StreamConditions } from '@shared/models/types.ts';
-import { qualityHexColors, defaultMarkerColor, defaultBorderColor } from '../lib/colors.ts';
+import { defaultBorderColor, defaultMarkerColor, qualityHexColors } from '../lib/colors.ts';
 
 interface StationMapProps {
   streams: Stream[];
@@ -172,33 +172,33 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
   // Error state
   if (error.value) {
     return (
-      <div class="flex items-center justify-center h-full bg-red-50">
-        <div class="text-center">
-          <div class="text-red-500 text-lg mb-2">⚠️ Map Error</div>
-          <div class="text-red-400 text-sm">{error.value}</div>
+      <div class='flex items-center justify-center h-full bg-red-50'>
+        <div class='text-center'>
+          <div class='text-red-500 text-lg mb-2'>⚠️ Map Error</div>
+          <div class='text-red-400 text-sm'>{error.value}</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div class="relative w-full h-full">
+    <div class='relative w-full h-full'>
       {/* Map container - always rendered */}
       <div
         ref={mapRef}
-        class="absolute inset-0"
+        class='absolute inset-0'
         style={{ zIndex: 1 }}
       />
-      
+
       {/* Loading overlay - positioned above map container */}
       {!loaded.value && (
         <div
-          class="absolute inset-0 flex items-center justify-center bg-slate-100"
+          class='absolute inset-0 flex items-center justify-center bg-slate-100'
           style={{ zIndex: 2 }}
         >
-          <div class="text-center">
-            <div class="animate-pulse text-slate-500 text-lg">🗺️</div>
-            <div class="text-slate-500 mt-2">Loading map...</div>
+          <div class='text-center'>
+            <div class='animate-pulse text-slate-500 text-lg'>🗺️</div>
+            <div class='text-slate-500 mt-2'>Loading map...</div>
           </div>
         </div>
       )}

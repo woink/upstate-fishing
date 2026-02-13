@@ -120,12 +120,16 @@ Deno.test('getStreamsByState - returns NJ streams', () => {
   );
 });
 
-Deno.test("getStreamsByState - all states equal total", () => {
-  const ny = getStreamsByState("NY");
-  const ct = getStreamsByState("CT");
-  const nc = getStreamsByState("NC");
-  const nj = getStreamsByState("NJ");
-  assertEquals(ny.length + nj.length + ct.length + nc.length, STREAMS.length, "All states should equal total streams");
+Deno.test('getStreamsByState - all states equal total', () => {
+  const ny = getStreamsByState('NY');
+  const ct = getStreamsByState('CT');
+  const nc = getStreamsByState('NC');
+  const nj = getStreamsByState('NJ');
+  assertEquals(
+    ny.length + nj.length + ct.length + nc.length,
+    STREAMS.length,
+    'All states should equal total streams',
+  );
 });
 
 // ============================================================================

@@ -1,6 +1,6 @@
 import { useSignal } from '@preact/signals';
 import type { StreamConditions } from '@shared/models/types.ts';
-import { qualityClasses, confidenceClasses } from '../lib/colors.ts';
+import { confidenceClasses, qualityClasses } from '../lib/colors.ts';
 
 interface StreamConditionsCardProps {
   conditions: StreamConditions;

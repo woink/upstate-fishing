@@ -8,8 +8,18 @@ interface HatchChartProps {
 
 const MONTH_LABELS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 const ORDER_COLORS: Record<InsectOrder, { bg: string; border: string; text: string }> = {
@@ -44,7 +54,7 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
         const aInCurrent = a.peakMonths.includes(currentMonth) ? 0 : 1;
         const bInCurrent = b.peakMonths.includes(currentMonth) ? 0 : 1;
         if (aInCurrent !== bInCurrent) return aInCurrent - bInCurrent;
-        
+
         const aMin = Math.min(...a.peakMonths);
         const bMin = Math.min(...b.peakMonths);
         return aMin - bMin || a.commonName.localeCompare(b.commonName);
@@ -60,10 +70,10 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
   };
 
   return (
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class='bg-white rounded-lg shadow overflow-hidden'>
       {/* Sort controls */}
-      <div class="px-4 py-2 bg-slate-50 border-b border-slate-100 flex gap-2 items-center">
-        <span class="text-sm text-slate-500">Sort by:</span>
+      <div class='px-4 py-2 bg-slate-50 border-b border-slate-100 flex gap-2 items-center'>
+        <span class='text-sm text-slate-500'>Sort by:</span>
         {(['month', 'name', 'order'] as const).map((sort) => (
           <button
             onClick={() => sortBy.value = sort}
@@ -79,27 +89,25 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
       </div>
 
       {/* Chart */}
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
+      <div class='overflow-x-auto'>
+        <table class='w-full text-sm'>
           <thead>
-            <tr class="bg-slate-50">
-              <th class="text-left p-3 font-medium text-slate-700 sticky left-0 bg-slate-50 min-w-[180px]">
+            <tr class='bg-slate-50'>
+              <th class='text-left p-3 font-medium text-slate-700 sticky left-0 bg-slate-50 min-w-[180px]'>
                 Hatch
               </th>
               {MONTH_LABELS.map((label, i) => (
                 <th
                   class={`p-2 font-medium text-center w-10 ${
-                    i + 1 === currentMonth
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'text-slate-500'
+                    i + 1 === currentMonth ? 'bg-yellow-100 text-yellow-800' : 'text-slate-500'
                   }`}
                   title={MONTH_NAMES[i]}
                 >
                   {label}
                 </th>
               ))}
-              <th class="p-3 font-medium text-slate-700 text-center min-w-[100px]">Temp</th>
-              <th class="p-3 font-medium text-slate-700 text-center min-w-[80px]">Hooks</th>
+              <th class='p-3 font-medium text-slate-700 text-center min-w-[100px]'>Temp</th>
+              <th class='p-3 font-medium text-slate-700 text-center min-w-[80px]'>Hooks</th>
             </tr>
           </thead>
           <tbody>
@@ -113,18 +121,16 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
                 }}
               >
                 {/* Hatch name */}
-                <td class="p-3 sticky left-0 bg-inherit">
-                  <div class="flex items-center gap-2">
+                <td class='p-3 sticky left-0 bg-inherit'>
+                  <div class='flex items-center gap-2'>
                     <span class={`w-2 h-2 rounded-full ${ORDER_COLORS[hatch.order].bg}`}></span>
-                    <span class="font-medium text-slate-800">{hatch.commonName}</span>
-                    {hatch.prefersOvercast ? (
-                      <span title="Prefers overcast">☁️</span>
-                    ) : (
-                      <span title="Prefers sunny" class="opacity-50">☀️</span>
-                    )}
+                    <span class='font-medium text-slate-800'>{hatch.commonName}</span>
+                    {hatch.prefersOvercast
+                      ? <span title='Prefers overcast'>☁️</span>
+                      : <span title='Prefers sunny' class='opacity-50'>☀️</span>}
                   </div>
                   {hatch.scientificName && (
-                    <div class="text-xs text-slate-400 italic ml-4">
+                    <div class='text-xs text-slate-400 italic ml-4'>
                       {hatch.scientificName}
                     </div>
                   )}
@@ -138,9 +144,7 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
 
                   return (
                     <td
-                      class={`p-1 text-center ${
-                        isCurrent ? 'bg-yellow-50' : ''
-                      }`}
+                      class={`p-1 text-center ${isCurrent ? 'bg-yellow-50' : ''}`}
                     >
                       {isPeak && (
                         <div
@@ -155,12 +159,12 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
                 })}
 
                 {/* Temperature */}
-                <td class="p-3 text-center text-slate-600">
+                <td class='p-3 text-center text-slate-600'>
                   {hatch.minTempF}°-{hatch.maxTempF}°F
                 </td>
 
                 {/* Hook sizes */}
-                <td class="p-3 text-center text-slate-600">
+                <td class='p-3 text-center text-slate-600'>
                   {formatHookSizes(hatch.hookSizes)}
                 </td>
               </tr>
@@ -171,50 +175,50 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
 
       {/* Detail panel */}
       {selectedHatch.value && (
-        <div class="border-t border-slate-200 p-4 bg-slate-50">
-          <div class="flex justify-between items-start">
+        <div class='border-t border-slate-200 p-4 bg-slate-50'>
+          <div class='flex justify-between items-start'>
             <div>
               <h3 class={`text-lg font-semibold ${ORDER_COLORS[selectedHatch.value.order].text}`}>
                 {selectedHatch.value.commonName}
               </h3>
               {selectedHatch.value.scientificName && (
-                <p class="text-sm text-slate-500 italic">
+                <p class='text-sm text-slate-500 italic'>
                   {selectedHatch.value.scientificName}
                 </p>
               )}
             </div>
             <button
               onClick={() => selectedHatch.value = null}
-              class="text-slate-400 hover:text-slate-600"
+              class='text-slate-400 hover:text-slate-600'
             >
               ✕
             </button>
           </div>
 
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          <div class='grid grid-cols-2 md:grid-cols-4 gap-4 mt-4'>
             <div>
-              <div class="text-xs text-slate-500 uppercase">Type</div>
-              <div class="font-medium capitalize">{selectedHatch.value.order}</div>
+              <div class='text-xs text-slate-500 uppercase'>Type</div>
+              <div class='font-medium capitalize'>{selectedHatch.value.order}</div>
             </div>
             <div>
-              <div class="text-xs text-slate-500 uppercase">Best Time</div>
-              <div class="font-medium">{TIME_LABELS[selectedHatch.value.timeOfDay]}</div>
+              <div class='text-xs text-slate-500 uppercase'>Best Time</div>
+              <div class='font-medium'>{TIME_LABELS[selectedHatch.value.timeOfDay]}</div>
             </div>
             <div>
-              <div class="text-xs text-slate-500 uppercase">Temperature</div>
-              <div class="font-medium">
+              <div class='text-xs text-slate-500 uppercase'>Temperature</div>
+              <div class='font-medium'>
                 {selectedHatch.value.minTempF}°F - {selectedHatch.value.maxTempF}°F
               </div>
             </div>
             <div>
-              <div class="text-xs text-slate-500 uppercase">Hook Sizes</div>
-              <div class="font-medium">{formatHookSizes(selectedHatch.value.hookSizes)}</div>
+              <div class='text-xs text-slate-500 uppercase'>Hook Sizes</div>
+              <div class='font-medium'>{formatHookSizes(selectedHatch.value.hookSizes)}</div>
             </div>
           </div>
 
-          <div class="mt-4">
-            <div class="text-xs text-slate-500 uppercase mb-1">Peak Months</div>
-            <div class="flex flex-wrap gap-1">
+          <div class='mt-4'>
+            <div class='text-xs text-slate-500 uppercase mb-1'>Peak Months</div>
+            <div class='flex flex-wrap gap-1'>
               {selectedHatch.value.peakMonths.map((m) => (
                 <span
                   class={`px-2 py-1 rounded text-sm ${
@@ -230,17 +234,17 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
           </div>
 
           {selectedHatch.value.notes && (
-            <div class="mt-4">
-              <div class="text-xs text-slate-500 uppercase mb-1">Notes</div>
-              <p class="text-sm text-slate-700">{selectedHatch.value.notes}</p>
+            <div class='mt-4'>
+              <div class='text-xs text-slate-500 uppercase mb-1'>Notes</div>
+              <p class='text-sm text-slate-700'>{selectedHatch.value.notes}</p>
             </div>
           )}
 
           {/* Link to streams where this hatch is predicted */}
-          <div class="mt-4 pt-4 border-t border-slate-200">
+          <div class='mt-4 pt-4 border-t border-slate-200'>
             <a
               href={`/streams?hatch=${selectedHatch.value.id}`}
-              class="text-sm text-sky-600 hover:text-sky-700 flex items-center gap-1"
+              class='text-sm text-sky-600 hover:text-sky-700 flex items-center gap-1'
             >
               🗺️ View streams with {selectedHatch.value.commonName} activity →
             </a>

@@ -79,11 +79,13 @@ Deno.test('map - coordinates are within valid bounds', () => {
 
 Deno.test('map - calculates center point', () => {
   const withCoords = mockStreams.filter((s) => s.coordinates !== undefined);
-  
+
   if (withCoords.length > 0) {
-    const avgLat = withCoords.reduce((sum, s) => sum + (s.coordinates?.latitude ?? 0), 0) / withCoords.length;
-    const avgLng = withCoords.reduce((sum, s) => sum + (s.coordinates?.longitude ?? 0), 0) / withCoords.length;
-    
+    const avgLat = withCoords.reduce((sum, s) => sum + (s.coordinates?.latitude ?? 0), 0) /
+      withCoords.length;
+    const avgLng = withCoords.reduce((sum, s) => sum + (s.coordinates?.longitude ?? 0), 0) /
+      withCoords.length;
+
     // Should be roughly in upstate NY area
     assertEquals(avgLat > 40 && avgLat < 43, true, 'Center lat in NY area');
     assertEquals(avgLng > -76 && avgLng < -73, true, 'Center lng in NY area');
@@ -93,7 +95,7 @@ Deno.test('map - calculates center point', () => {
 Deno.test('map - default center for upstate NY', () => {
   // Default center used in StationMap
   const defaultCenter = { lat: 41.8, lng: -74.5 };
-  
+
   assertEquals(defaultCenter.lat, 41.8);
   assertEquals(defaultCenter.lng, -74.5);
 });
@@ -104,7 +106,7 @@ Deno.test('map - default center for upstate NY', () => {
 
 Deno.test('map - leaflet CDN URL is valid', () => {
   const leafletUrl = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-  
+
   assertEquals(leafletUrl.startsWith('https://'), true);
   assertEquals(leafletUrl.includes('leaflet'), true);
   assertEquals(leafletUrl.includes('1.9.4'), true);
@@ -113,10 +115,10 @@ Deno.test('map - leaflet CDN URL is valid', () => {
 Deno.test('map - leaflet CSS URL matches JS version', () => {
   const jsUrl = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
   const cssUrl = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-  
+
   const jsVersion = jsUrl.match(/@([0-9.]+)/)?.[1];
   const cssVersion = cssUrl.match(/@([0-9.]+)/)?.[1];
-  
+
   assertEquals(jsVersion, cssVersion, 'JS and CSS versions should match');
 });
 
@@ -128,12 +130,12 @@ Deno.test('map - default marker style', () => {
   const defaultStyle = {
     radius: 10,
     fillColor: '#64748b', // slate-500
-    color: '#475569',     // slate-600
+    color: '#475569', // slate-600
     weight: 2,
     opacity: 1,
     fillOpacity: 0.8,
   };
-  
+
   assertEquals(defaultStyle.radius, 10);
   assertEquals(defaultStyle.weight, 2);
   assertEquals(defaultStyle.fillOpacity, 0.8);
@@ -142,11 +144,11 @@ Deno.test('map - default marker style', () => {
 Deno.test('map - quality colors are accessible', () => {
   const qualityColors = {
     excellent: '#22c55e', // green-500
-    good: '#3b82f6',      // blue-500
-    fair: '#eab308',      // yellow-500
-    poor: '#ef4444',      // red-500
+    good: '#3b82f6', // blue-500
+    fair: '#eab308', // yellow-500
+    poor: '#ef4444', // red-500
   };
-  
+
   // All should be valid hex colors
   Object.values(qualityColors).forEach((color) => {
     assertEquals(color.startsWith('#'), true);
@@ -167,7 +169,7 @@ Deno.test('map - builds loading popup content', () => {
       <span>Loading conditions...</span>
     </div>
   `;
-  
+
   assertEquals(content.includes(stream.name), true);
   assertEquals(content.includes('Loading'), true);
 });
@@ -177,7 +179,7 @@ Deno.test('map - builds loaded popup content', () => {
   const waterTemp = 54;
   const flow = 125;
   const quality = 'good';
-  
+
   const content = `
     <div>
       <strong>${stream.name}</strong>
@@ -186,7 +188,7 @@ Deno.test('map - builds loaded popup content', () => {
       Quality: ${quality}
     </div>
   `;
-  
+
   assertEquals(content.includes(`${waterTemp}°F`), true);
   assertEquals(content.includes(`${flow} cfs`), true);
   assertEquals(content.includes(quality), true);
@@ -200,7 +202,7 @@ Deno.test('map - builds conditions URL correctly', () => {
   const apiUrl = '';
   const streamId = 'beaverkill';
   const url = `${apiUrl}/api/streams/${streamId}/conditions`;
-  
+
   assertEquals(url, '/api/streams/beaverkill/conditions');
 });
 
@@ -208,7 +210,7 @@ Deno.test('map - handles empty apiUrl (relative path)', () => {
   const apiUrl = '';
   const path = '/api/streams/test/conditions';
   const fullUrl = `${apiUrl}${path}`;
-  
+
   assertEquals(fullUrl, '/api/streams/test/conditions');
 });
 
@@ -218,14 +220,14 @@ Deno.test('map - handles empty apiUrl (relative path)', () => {
 
 Deno.test('map - container has required dimensions', () => {
   const containerStyle = { width: '100%', height: '100%' };
-  
+
   assertEquals(containerStyle.width, '100%');
   assertEquals(containerStyle.height, '100%');
 });
 
 Deno.test('map - parent container has fixed height', () => {
   const parentStyle = { height: '600px' };
-  
+
   assertEquals(parentStyle.height, '600px');
 });
 
@@ -236,7 +238,7 @@ Deno.test('map - parent container has fixed height', () => {
 Deno.test('map - handles fetch error gracefully', () => {
   const error = new Error('Network error');
   const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-  
+
   assertEquals(errorMessage, 'Network error');
 });
 
@@ -245,7 +247,7 @@ Deno.test('map - handles missing condition data', () => {
     success: false,
     error: { error: 'Station not found', code: 'NOT_FOUND' },
   };
-  
+
   const hasData = response.success && 'data' in response;
   assertEquals(hasData, false);
 });
@@ -256,7 +258,7 @@ Deno.test('map - handles missing condition data', () => {
 
 Deno.test('map - OSM tile URL is valid', () => {
   const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-  
+
   assertEquals(tileUrl.includes('{s}'), true, 'Has subdomain placeholder');
   assertEquals(tileUrl.includes('{z}'), true, 'Has zoom placeholder');
   assertEquals(tileUrl.includes('{x}'), true, 'Has x placeholder');
@@ -265,6 +267,6 @@ Deno.test('map - OSM tile URL is valid', () => {
 
 Deno.test('map - has attribution', () => {
   const attribution = '© OpenStreetMap contributors';
-  
+
   assertEquals(attribution.includes('OpenStreetMap'), true);
 });
