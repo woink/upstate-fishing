@@ -1,125 +1,23 @@
-# Upstate Fishing Conditions App
+# Upstate Fishing
 
-**Goal:** Help Ward know where to fish in NY, NJ, and CT, combining stream conditions, hatch predictions, and local intel.
-
-## Status
-
-| Component | Status |
-|-----------|--------|
-| Backend API | ✅ Complete |
-| Frontend scaffold | ✅ Complete |
-| Stream conditions | ✅ Complete |
-| Hatch predictions | ✅ Complete |
-| Interactive map | 🚧 In progress |
-| Mobile optimization | 📋 Planned |
+Real-time fishing conditions for NY/NJ/CT trout streams — combines USGS water data, weather forecasts, and insect hatch predictions.
 
 ## Tech Stack
 
-- **Runtime:** Deno
-- **Language:** TypeScript (strict mode)
-- **Backend:** Hono
-- **Frontend:** Deno Fresh + Tailwind + Leaflet
-- **Validation:** Zod
+Deno · TypeScript · Hono (backend) · Fresh + Preact + Tailwind (frontend) · Zod · Leaflet
 
 ## Quick Start
 
 ```bash
-# Install Deno (if needed)
-curl -fsSL https://deno.land/install.sh | sh
-
-# Run backend (port 8000)
+# Backend (port 8000)
 deno task dev
 
-# Run frontend (port 8001, in another terminal)
+# Frontend (port 8001)
 cd frontend && deno task dev
 ```
 
-## Project Structure
-
-```
-upstate-fishing-backend/
-├── src/                    # Backend source
-│   ├── data/              # Static data (streams, hatches)
-│   ├── models/            # TypeScript types + Zod schemas
-│   ├── routes/            # Hono API routes
-│   ├── services/          # External API integrations
-│   ├── main.ts            # Server entry point
-│   └── mod.ts             # Module exports
-├── frontend/              # Deno Fresh app
-│   ├── routes/            # Page routes
-│   ├── islands/           # Interactive components
-│   ├── static/            # CSS, assets
-│   └── deno.json          # Frontend config
-├── tests/                 # Test files
-└── deno.json              # Root config
-```
-
-## API Endpoints
-
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/streams` | List all streams (filter by `?region=` or `?state=`) |
-| `GET /api/streams/:id` | Get stream details |
-| `GET /api/streams/:id/conditions` | Get current conditions + hatch predictions |
-| `GET /api/hatches` | List all hatches (filter by `?order=` or `?month=`) |
-| `GET /api/hatches/:id` | Get hatch details |
-| `GET /api/stations/:id` | Get USGS station readings |
-| `POST /api/predict` | Custom hatch prediction |
-
-## Frontend Pages
-
-| Route | Description |
-|-------|-------------|
-| `/` | Today's top picks + quick links |
-| `/streams` | Browse all streams with conditions |
-| `/streams/:id` | Stream detail with full conditions |
-| `/hatches` | Browse hatches by month/order |
-| `/map` | Interactive map with USGS sensors |
-
-## Covered Waters
-
-### New York
-- **Catskills:** Beaverkill, Willowemoc, Esopus, Neversink
-- **Delaware:** East Branch, West Branch
-- **Croton:** East Branch, West Branch, Middle Branch
-
-### New Jersey
-- **Raritan:** South Branch, North Branch, Main Stem
-- **Other:** Flat Brook, Pequest River
-
-### Connecticut
-- **Farmington River**
-- **Housatonic River**
-- **Naugatuck River**
-- **Shetucket River**
-
 ## Data Sources
 
-- **USGS Water Data API** - Real-time water temp, flow, gage height
-- **Weather.gov API** - Air temp, cloud cover, precipitation
-- **Hatch Data** - Curated temperature thresholds for 18+ insect species
-
-> **Note:** Some USGS stations lack water temperature sensors. Croton watershed and Shetucket River stations only provide flow/gage height—water temp is estimated from nearby stations or air temp.
-
-## Development
-
-```bash
-# Type check
-deno task check
-
-# Run tests
-deno task test
-
-# Format code
-deno task fmt
-
-# Lint
-deno task lint
-```
-
-## Environment Variables
-
-```bash
-# Frontend
-API_URL=http://localhost:8000   # Backend URL
-```
+- **USGS Water Data API** — real-time water temp, flow, gage height
+- **Weather.gov API** — air temp, cloud cover, precipitation
+- **Hatch data** — curated temperature/season thresholds for 18+ insect species
