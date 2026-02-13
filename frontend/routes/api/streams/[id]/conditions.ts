@@ -39,7 +39,7 @@ export const handler: Handlers = {
         weatherCachedAt ?? Date.now(),
       );
 
-      const cacheHeaders = makeCacheHeaders(
+      const { 'Cache-Control': _, ...cacheMetaHeaders } = makeCacheHeaders(
         allCached,
         TTL.USGS_SECONDS,
         allCached ? earliestCachedAt : null,
@@ -55,7 +55,7 @@ export const handler: Handlers = {
           },
           timestamp: new Date().toISOString(),
         },
-        { headers: { ...cacheHeaders, 'Cache-Control': CACHE_DYNAMIC } },
+        { headers: { ...cacheMetaHeaders, 'Cache-Control': CACHE_DYNAMIC } },
       );
     } catch (err) {
       console.error(`Error fetching conditions for ${stream.name}:`, err);
