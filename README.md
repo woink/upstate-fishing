@@ -1,11 +1,17 @@
-# Upstate NY/NJ Fishing Conditions App
+# Upstate Fishing Conditions App
 
-**Goal:** Help Ward know where to fish in upstate NY and NJ, combining stream conditions, hatch predictions, and local intel.
+**Goal:** Help Ward know where to fish in NY, NJ, and CT, combining stream conditions, hatch predictions, and local intel.
 
-## Status: MVP Frontend In Progress 🚧
+## Status
 
-**Backend:** Complete ✓
-**Frontend:** Deno Fresh scaffold ready
+| Component | Status |
+|-----------|--------|
+| Backend API | ✅ Complete |
+| Frontend scaffold | ✅ Complete |
+| Stream conditions | ✅ Complete |
+| Hatch predictions | ✅ Complete |
+| Interactive map | 🚧 In progress |
+| Mobile optimization | 📋 Planned |
 
 ## Tech Stack
 
@@ -67,6 +73,7 @@ upstate-fishing-backend/
 | `/` | Today's top picks + quick links |
 | `/streams` | Browse all streams with conditions |
 | `/streams/:id` | Stream detail with full conditions |
+| `/hatches` | Browse hatches by month/order |
 | `/map` | Interactive map with USGS sensors |
 
 ## Covered Waters
@@ -80,11 +87,19 @@ upstate-fishing-backend/
 - **Raritan:** South Branch, North Branch, Main Stem
 - **Other:** Flat Brook, Pequest River
 
+### Connecticut
+- **Farmington River**
+- **Housatonic River**
+- **Naugatuck River**
+- **Shetucket River**
+
 ## Data Sources
 
 - **USGS Water Data API** - Real-time water temp, flow, gage height
 - **Weather.gov API** - Air temp, cloud cover, precipitation
 - **Hatch Data** - Curated temperature thresholds for 18+ insect species
+
+> **Note:** Some USGS stations lack water temperature sensors. Croton watershed and Shetucket River stations only provide flow/gage height—water temp is estimated from nearby stations or air temp.
 
 ## Development
 
