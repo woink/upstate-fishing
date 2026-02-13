@@ -69,6 +69,12 @@ export const handler: Handlers = {
         'Content-Type': res.headers.get('Content-Type') ?? 'application/json',
       };
 
+      // Forward backend cache metadata headers
+      const xCache = res.headers.get('X-Cache');
+      if (xCache) headers['X-Cache'] = xCache;
+      const xCachedAt = res.headers.get('X-Cached-At');
+      if (xCachedAt) headers['X-Cached-At'] = xCachedAt;
+
       // Add cache headers for successful responses
       if (res.ok) {
         const cacheControl = getCacheControl(path);

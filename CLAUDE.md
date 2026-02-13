@@ -2,9 +2,11 @@
 
 ## Project Overview
 
-Upstate Fishing Conditions App — helps anglers find where to fish in NY, NJ, CT, and NC by combining real-time stream conditions, hatch predictions, and local intelligence.
+Upstate Fishing Conditions App — helps anglers find where to fish in NY, NJ, CT, and NC by combining
+real-time stream conditions, hatch predictions, and local intelligence.
 
-**Tech stack:** Deno, TypeScript (strict), Hono (backend), Fresh + Preact (frontend), Tailwind CSS, Leaflet (maps), Zod (validation), Deno KV (caching).
+**Tech stack:** Deno, TypeScript (strict), Hono (backend), Fresh + Preact (frontend), Tailwind CSS,
+Leaflet (maps), Zod (validation), Deno KV (caching).
 
 ## Common Commands
 
@@ -41,7 +43,8 @@ cd frontend && deno task build
 
 - **Formatter:** `deno fmt` — single quotes, 2-space indent, 100-char line width
 - **Linter:** `deno lint` with recommended rules
-- **TypeScript:** Strict mode (`strict`, `noImplicitAny`, `strictNullChecks`, `noUnusedLocals`, `noUnusedParameters`)
+- **TypeScript:** Strict mode (`strict`, `noImplicitAny`, `strictNullChecks`, `noUnusedLocals`,
+  `noUnusedParameters`)
 - Always run `deno task fmt` and `deno task lint` before committing
 
 ## Project Structure
@@ -69,7 +72,8 @@ cd frontend && deno task build
 
 ## CI Pipeline
 
-CI runs on PRs to `main` and `epic/*` branches (`.forgejo/workflows/ci.yaml`):
+No CI workflow exists yet. Run these checks locally before pushing:
+
 1. `deno task fmt --check`
 2. `deno task lint`
 3. `deno task check`

@@ -1,5 +1,5 @@
 import { Handlers, PageProps } from '$fresh/server.ts';
-import type { Stream } from '@shared/models/types.ts';
+import { RegionSchema, StateSchema, type Stream } from '@shared/models/types.ts';
 import StreamList from '../../islands/StreamList.tsx';
 
 interface StreamsPageData {
@@ -12,8 +12,10 @@ interface StreamsPageData {
 export const handler: Handlers<StreamsPageData> = {
   async GET(req, ctx) {
     const url = new URL(req.url);
-    const region = url.searchParams.get('region') ?? undefined;
-    const state = url.searchParams.get('state') ?? undefined;
+    const regionResult = RegionSchema.safeParse(url.searchParams.get('region'));
+    const region = regionResult.success ? regionResult.data : undefined;
+    const stateResult = StateSchema.safeParse(url.searchParams.get('state'));
+    const state = stateResult.success ? stateResult.data : undefined;
 
     const backendUrl = Deno.env.get('API_URL') ?? 'http://localhost:8000';
 

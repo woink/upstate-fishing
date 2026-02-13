@@ -10,7 +10,7 @@ import { cachedUSGSService } from '../services/cached-usgs.ts';
 import { cachedWeatherService } from '../services/cached-weather.ts';
 import { predictionService } from '../services/predictions.ts';
 import { makeCacheHeaders, TTL } from '../services/cache.ts';
-import type { Region, State } from '../models/types.ts';
+import { RegionSchema, StateSchema } from '../models/types.ts';
 
 // ============================================================================
 // API Router
@@ -27,8 +27,10 @@ export const api = new Hono();
  * List all streams, optionally filtered by region or state
  */
 api.get('/streams', (c) => {
-  const region = c.req.query('region') as Region | undefined;
-  const state = c.req.query('state') as State | undefined;
+  const regionResult = RegionSchema.safeParse(c.req.query('region'));
+  const region = regionResult.success ? regionResult.data : undefined;
+  const stateResult = StateSchema.safeParse(c.req.query('state'));
+  const state = stateResult.success ? stateResult.data : undefined;
 
   let streams = [...STREAMS];
 
