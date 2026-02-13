@@ -7,9 +7,6 @@
 
 /** Convert Celsius to Fahrenheit, rounded to `precision` decimal places. */
 export function celsiusToFahrenheit(celsius: number, precision = 1): number {
-  const raw = celsius * 9 / 5 + 32;
-  const factor = 10 ** precision;
-export function celsiusToFahrenheit(celsius: number, precision = 1): number {
   if (precision < 0 || precision > 15) {
     throw new RangeError('Precision must be between 0 and 15');
   }
@@ -17,10 +14,12 @@ export function celsiusToFahrenheit(celsius: number, precision = 1): number {
   const factor = 10 ** precision;
   return Math.round(raw * factor) / factor;
 }
-}
 
 /** Convert Fahrenheit to Celsius, rounded to `precision` decimal places. */
 export function fahrenheitToCelsius(fahrenheit: number, precision = 1): number {
+  if (precision < 0 || precision > 15) {
+    throw new RangeError('Precision must be between 0 and 15');
+  }
   const raw = (fahrenheit - 32) * 5 / 9;
   const factor = 10 ** precision;
   return Math.round(raw * factor) / factor;

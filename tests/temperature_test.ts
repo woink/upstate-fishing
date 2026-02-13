@@ -1,4 +1,4 @@
-import { assertEquals } from '@std/assert';
+import { assertEquals, assertThrows } from '@std/assert';
 import { celsiusToFahrenheit, fahrenheitToCelsius } from '@shared/utils/temperature.ts';
 
 // ============================================================================
@@ -60,4 +60,59 @@ Deno.test('fahrenheitToCelsius - precision=0 rounds to integer', () => {
 
 Deno.test('fahrenheitToCelsius - precision=2', () => {
   assertEquals(fahrenheitToCelsius(54, 2), 12.22);
+});
+
+// ============================================================================
+// Edge Cases
+// ============================================================================
+
+Deno.test('celsiusToFahrenheit - negative temperatures', () => {
+  // -40 is the crossover point where both scales converge
+  assertEquals(celsiusToFahrenheit(-40), -40);
+  assertEquals(celsiusToFahrenheit(-17.8, 1), 0);
+});
+
+Deno.test('fahrenheitToCelsius - negative temperatures', () => {
+  assertEquals(fahrenheitToCelsius(-40), -40);
+  assertEquals(fahrenheitToCelsius(0), -17.8);
+});
+
+Deno.test('celsiusToFahrenheit - special values', () => {
+  assertEquals(celsiusToFahrenheit(NaN), NaN);
+  assertEquals(celsiusToFahrenheit(Infinity), Infinity);
+  assertEquals(celsiusToFahrenheit(-Infinity), -Infinity);
+});
+
+Deno.test('fahrenheitToCelsius - special values', () => {
+  assertEquals(fahrenheitToCelsius(NaN), NaN);
+  assertEquals(fahrenheitToCelsius(Infinity), Infinity);
+  assertEquals(fahrenheitToCelsius(-Infinity), -Infinity);
+});
+
+// ============================================================================
+// Precision Validation
+// ============================================================================
+
+Deno.test('celsiusToFahrenheit - throws on negative precision', () => {
+  assertThrows(() => celsiusToFahrenheit(10, -1), RangeError, 'Precision must be between 0 and 15');
+});
+
+Deno.test('celsiusToFahrenheit - throws on precision > 15', () => {
+  assertThrows(() => celsiusToFahrenheit(10, 16), RangeError, 'Precision must be between 0 and 15');
+});
+
+Deno.test('fahrenheitToCelsius - throws on negative precision', () => {
+  assertThrows(() => fahrenheitToCelsius(50, -1), RangeError, 'Precision must be between 0 and 15');
+});
+
+Deno.test('fahrenheitToCelsius - throws on precision > 15', () => {
+  assertThrows(() => fahrenheitToCelsius(50, 16), RangeError, 'Precision must be between 0 and 15');
+});
+
+Deno.test('precision boundary values work correctly', () => {
+  // precision=0 and precision=15 should not throw
+  assertEquals(celsiusToFahrenheit(100, 0), 212);
+  assertEquals(typeof celsiusToFahrenheit(100, 15), 'number');
+  assertEquals(fahrenheitToCelsius(212, 0), 100);
+  assertEquals(typeof fahrenheitToCelsius(212, 15), 'number');
 });
