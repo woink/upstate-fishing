@@ -6,13 +6,13 @@ import { Hono } from '@hono/hono';
 import { z } from 'zod';
 import { getStreamById, getStreamsByRegion, getStreamsByState, STREAMS } from '../data/streams.ts';
 import { HATCHES } from '../data/hatches.ts';
+import { InsectOrderSchema, RegionSchema, StateSchema } from '../models/types.ts';
 import { cachedUSGSService } from '../services/cached-usgs.ts';
 import { cachedWeatherService } from '../services/cached-weather.ts';
 import { predictionService } from '../services/predictions.ts';
 import { makeCacheHeaders, TTL } from '../services/cache.ts';
 import { fahrenheitToCelsius } from '../utils/temperature.ts';
 import { logger } from '../utils/logger.ts';
-import type { Region, State } from '../models/types.ts';
 
 const CUSTOM_STATION_ID = 'custom';
 const CUSTOM_STATION_NAME = 'Custom Input';
@@ -47,15 +47,15 @@ export const api = new Hono();
  * List all streams, optionally filtered by region or state
  */
 api.get('/streams', (c) => {
-  const region = c.req.query('region') as Region | undefined;
-  const state = c.req.query('state') as State | undefined;
+  const regionParsed = RegionSchema.safeParse(c.req.query('region'));
+  const stateParsed = StateSchema.safeParse(c.req.query('state'));
 
   let streams = [...STREAMS];
 
-  if (region) {
-    streams = getStreamsByRegion(region);
-  } else if (state) {
-    streams = getStreamsByState(state);
+  if (regionParsed.success) {
+    streams = getStreamsByRegion(regionParsed.data);
+  } else if (stateParsed.success) {
+    streams = getStreamsByState(stateParsed.data);
   }
 
   return c.json({
@@ -198,7 +198,10 @@ api.get('/hatches', (c) => {
   let hatches = [...HATCHES];
 
   if (order) {
-    hatches = hatches.filter((h) => h.order === order);
+    const validOrder = InsectOrderSchema.safeParse(order);
+    if (validOrder.success) {
+      hatches = hatches.filter((h) => h.order === validOrder.data);
+    }
   }
 
   if (month) {

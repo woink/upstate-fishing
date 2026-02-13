@@ -1,6 +1,7 @@
 import { Handlers } from '$fresh/server.ts';
 import { HATCHES } from '@shared/data/hatches.ts';
-import { apiSuccessList } from '../../../utils/api-response.ts';
+import { InsectOrderSchema } from '@shared/models/types.ts';
+import { apiError, apiSuccessList } from '../../../utils/api-response.ts';
 
 export const handler: Handlers = {
   GET(req, _ctx) {
@@ -11,14 +12,11 @@ export const handler: Handlers = {
     let hatches = [...HATCHES];
 
     if (order) {
-    if (order) {
-      // Validate order parameter against schema
       const validOrder = InsectOrderSchema.safeParse(order);
       if (!validOrder.success) {
         return apiError('Invalid order parameter', 'VALIDATION_ERROR', 400);
       }
-      hatches = hatches.filter((h) => h.order === order);
-    }
+      hatches = hatches.filter((h) => h.order === validOrder.data);
     }
 
     if (month) {
