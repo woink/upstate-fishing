@@ -75,7 +75,7 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
       <div class='px-4 py-2 bg-slate-50 border-b border-slate-100 flex gap-2 items-center'>
         <span class='text-sm text-slate-500'>Sort by:</span>
         {(['month', 'name', 'order'] as const).map((sort) => (
-          <button
+          <button type="button"
             onClick={() => sortBy.value = sort}
             class={`px-2 py-1 text-sm rounded transition ${
               sortBy.value === sort
@@ -187,7 +187,7 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
                 </p>
               )}
             </div>
-            <button
+            <button type="button"
               onClick={() => selectedHatch.value = null}
               class='text-slate-400 hover:text-slate-600'
             >
