@@ -1,7 +1,7 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import type { Stream, StreamConditions } from '@shared/models/types.ts';
-import { qualityClasses, qualityBadgeClasses } from '../lib/colors.ts';
+import { qualityBadgeClasses, qualityClasses } from '../lib/colors.ts';
 
 interface StreamListProps {
   streams: Stream[];

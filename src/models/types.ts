@@ -14,7 +14,15 @@ export const CoordinatesSchema = z.object({
 });
 export type Coordinates = z.infer<typeof CoordinatesSchema>;
 
-export const RegionSchema = z.enum(['catskills', 'croton', 'raritan', 'delaware', 'connecticut', 'nc-highcountry', 'nc-foothills']);
+export const RegionSchema = z.enum([
+  'catskills',
+  'croton',
+  'raritan',
+  'delaware',
+  'connecticut',
+  'nc-highcountry',
+  'nc-foothills',
+]);
 export type Region = z.infer<typeof RegionSchema>;
 
 export const StateSchema = z.enum(['NY', 'NJ', 'CT', 'NC']);
