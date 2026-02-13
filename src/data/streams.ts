@@ -356,6 +356,12 @@ export function getAllStationIds(): string[] {
  * Filter streams by query parameters (region or state).
  * Accepts raw string | null values from URL search params.
  * Returns filtered streams along with the validated filter values.
+ *
+ * **Precedence:** Region is checked first. When both `region` and `state` are
+ * valid, region takes precedence and state is ignored.
+ *
+ * **Fallback:** If neither parameter passes Zod validation (invalid, null,
+ * undefined, or empty string), all streams are returned unfiltered.
  */
 export function filterStreamsByQuery(params: {
   region?: string | null;
