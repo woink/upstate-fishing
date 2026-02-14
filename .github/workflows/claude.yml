@@ -60,4 +60,4 @@ jobs:
           # prompt: 'Update the pull request description to include a summary of changes.'
 
           # Pre-approve git tools so Claude can commit/push without interactive prompts in CI
-          claude_args: '--allowedTools "Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(git add:*),Bash(git diff:*),Bash(git log:*)"'
+          claude_args: '--allowedTools "Bash(git commit:*),Bash(git push:*),Bash(git status:*),Bash(git add:*),Bash(git diff:*),Bash(git log:*),Bash(gh issue create:*)"'

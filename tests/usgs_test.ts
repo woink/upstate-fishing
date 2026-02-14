@@ -3,7 +3,7 @@
  */
 
 import { assertEquals } from '@std/assert';
-import { USGS_PARAMS, USGSService } from '../src/services/usgs.ts';
+import { isValidReading, USGS_PARAMS, USGSService } from '../src/services/usgs.ts';
 
 // ============================================================================
 // USGS_PARAMS Tests
@@ -13,6 +13,25 @@ Deno.test('USGS_PARAMS - has correct parameter codes', () => {
   assertEquals(USGS_PARAMS.WATER_TEMP, '00010');
   assertEquals(USGS_PARAMS.DISCHARGE, '00060');
   assertEquals(USGS_PARAMS.GAGE_HEIGHT, '00065');
+});
+
+// ============================================================================
+// Sentinel Value Filtering Tests
+// ============================================================================
+
+Deno.test('isValidReading - filters USGS sentinel values', () => {
+  // Sentinel values should be filtered
+  assertEquals(isValidReading(-999999), false);
+  assertEquals(isValidReading(-99999), false);
+
+  // NaN should be filtered
+  assertEquals(isValidReading(NaN), false);
+
+  // Valid readings should pass
+  assertEquals(isValidReading(0), true);
+  assertEquals(isValidReading(15.5), true);
+  assertEquals(isValidReading(100), true);
+  assertEquals(isValidReading(-5), true); // Negative temps are valid
 });
 
 // ============================================================================

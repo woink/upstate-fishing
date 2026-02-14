@@ -18,37 +18,39 @@ const NWSPointsResponseSchema = z.object({
     gridY: z.number(),
     forecast: z.string(),
     forecastHourly: z.string(),
-  }),
-});
+  }).passthrough(),
+}).passthrough();
 
 const NWSForecastPeriodSchema = z.object({
   startTime: z.string(),
   endTime: z.string(),
   temperature: z.number(),
   temperatureUnit: z.string(),
-  probabilityOfPrecipitation: z.object({ value: z.number().nullable() }).optional(),
+  probabilityOfPrecipitation: z.object({ value: z.number().nullable() }).passthrough().optional(),
   windSpeed: z.string(),
   shortForecast: z.string(),
   isDaytime: z.boolean(),
-});
+}).passthrough();
 
 const NWSForecastResponseSchema = z.object({
   properties: z.object({
     generatedAt: z.string(),
     periods: z.array(NWSForecastPeriodSchema),
-  }),
-});
+  }).passthrough(),
+}).passthrough();
 
 const NWSGridpointsResponseSchema = z.object({
   properties: z.object({
     skyCover: z.object({
-      values: z.array(z.object({
-        validTime: z.string(),
-        value: z.number(),
-      })),
+      values: z.array(
+        z.object({
+          validTime: z.string(),
+          value: z.number(),
+        }).passthrough(),
+      ),
     }).optional(),
-  }),
-});
+  }).passthrough(),
+}).passthrough();
 
 // ============================================================================
 // Weather Service

@@ -14,37 +14,57 @@ import { celsiusToFahrenheit } from '../utils/temperature.ts';
 const USGSValueSchema = z.object({
   value: z.string(),
   dateTime: z.string(),
-});
+}).passthrough();
 
 const USGSTimeSeriesSchema = z.object({
   sourceInfo: z.object({
-    siteCode: z.array(z.object({ value: z.string() })),
+    siteCode: z.array(z.object({ value: z.string() }).passthrough()),
     siteName: z.string(),
     geoLocation: z.object({
       geogLocation: z.object({
         latitude: z.number(),
         longitude: z.number(),
-      }),
-    }),
-  }),
+      }).passthrough(),
+    }).passthrough(),
+  }).passthrough(),
   variable: z.object({
-    variableCode: z.array(z.object({ value: z.string() })),
+    variableCode: z.array(z.object({ value: z.string() }).passthrough()),
     variableName: z.string(),
-    unit: z.object({ unitCode: z.string() }),
-  }),
-  values: z.array(z.object({
-    value: z.array(USGSValueSchema),
-  })),
-});
+    unit: z.object({ unitCode: z.string() }).passthrough(),
+  }).passthrough(),
+  values: z.array(
+    z.object({
+      value: z.array(USGSValueSchema),
+    }).passthrough(),
+  ),
+}).passthrough();
 
 const USGSResponseSchema = z.object({
   value: z.object({
     timeSeries: z.array(USGSTimeSeriesSchema),
-  }),
-});
+  }).passthrough(),
+}).passthrough();
 
 type USGSResponse = z.infer<typeof USGSResponseSchema>;
 type USGSTimeSeries = z.infer<typeof USGSTimeSeriesSchema>;
+
+// ============================================================================
+// USGS Sentinel Values
+// ============================================================================
+
+/**
+ * USGS uses these values to indicate missing/invalid readings
+ * Common sentinel values per USGS IV API documentation:
+ * - -999999: Ice-affected/Equipment malfunction
+ * - -99999: Other invalid reading conditions
+ *
+ * Source: https://help.waterdata.usgs.gov/codes-and-parameters
+ */
+export const USGS_SENTINEL_VALUES = new Set([-999999, -99999]);
+
+export function isValidReading(value: number): boolean {
+  return !isNaN(value) && !USGS_SENTINEL_VALUES.has(value);
+}
 
 // ============================================================================
 // USGS Parameter Codes
@@ -150,17 +170,19 @@ export class USGSService {
         stationData.timestamp = latestValue.dateTime;
       }
 
-      // Set value based on parameter code
+      // Set value based on parameter code (filter NaN and USGS sentinel values)
       switch (paramCode) {
-        case USGS_PARAMS.WATER_TEMP:
-          stationData.waterTempC = isNaN(value) ? null : value;
-          stationData.waterTempF = isNaN(value) ? null : celsiusToFahrenheit(value);
+        case USGS_PARAMS.WATER_TEMP: {
+          const isValid = isValidReading(value);
+          stationData.waterTempC = isValid ? value : null;
+          stationData.waterTempF = isValid ? celsiusToFahrenheit(value) : null;
           break;
+        }
         case USGS_PARAMS.DISCHARGE:
-          stationData.dischargeCfs = isNaN(value) ? null : value;
+          stationData.dischargeCfs = isValidReading(value) ? value : null;
           break;
         case USGS_PARAMS.GAGE_HEIGHT:
-          stationData.gageHeightFt = isNaN(value) ? null : value;
+          stationData.gageHeightFt = isValidReading(value) ? value : null;
           break;
       }
     }
