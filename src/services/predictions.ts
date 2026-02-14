@@ -12,6 +12,7 @@ import type {
 } from '../models/types.ts';
 import type { Stream } from '../models/types.ts';
 import { HATCHES } from '../data/hatches.ts';
+import { computeDataCompleteness } from './usgs.ts';
 
 // ============================================================================
 // Prediction Configuration
@@ -116,6 +117,7 @@ export class PredictionService {
       predictedHatches,
       fishingQuality: this.assessFishingQuality(waterTempF, predictedHatches, weather),
       summary: this.buildSummary(stream, waterTempF, predictedHatches, weather),
+      dataCompleteness: computeDataCompleteness(stationData),
     };
   }
 
@@ -265,7 +267,8 @@ export class PredictionService {
         hatch,
         probability: 0.5,
         confidence: 'low' as const,
-        reasoning: 'Based on typical seasonal timing. No water temperature data available.',
+        reasoning:
+          'Based on seasonal timing only — water temperature not monitored at this station.',
       }))
       .sort((a, b) => b.probability - a.probability);
   }

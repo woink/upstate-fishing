@@ -50,8 +50,31 @@ export const StationDataSchema = z.object({
   waterTempC: z.number().nullable(),
   dischargeCfs: z.number().nullable(), // cubic feet per second
   gageHeightFt: z.number().nullable(),
+  dataAvailability: z.lazy(() => DataAvailabilitySchema).optional(),
 });
 export type StationData = z.infer<typeof StationDataSchema>;
+
+// ============================================================================
+// Data Availability Types
+// ============================================================================
+
+export const ParameterStatusSchema = z.enum([
+  'available', // valid reading present
+  'not_equipped', // station does not monitor this parameter
+  'sentinel', // USGS returned sentinel value (-999999, -99999)
+  'no_data', // parameter expected but value missing/unparseable
+]);
+export type ParameterStatus = z.infer<typeof ParameterStatusSchema>;
+
+export const DataAvailabilitySchema = z.object({
+  waterTemp: ParameterStatusSchema,
+  discharge: ParameterStatusSchema,
+  gageHeight: ParameterStatusSchema,
+});
+export type DataAvailability = z.infer<typeof DataAvailabilitySchema>;
+
+export const DataCompletenessSchema = z.enum(['full', 'partial', 'limited']);
+export type DataCompleteness = z.infer<typeof DataCompletenessSchema>;
 
 // ============================================================================
 // Weather Types
@@ -117,6 +140,7 @@ export const StreamConditionsSchema = z.object({
   predictedHatches: z.array(HatchPredictionSchema),
   fishingQuality: z.enum(['poor', 'fair', 'good', 'excellent']),
   summary: z.string(),
+  dataCompleteness: DataCompletenessSchema.optional(),
 });
 export type StreamConditions = z.infer<typeof StreamConditionsSchema>;
 
