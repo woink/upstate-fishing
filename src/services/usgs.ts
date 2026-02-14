@@ -53,9 +53,9 @@ type USGSTimeSeries = z.infer<typeof USGSTimeSeriesSchema>;
 // ============================================================================
 
 /** USGS uses these values to indicate missing/invalid readings */
-const USGS_SENTINEL_VALUES = new Set([-999999, -99999]);
+export const USGS_SENTINEL_VALUES = new Set([-999999, -99999]);
 
-function isValidReading(value: number): boolean {
+export function isValidReading(value: number): boolean {
   return !isNaN(value) && !USGS_SENTINEL_VALUES.has(value);
 }
 
