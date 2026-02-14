@@ -52,7 +52,14 @@ type USGSTimeSeries = z.infer<typeof USGSTimeSeriesSchema>;
 // USGS Sentinel Values
 // ============================================================================
 
-/** USGS uses these values to indicate missing/invalid readings */
+/**
+ * USGS uses these values to indicate missing/invalid readings
+ * Common sentinel values per USGS IV API documentation:
+ * - -999999: Ice-affected/Equipment malfunction
+ * - -99999: Other invalid reading conditions
+ *
+ * Source: https://help.waterdata.usgs.gov/codes-and-parameters
+ */
 export const USGS_SENTINEL_VALUES = new Set([-999999, -99999]);
 
 export function isValidReading(value: number): boolean {
@@ -165,10 +172,12 @@ export class USGSService {
 
       // Set value based on parameter code (filter NaN and USGS sentinel values)
       switch (paramCode) {
-        case USGS_PARAMS.WATER_TEMP:
-          stationData.waterTempC = isValidReading(value) ? value : null;
-          stationData.waterTempF = isValidReading(value) ? celsiusToFahrenheit(value) : null;
+        case USGS_PARAMS.WATER_TEMP: {
+          const isValid = isValidReading(value);
+          stationData.waterTempC = isValid ? value : null;
+          stationData.waterTempF = isValid ? celsiusToFahrenheit(value) : null;
           break;
+        }
         case USGS_PARAMS.DISCHARGE:
           stationData.dischargeCfs = isValidReading(value) ? value : null;
           break;
