@@ -43,8 +43,11 @@ export const handler: Handlers<StreamDetailData> = {
       return ctx.render({ conditions, apiUrl: '' });
     } catch (error) {
       logger.error('Failed to fetch stream conditions', {
+        streamId: stream.id,
         stream: stream.name,
+        stationIds: stream.stationIds,
         error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
       });
       return ctx.render({ conditions: null, error: 'Failed to fetch conditions', apiUrl: '' });
     }

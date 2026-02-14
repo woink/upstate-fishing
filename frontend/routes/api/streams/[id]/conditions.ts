@@ -63,8 +63,11 @@ export const handler: Handlers = {
       );
     } catch (err) {
       logger.error('Failed to fetch conditions', {
+        streamId: stream.id,
         stream: stream.name,
+        stationIds: stream.stationIds,
         error: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
       });
       return apiError(
         'Failed to fetch conditions',
