@@ -10,21 +10,15 @@ Weather.gov forecasts, and insect hatch predictions to recommend where to fish.
 
 ## Development Commands
 
-### Backend (Hono API on port 8000)
+### Development
 
 ```bash
-deno task dev              # Start with hot reload (requires --unstable-kv)
-deno task test             # Run all backend tests
+deno task dev              # Start Fresh dev server with hot reload
+deno task test             # Run all tests (requires --unstable-kv)
 deno task check            # Type-check src/**/*.ts
 deno task lint             # Lint
 deno task fmt              # Format
 deno task fmt --check      # Check formatting without writing
-```
-
-### Frontend (Fresh on port 8001)
-
-```bash
-deno task dev:frontend     # Start frontend dev server (or cd frontend && deno task dev)
 cd frontend && deno task build    # Production build
 cd frontend && deno task check    # Type-check frontend
 ```
@@ -43,17 +37,16 @@ cd frontend && deno test --allow-net --allow-env --allow-read tests/routes_test.
 
 ### Environment
 
-Copy `.env.example` to `.env`. Key variables: `PORT`, `CORS_ORIGINS`, `API_URL` (frontend's backend
-URL), `RUN_INTEGRATION_TESTS`.
+Copy `.env.example` to `.env`. Key variable: `RUN_INTEGRATION_TESTS`.
 
 ## Architecture
 
 ### Monorepo with Shared Types
 
 ```
-src/           -> Backend (Deno + Hono REST API)
-frontend/      -> Frontend (Deno Fresh + Preact + Tailwind)
-tests/         -> Backend tests
+src/           -> Shared library (types, services, data)
+frontend/      -> Fresh app (Deno Fresh + Preact + Tailwind)
+tests/         -> Shared library tests
 frontend/tests/ -> Frontend tests
 ```
 
@@ -79,8 +72,8 @@ Fresh uses an "islands" pattern -- pages in `routes/` are server-rendered, inter
 Key islands: `StationMap.tsx` (Leaflet map), `StreamList.tsx`, `TopPicks.tsx`, `HatchChart.tsx`,
 `StreamConditionsCard.tsx`.
 
-The frontend proxies API calls through `routes/api/[...path].ts` which forwards to the backend and
-adds cache-control headers.
+Fresh API routes in `frontend/routes/api/` serve all endpoints directly (streams, hatches, stations,
+predictions) using the shared services from `src/`.
 
 ### Data Layer
 
