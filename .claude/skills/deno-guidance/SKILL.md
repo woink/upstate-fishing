@@ -107,7 +107,8 @@ Quick command: `deno deploy --prod`
 
 ## Documentation Lookup Workflow
 
-When you need documentation for Deno, JSR packages, or related libraries, follow this priority order:
+When you need documentation for Deno, JSR packages, or related libraries, follow this priority
+order:
 
 1. **Context7 (preferred)** — Use `resolve-library-id` to find the library, then `query-docs` to
    retrieve documentation. This gives structured, up-to-date docs and code examples.
