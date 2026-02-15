@@ -1,7 +1,7 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import type { Stream, StreamConditions } from '@shared/models/types.ts';
-import { qualityBadgeClasses, qualityClasses } from '../lib/colors.ts';
+import { parameterStatusDisplay, qualityBadgeClasses, qualityClasses } from '../lib/colors.ts';
 
 interface StreamListProps {
   streams: Stream[];
@@ -86,34 +86,52 @@ export default function StreamList({ streams, apiUrl }: StreamListProps) {
               )}
             </div>
 
-            {conditions && (
-              <div class='mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm'>
-                {conditions.stationData[0]?.waterTempF && (
+            {conditions && (() => {
+              const station = conditions.stationData[0];
+              const tempStatus = station?.dataAvailability?.waterTemp ?? 'no_data';
+              const tempDisplay = parameterStatusDisplay[tempStatus] ??
+                parameterStatusDisplay.no_data;
+              const flowStatus = station?.dataAvailability?.discharge ?? 'no_data';
+              const flowDisplay = parameterStatusDisplay[flowStatus] ??
+                parameterStatusDisplay.no_data;
+
+              return (
+                <div class='mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm'>
                   <div>
                     <span class='text-slate-500'>Water</span>
-                    <p class='font-medium'>{conditions.stationData[0].waterTempF}°F</p>
+                    {station?.waterTempF
+                      ? <p class='font-medium'>{station.waterTempF}°F</p>
+                      : (
+                        <p class={`font-medium ${tempDisplay.classes}`} title={tempDisplay.title}>
+                          {tempDisplay.text || 'N/A'}
+                        </p>
+                      )}
                   </div>
-                )}
-                {conditions.weather && (
-                  <div>
-                    <span class='text-slate-500'>Air</span>
-                    <p class='font-medium'>{conditions.weather.airTempF}°F</p>
-                  </div>
-                )}
-                {conditions.stationData[0]?.dischargeCfs && (
+                  {conditions.weather && (
+                    <div>
+                      <span class='text-slate-500'>Air</span>
+                      <p class='font-medium'>{conditions.weather.airTempF}°F</p>
+                    </div>
+                  )}
                   <div>
                     <span class='text-slate-500'>Flow</span>
-                    <p class='font-medium'>{conditions.stationData[0].dischargeCfs} cfs</p>
+                    {station?.dischargeCfs
+                      ? <p class='font-medium'>{station.dischargeCfs} cfs</p>
+                      : (
+                        <p class={`font-medium ${flowDisplay.classes}`} title={flowDisplay.title}>
+                          {flowDisplay.text || 'N/A'}
+                        </p>
+                      )}
                   </div>
-                )}
-                {conditions.predictedHatches.length > 0 && (
-                  <div>
-                    <span class='text-slate-500'>Top Hatch</span>
-                    <p class='font-medium'>{conditions.predictedHatches[0].hatch.commonName}</p>
-                  </div>
-                )}
-              </div>
-            )}
+                  {conditions.predictedHatches.length > 0 && (
+                    <div>
+                      <span class='text-slate-500'>Top Hatch</span>
+                      <p class='font-medium'>{conditions.predictedHatches[0].hatch.commonName}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             <div class='mt-2 text-xs text-slate-400'>
               {stream.stationIds.length} USGS station{stream.stationIds.length !== 1 ? 's' : ''}

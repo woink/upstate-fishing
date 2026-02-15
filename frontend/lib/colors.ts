@@ -70,6 +70,43 @@ export const confidenceClasses: Record<ConfidenceLevel, string> = {
 };
 
 /**
+ * Display metadata for USGS parameter statuses
+ *
+ * Maps each ParameterStatus to user-facing text, tooltip, and Tailwind classes.
+ * Used when a station value is null to explain *why* data is missing.
+ */
+export const parameterStatusDisplay: Record<
+  string,
+  { text: string; title: string; classes: string }
+> = {
+  available: { text: '', title: '', classes: '' },
+  not_equipped: {
+    text: 'N/A',
+    title: 'Not monitored at this station',
+    classes: 'text-slate-400',
+  },
+  sentinel: {
+    text: 'Unavailable',
+    title: 'Equipment issue or ice-affected reading',
+    classes: 'text-amber-500',
+  },
+  no_data: {
+    text: '\u2014',
+    title: 'Sensor equipped but no data received',
+    classes: 'text-slate-400',
+  },
+};
+
+/**
+ * Display metadata for stream data completeness levels
+ */
+export const completenessDisplay: Record<string, { label: string; classes: string }> = {
+  full: { label: 'Full data', classes: 'text-green-600 bg-green-50' },
+  partial: { label: 'Partial data', classes: 'text-amber-600 bg-amber-50' },
+  limited: { label: 'Limited data', classes: 'text-slate-500 bg-slate-100' },
+};
+
+/**
  * Default/loading state color
  */
 export const defaultMarkerColor = '#64748b'; // slate-500

@@ -1,6 +1,11 @@
 import { useSignal } from '@preact/signals';
-import type { StreamConditions } from '@shared/models/types.ts';
-import { confidenceClasses, qualityClasses } from '../lib/colors.ts';
+import type { DataAvailability, StationData, StreamConditions } from '@shared/models/types.ts';
+import {
+  completenessDisplay,
+  confidenceClasses,
+  parameterStatusDisplay,
+  qualityClasses,
+} from '../lib/colors.ts';
 
 interface StreamConditionsCardProps {
   conditions: StreamConditions;
@@ -30,6 +35,34 @@ export default function StreamConditionsCard({
   }
 
   const cond = conditions.value;
+
+  function renderParam(
+    station: StationData,
+    label: string,
+    value: number | null,
+    unit: string,
+    availabilityKey: keyof DataAvailability,
+  ) {
+    if (value !== null) {
+      return (
+        <div>
+          <span class='text-slate-500 block'>{label}</span>
+          <span class='font-semibold'>
+            {value}
+            {unit}
+          </span>
+        </div>
+      );
+    }
+    const status = station.dataAvailability?.[availabilityKey] ?? 'no_data';
+    const display = parameterStatusDisplay[status] ?? parameterStatusDisplay.no_data;
+    return (
+      <div title={display.title}>
+        <span class='text-slate-500 block'>{label}</span>
+        <span class={`font-semibold ${display.classes}`}>{display.text}</span>
+      </div>
+    );
+  }
 
   return (
     <div class={`rounded-lg border-l-4 shadow-lg ${qualityClasses[cond.fishingQuality]}`}>
@@ -71,24 +104,9 @@ export default function StreamConditionsCard({
               <div key={station.stationId} class='bg-slate-50 rounded p-3 text-sm'>
                 <p class='text-slate-500 text-xs mb-2'>{station.stationName}</p>
                 <div class='grid grid-cols-3 gap-2'>
-                  {station.waterTempF && (
-                    <div>
-                      <span class='text-slate-500 block'>Temp</span>
-                      <span class='font-semibold'>{station.waterTempF}°F</span>
-                    </div>
-                  )}
-                  {station.dischargeCfs && (
-                    <div>
-                      <span class='text-slate-500 block'>Flow</span>
-                      <span class='font-semibold'>{station.dischargeCfs} cfs</span>
-                    </div>
-                  )}
-                  {station.gageHeightFt && (
-                    <div>
-                      <span class='text-slate-500 block'>Gage</span>
-                      <span class='font-semibold'>{station.gageHeightFt} ft</span>
-                    </div>
-                  )}
+                  {renderParam(station, 'Temp', station.waterTempF, '°F', 'waterTemp')}
+                  {renderParam(station, 'Flow', station.dischargeCfs, ' cfs', 'discharge')}
+                  {renderParam(station, 'Gage', station.gageHeightFt, ' ft', 'gageHeight')}
                 </div>
               </div>
             ))}
@@ -166,8 +184,17 @@ export default function StreamConditionsCard({
       )}
 
       {/* Footer */}
-      <div class='p-4 bg-slate-100 text-xs text-slate-500 rounded-b-lg'>
-        Last updated: {new Date(cond.timestamp).toLocaleString()}
+      <div class='p-4 bg-slate-100 text-xs text-slate-500 rounded-b-lg flex items-center justify-between'>
+        <span>Last updated: {new Date(cond.timestamp).toLocaleString()}</span>
+        {cond.dataCompleteness && cond.dataCompleteness !== 'full' && (
+          <span
+            class={`px-2 py-0.5 rounded text-xs font-medium ${
+              completenessDisplay[cond.dataCompleteness]?.classes ?? ''
+            }`}
+          >
+            {completenessDisplay[cond.dataCompleteness]?.label ?? cond.dataCompleteness}
+          </span>
+        )}
       </div>
     </div>
   );

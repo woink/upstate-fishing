@@ -1,7 +1,12 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import type { StreamConditions } from '@shared/models/types.ts';
-import { qualityClasses, qualityLabels, qualityOrder } from '../lib/colors.ts';
+import {
+  parameterStatusDisplay,
+  qualityClasses,
+  qualityLabels,
+  qualityOrder,
+} from '../lib/colors.ts';
 
 interface TopPicksProps {
   apiUrl: string;
@@ -109,15 +114,35 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
               {i === 0 && <span class='text-lg'>⭐</span>}
             </div>
 
-            <div class='text-sm space-y-1 mb-3'>
-              {cond.stationData[0]?.waterTempF && (
-                <p>💧 Water: {cond.stationData[0].waterTempF}°F</p>
-              )}
-              {cond.weather && <p>🌡️ Air: {cond.weather.airTempF}°F</p>}
-              {cond.stationData[0]?.dischargeCfs && (
-                <p>🌊 Flow: {cond.stationData[0].dischargeCfs} cfs</p>
-              )}
-            </div>
+            {(() => {
+              const station = cond.stationData[0];
+              const tempStatus = station?.dataAvailability?.waterTemp ?? 'no_data';
+              const tempDisplay = parameterStatusDisplay[tempStatus] ??
+                parameterStatusDisplay.no_data;
+              const flowStatus = station?.dataAvailability?.discharge ?? 'no_data';
+              const flowDisplay = parameterStatusDisplay[flowStatus] ??
+                parameterStatusDisplay.no_data;
+
+              return (
+                <div class='text-sm space-y-1 mb-3'>
+                  {station?.waterTempF
+                    ? <p>💧 Water: {station.waterTempF}°F</p>
+                    : (
+                      <p class={tempDisplay.classes} title={tempDisplay.title}>
+                        💧 Water: {tempDisplay.text || 'N/A'}
+                      </p>
+                    )}
+                  {cond.weather && <p>🌡️ Air: {cond.weather.airTempF}°F</p>}
+                  {station?.dischargeCfs
+                    ? <p>🌊 Flow: {station.dischargeCfs} cfs</p>
+                    : (
+                      <p class={flowDisplay.classes} title={flowDisplay.title}>
+                        🌊 Flow: {flowDisplay.text || 'N/A'}
+                      </p>
+                    )}
+                </div>
+              );
+            })()}
 
             {cond.predictedHatches.length > 0 && (
               <div class='text-xs'>
