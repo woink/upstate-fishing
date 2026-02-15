@@ -142,8 +142,8 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
               <span style="color: #64748b; font-size: 12px">${stream.region} • ${stream.state}</span>
               <hr style="margin: 8px 0; border: none; border-top: 1px solid #e2e8f0">
               <div style="font-size: 13px">
-                ${waterTemp ? `💧 Water: <strong>${waterTemp}°F</strong><br>` : ''}
-                ${flow ? `🌊 Flow: <strong>${flow} cfs</strong><br>` : ''}
+                ${waterTemp != null ? `💧 Water: <strong>${waterTemp}°F</strong><br>` : ''}
+                ${flow != null ? `🌊 Flow: <strong>${flow} cfs</strong><br>` : ''}
                 ${topHatch ? `🪰 ${topHatch}<br>` : ''}
               </div>
               <div style="margin-top: 8px">
