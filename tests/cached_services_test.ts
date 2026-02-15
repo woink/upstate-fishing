@@ -2,11 +2,12 @@
  * Cached services tests
  */
 
-import { assertEquals, assertExists } from '@std/assert';
+import { assertEquals, assertExists, assertNotEquals } from '@std/assert';
 import { afterAll, beforeAll, describe, it } from '@std/testing/bdd';
 import { CachedUSGSService } from '../src/services/cached-usgs.ts';
 import { CachedWeatherService } from '../src/services/cached-weather.ts';
 import { cacheService, makeUSGSKey, makeWeatherKey } from '../src/services/cache.ts';
+import { USGSService } from '../src/services/usgs.ts';
 import type { StationData } from '../src/models/types.ts';
 
 // ============================================================================
@@ -204,5 +205,70 @@ describe('CachedWeatherService', () => {
     // Different coords should fetch
     await cachedService.getHourlyForecast(coords2);
     assertEquals(mockWeather.callCount, beforeCount + 1);
+  });
+});
+
+// ============================================================================
+// Cache Key Generation Tests
+// ============================================================================
+
+describe('Cache Key Generation', () => {
+  it('makeUSGSKey - different parameter lists produce different keys', () => {
+    const key1 = makeUSGSKey(['01420500'], ['00010', '00060']);
+    const key2 = makeUSGSKey(['01420500'], ['00010', '00065']);
+    assertNotEquals(key1, key2, 'Different params should produce different keys');
+  });
+
+  it('makeUSGSKey - same stations in different order produce same key', () => {
+    const key1 = makeUSGSKey(['01420500', '01418500'], ['00010']);
+    const key2 = makeUSGSKey(['01418500', '01420500'], ['00010']);
+    assertEquals(key1, key2, 'Station order should not matter (sorted internally)');
+  });
+
+  it('makeWeatherKey - slightly different coordinates produce different keys', () => {
+    const key1 = makeWeatherKey(41.9628, -74.9201);
+    const key2 = makeWeatherKey(41.9629, -74.9201);
+    assertNotEquals(key1, key2, 'Slightly different lat should produce different keys');
+  });
+
+  it('makeWeatherKey - same coordinates produce same key', () => {
+    const key1 = makeWeatherKey(41.9628, -74.9201);
+    const key2 = makeWeatherKey(41.9628, -74.9201);
+    assertEquals(key1, key2, 'Same coordinates should produce same key');
+  });
+});
+
+// ============================================================================
+// Cache behavior with empty results from mock service
+// ============================================================================
+
+describe({
+  name: 'CachedUSGSService - Edge Cases',
+  // CachedUSGSService uses the global cacheService singleton which opens a Deno KV
+  // database handle that cannot be closed without modifying production code.
+  sanitizeResources: false,
+}, () => {
+  it('should handle mock service returning empty timeSeries', async () => {
+    const mockResponse = { value: { timeSeries: [] } };
+
+    const server = Deno.serve({ port: 0 }, (_req) => {
+      return new Response(JSON.stringify(mockResponse), {
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+
+    try {
+      const addr = server.addr as Deno.NetAddr;
+      const usgs = new USGSService({ baseUrl: `http://localhost:${addr.port}/` });
+      const cachedService = new CachedUSGSService(usgs);
+
+      const result = await cachedService.getInstantaneousValues(['01420500']);
+      assertEquals(result.data, []);
+      assertEquals(result.cached, false);
+    } finally {
+      await server.shutdown();
+      // Allow ephemeral server resources to drain
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
   });
 });
