@@ -51,7 +51,7 @@ export const handler: Handlers = {
 
       const { waterTempF, airTempF, cloudCoverPercent, precipProbability, date } = parsed.data;
 
-      const stationData = waterTempF
+      const stationData = waterTempF !== undefined
         ? [{
           stationId: CUSTOM_STATION_ID,
           stationName: CUSTOM_STATION_NAME,
@@ -63,7 +63,7 @@ export const handler: Handlers = {
         }]
         : [];
 
-      const weather = airTempF
+      const weather = airTempF !== undefined
         ? {
           timestamp: new Date().toISOString(),
           airTempF,

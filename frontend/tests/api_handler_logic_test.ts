@@ -275,7 +275,7 @@ Deno.test('GET /api/streams/:id - stream has coordinates when available', () => 
 
 Deno.test('predict - builds station data from waterTempF', () => {
   const waterTempF = 54;
-  const stationData = waterTempF
+  const stationData = waterTempF !== undefined
     ? [{
       stationId: 'custom',
       stationName: 'Custom Input',
@@ -297,7 +297,7 @@ Deno.test('predict - builds station data from waterTempF', () => {
 
 Deno.test('predict - empty station data when no waterTempF', () => {
   const waterTempF = undefined;
-  const stationData = waterTempF
+  const stationData = waterTempF !== undefined
     ? [{
       stationId: 'custom',
       stationName: 'Custom Input',
@@ -317,7 +317,7 @@ Deno.test('predict - builds weather from airTempF', () => {
   const cloudCoverPercent = 80;
   const precipProbability = 20;
 
-  const weather = airTempF
+  const weather = airTempF !== undefined
     ? {
       timestamp: new Date().toISOString(),
       airTempF,
@@ -342,7 +342,7 @@ Deno.test('predict - weather defaults cloudCover to 50 when not provided', () =>
   const cloudCoverPercent = undefined;
   const precipProbability = undefined;
 
-  const weather = airTempF
+  const weather = airTempF !== undefined
     ? {
       timestamp: new Date().toISOString(),
       airTempF,
@@ -361,7 +361,7 @@ Deno.test('predict - weather defaults cloudCover to 50 when not provided', () =>
 
 Deno.test('predict - null weather when no airTempF', () => {
   const airTempF = undefined;
-  const weather = airTempF
+  const weather = airTempF !== undefined
     ? {
       timestamp: new Date().toISOString(),
       airTempF,
@@ -380,6 +380,47 @@ Deno.test('predict - temperature conversion is correct', () => {
   assertEquals(fahrenheitToCelsius(32), 0);
   assertEquals(fahrenheitToCelsius(212), 100);
   assertEquals(fahrenheitToCelsius(50), 10);
+});
+
+Deno.test('predict - builds station data when waterTempF is 0', () => {
+  const waterTempF: number | undefined = 0;
+  const stationData = waterTempF !== undefined
+    ? [{
+      stationId: 'custom',
+      stationName: 'Custom Input',
+      timestamp: new Date().toISOString(),
+      waterTempF,
+      waterTempC: fahrenheitToCelsius(waterTempF),
+      dischargeCfs: null,
+      gageHeightFt: null,
+    }]
+    : [];
+
+  assertEquals(stationData.length, 1);
+  assertEquals(stationData[0].waterTempF, 0);
+});
+
+Deno.test('predict - builds weather when airTempF is 0', () => {
+  const airTempF: number | undefined = 0;
+  const weather = airTempF !== undefined
+    ? {
+      timestamp: new Date().toISOString(),
+      airTempF,
+      cloudCoverPercent: 50,
+      precipProbability: 0,
+      windSpeedMph: 5,
+      shortForecast: 'Custom conditions',
+      isDaylight: true,
+    }
+    : null;
+
+  assertExists(weather);
+  assertEquals(weather.airTempF, 0);
+});
+
+Deno.test('predict - waterTempF 0 converts to correct Celsius', () => {
+  const celsiusValue = fahrenheitToCelsius(0);
+  assertEquals(Math.round(celsiusValue * 10) / 10, -17.8);
 });
 
 // ============================================================================
