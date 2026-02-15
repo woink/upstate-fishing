@@ -15,8 +15,10 @@ frontend/_fresh/
 .vscode/
 .idea/
 
-# AI tooling
-.claude/
+# AI tooling - local/personal files only
+.claude/*.local.md
+.claude/*.local.json
+.claude/settings.local.json
 .serena/
 
 # OS

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "deno-sandbox",
+  "owner": "donjo",
+  "repo": "denoland",
+  "path": "skills/deno-sandbox",
+  "branch": "main",
+  "sha": "bd0732c8a8b0f4d5d6a9e2d8635c151aae4b0f25",
+  "source": "manual"
+}
