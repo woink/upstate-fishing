@@ -3,7 +3,13 @@
  */
 
 import { assertEquals } from '@std/assert';
-import { isValidReading, USGS_PARAMS, USGSService } from '../src/services/usgs.ts';
+import {
+  computeDataCompleteness,
+  isValidReading,
+  USGS_PARAMS,
+  USGSService,
+} from '../src/services/usgs.ts';
+import type { StationData } from '../src/models/types.ts';
 
 // ============================================================================
 // USGS_PARAMS Tests
@@ -27,11 +33,16 @@ Deno.test('isValidReading - filters USGS sentinel values', () => {
   // NaN should be filtered
   assertEquals(isValidReading(NaN), false);
 
+  // Infinity should be filtered
+  assertEquals(isValidReading(Infinity), false);
+  assertEquals(isValidReading(-Infinity), false);
+
   // Valid readings should pass
   assertEquals(isValidReading(0), true);
   assertEquals(isValidReading(15.5), true);
   assertEquals(isValidReading(100), true);
   assertEquals(isValidReading(-5), true); // Negative temps are valid
+  assertEquals(isValidReading(-999998), true); // Not a sentinel
 });
 
 // ============================================================================
@@ -114,6 +125,219 @@ Deno.test('USGSService - station data structure is correct', () => {
   // Document expected output structure
   for (const field of expectedFields) {
     assertEquals(typeof field, 'string', `Expected field: ${field}`);
+  }
+});
+
+// ============================================================================
+// computeDataCompleteness Tests
+// ============================================================================
+
+function makeStationData(
+  overrides: Partial<StationData> = {},
+): StationData {
+  return {
+    stationId: '01420500',
+    stationName: 'Test Station',
+    timestamp: new Date().toISOString(),
+    waterTempF: null,
+    waterTempC: null,
+    dischargeCfs: null,
+    gageHeightFt: null,
+    ...overrides,
+  };
+}
+
+Deno.test('computeDataCompleteness - all available returns full', () => {
+  const stations: StationData[] = [
+    makeStationData({
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    }),
+  ];
+  assertEquals(computeDataCompleteness(stations), 'full');
+});
+
+Deno.test('computeDataCompleteness - mixed availability returns partial', () => {
+  const stations: StationData[] = [
+    makeStationData({
+      dataAvailability: {
+        waterTemp: 'available',
+        discharge: 'available',
+        gageHeight: 'not_equipped',
+      },
+    }),
+  ];
+  assertEquals(computeDataCompleteness(stations), 'partial');
+});
+
+Deno.test('computeDataCompleteness - no water temp returns limited', () => {
+  const stations: StationData[] = [
+    makeStationData({
+      dataAvailability: {
+        waterTemp: 'not_equipped',
+        discharge: 'available',
+        gageHeight: 'available',
+      },
+    }),
+  ];
+  assertEquals(computeDataCompleteness(stations), 'limited');
+});
+
+Deno.test('computeDataCompleteness - empty array returns limited', () => {
+  assertEquals(computeDataCompleteness([]), 'limited');
+});
+
+Deno.test('computeDataCompleteness - multiple stations all full returns full', () => {
+  const stations: StationData[] = [
+    makeStationData({
+      stationId: '01420500',
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    }),
+    makeStationData({
+      stationId: '01418500',
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    }),
+  ];
+  assertEquals(computeDataCompleteness(stations), 'full');
+});
+
+Deno.test('computeDataCompleteness - one station partial makes overall partial', () => {
+  const stations: StationData[] = [
+    makeStationData({
+      stationId: '01420500',
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    }),
+    makeStationData({
+      stationId: '01418500',
+      dataAvailability: {
+        waterTemp: 'available',
+        discharge: 'sentinel',
+        gageHeight: 'available',
+      },
+    }),
+  ];
+  assertEquals(computeDataCompleteness(stations), 'partial');
+});
+
+// ============================================================================
+// USGSService - Mock Response Transformation Tests
+// ============================================================================
+
+function buildMockUSGSResponse(
+  timeSeries: Array<{
+    stationId: string;
+    stationName: string;
+    paramCode: string;
+    value: string;
+  }>,
+) {
+  return {
+    value: {
+      timeSeries: timeSeries.map((ts) => ({
+        sourceInfo: {
+          siteCode: [{ value: ts.stationId }],
+          siteName: ts.stationName,
+          geoLocation: {
+            geogLocation: { latitude: 42.0, longitude: -74.0 },
+          },
+        },
+        variable: {
+          variableCode: [{ value: ts.paramCode }],
+          variableName: 'Test Variable',
+          unit: { unitCode: 'deg C' },
+        },
+        values: [{
+          value: [{ value: ts.value, dateTime: '2024-04-15T12:00:00.000Z' }],
+        }],
+      })),
+    },
+  };
+}
+
+Deno.test('USGSService - sentinel values produce sentinel availability', async () => {
+  const mockResponse = buildMockUSGSResponse([
+    { stationId: '01000001', stationName: 'Test Station', paramCode: '00010', value: '-999999' },
+    { stationId: '01000001', stationName: 'Test Station', paramCode: '00060', value: '150.0' },
+    { stationId: '01000001', stationName: 'Test Station', paramCode: '00065', value: '2.5' },
+  ]);
+
+  const server = Deno.serve({ port: 0 }, (_req) => {
+    return new Response(JSON.stringify(mockResponse), {
+      headers: { 'content-type': 'application/json' },
+    });
+  });
+
+  try {
+    const addr = server.addr;
+    const service = new USGSService({ baseUrl: `http://localhost:${addr.port}/` });
+    const result = await service.getInstantaneousValues(['01000001']);
+
+    assertEquals(result.length, 1);
+    assertEquals(result[0].waterTempF, null);
+    assertEquals(result[0].waterTempC, null);
+    assertEquals(result[0].dischargeCfs, 150.0);
+    assertEquals(result[0].dataAvailability?.waterTemp, 'sentinel');
+    assertEquals(result[0].dataAvailability?.discharge, 'available');
+    assertEquals(result[0].dataAvailability?.gageHeight, 'available');
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('USGSService - missing parameters produce not_equipped availability', async () => {
+  // Only discharge — no water temp or gage height time series
+  const mockResponse = buildMockUSGSResponse([
+    { stationId: '01000002', stationName: 'Discharge Only', paramCode: '00060', value: '200.0' },
+  ]);
+
+  const server = Deno.serve({ port: 0 }, (_req) => {
+    return new Response(JSON.stringify(mockResponse), {
+      headers: { 'content-type': 'application/json' },
+    });
+  });
+
+  try {
+    const addr = server.addr;
+    const service = new USGSService({ baseUrl: `http://localhost:${addr.port}/` });
+    const result = await service.getInstantaneousValues(['01000002']);
+
+    assertEquals(result.length, 1);
+    assertEquals(result[0].waterTempF, null);
+    assertEquals(result[0].dischargeCfs, 200.0);
+    assertEquals(result[0].dataAvailability?.waterTemp, 'not_equipped');
+    assertEquals(result[0].dataAvailability?.discharge, 'available');
+    assertEquals(result[0].dataAvailability?.gageHeight, 'not_equipped');
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('USGSService - valid readings produce available status', async () => {
+  const mockResponse = buildMockUSGSResponse([
+    { stationId: '01000003', stationName: 'Full Station', paramCode: '00010', value: '12.2' },
+    { stationId: '01000003', stationName: 'Full Station', paramCode: '00060', value: '150.0' },
+    { stationId: '01000003', stationName: 'Full Station', paramCode: '00065', value: '2.5' },
+  ]);
+
+  const server = Deno.serve({ port: 0 }, (_req) => {
+    return new Response(JSON.stringify(mockResponse), {
+      headers: { 'content-type': 'application/json' },
+    });
+  });
+
+  try {
+    const addr = server.addr;
+    const service = new USGSService({ baseUrl: `http://localhost:${addr.port}/` });
+    const result = await service.getInstantaneousValues(['01000003']);
+
+    assertEquals(result.length, 1);
+    assertEquals(result[0].waterTempC, 12.2);
+    assertEquals(result[0].dischargeCfs, 150.0);
+    assertEquals(result[0].gageHeightFt, 2.5);
+    assertEquals(result[0].dataAvailability?.waterTemp, 'available');
+    assertEquals(result[0].dataAvailability?.discharge, 'available');
+    assertEquals(result[0].dataAvailability?.gageHeight, 'available');
+  } finally {
+    await server.shutdown();
   }
 });
 

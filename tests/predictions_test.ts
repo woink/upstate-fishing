@@ -4,7 +4,7 @@
 
 import { assertEquals, assertGreater } from '@std/assert';
 import { PredictionService } from '../src/services/predictions.ts';
-import type { StationData, WeatherConditions } from '../src/models/types.ts';
+import type { StationData, Stream, WeatherConditions } from '../src/models/types.ts';
 
 Deno.test('PredictionService - predicts Hendrickson in April at 54°F', () => {
   const service = new PredictionService();
@@ -123,4 +123,77 @@ Deno.test('PredictionService - sulphurs in summer', () => {
   // Should predict sulphurs
   const sulphurs = predictions.filter((p) => p.hatch.commonName.includes('Sulphur'));
   assertGreater(sulphurs.length, 0, 'Should predict at least one sulphur hatch');
+});
+
+// ============================================================================
+// Data Completeness Tests
+// ============================================================================
+
+const testStream: Stream = {
+  id: 'test-stream',
+  name: 'Test Stream',
+  region: 'catskills',
+  state: 'NY',
+  stationIds: ['01420500'],
+};
+
+Deno.test('PredictionService - generateConditions includes dataCompleteness', () => {
+  const service = new PredictionService();
+
+  const stationData: StationData[] = [
+    {
+      stationId: '01420500',
+      stationName: 'Test Station',
+      timestamp: new Date().toISOString(),
+      waterTempF: 54,
+      waterTempC: 12.2,
+      dischargeCfs: 150,
+      gageHeightFt: 2.5,
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    },
+  ];
+
+  const conditions = service.generateConditions(testStream, stationData, null);
+  assertEquals(conditions.dataCompleteness, 'full');
+});
+
+Deno.test('PredictionService - empty station data produces limited completeness', () => {
+  const service = new PredictionService();
+
+  const conditions = service.generateConditions(testStream, [], null);
+  assertEquals(conditions.dataCompleteness, 'limited');
+});
+
+Deno.test('PredictionService - month-only fallback uses updated reasoning', () => {
+  const service = new PredictionService();
+
+  // No water temp means month-only fallback
+  const stationData: StationData[] = [
+    {
+      stationId: '01420500',
+      stationName: 'Test Station',
+      timestamp: new Date().toISOString(),
+      waterTempF: null,
+      waterTempC: null,
+      dischargeCfs: 150,
+      gageHeightFt: 2.5,
+      dataAvailability: {
+        waterTemp: 'not_equipped',
+        discharge: 'available',
+        gageHeight: 'available',
+      },
+    },
+  ];
+
+  // Use a month that has known hatches (April)
+  const april = new Date(2024, 3, 15, 14, 0, 0);
+  const predictions = service.predictHatches(stationData, null, april);
+
+  if (predictions.length > 0) {
+    assertEquals(
+      predictions[0].reasoning.includes('water temperature not monitored'),
+      true,
+      'Reasoning should mention water temp not monitored',
+    );
+  }
 });
