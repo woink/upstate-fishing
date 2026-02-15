@@ -125,7 +125,7 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
 
               return (
                 <div class='text-sm space-y-1 mb-3'>
-                  {station?.waterTempF
+                  {station?.waterTempF != null
                     ? <p>💧 Water: {station.waterTempF}°F</p>
                     : (
                       <p class={tempDisplay.classes} title={tempDisplay.title}>
@@ -133,7 +133,7 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
                       </p>
                     )}
                   {cond.weather && <p>🌡️ Air: {cond.weather.airTempF}°F</p>}
-                  {station?.dischargeCfs
+                  {station?.dischargeCfs != null
                     ? <p>🌊 Flow: {station.dischargeCfs} cfs</p>
                     : (
                       <p class={flowDisplay.classes} title={flowDisplay.title}>

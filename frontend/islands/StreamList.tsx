@@ -99,7 +99,7 @@ export default function StreamList({ streams, apiUrl }: StreamListProps) {
                 <div class='mt-3 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm'>
                   <div>
                     <span class='text-slate-500'>Water</span>
-                    {station?.waterTempF
+                    {station?.waterTempF != null
                       ? <p class='font-medium'>{station.waterTempF}°F</p>
                       : (
                         <p class={`font-medium ${tempDisplay.classes}`} title={tempDisplay.title}>
@@ -115,7 +115,7 @@ export default function StreamList({ streams, apiUrl }: StreamListProps) {
                   )}
                   <div>
                     <span class='text-slate-500'>Flow</span>
-                    {station?.dischargeCfs
+                    {station?.dischargeCfs != null
                       ? <p class='font-medium'>{station.dischargeCfs} cfs</p>
                       : (
                         <p class={`font-medium ${flowDisplay.classes}`} title={flowDisplay.title}>
