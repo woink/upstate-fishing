@@ -73,17 +73,14 @@ test.describe('Hatch Chart Page', () => {
   });
 
   test('shows empty state when no hatches match filters', async ({ page }) => {
-    // Midges in an unlikely month combination
+    // Stoneflies in an unlikely month combination
     await page.goto('/hatches?order=stonefly&month=8');
-    const emptyState = page.locator('text=No hatches found');
-    // This may or may not appear depending on data -- just check page doesn't crash
+    // This may or may not show "No hatches found" depending on data -- just check page doesn't crash
     await expect(page.locator('h1')).toHaveText('Hatch Chart');
   });
 
   test('HatchChart island renders the interactive table', async ({ page }) => {
-    // The HatchChart island should render with rows
-    const table = page.locator('table, [role="table"]').first();
-    // If no table element, the chart may use divs -- check for hatch names
+    // The HatchChart island should render with hatch names visible
     const hatchRow = page.locator('text=/Hendrickson|Blue-Winged Olive|March Brown/').first();
     await expect(hatchRow).toBeVisible({ timeout: 10_000 });
   });

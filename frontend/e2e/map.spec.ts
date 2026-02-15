@@ -28,9 +28,9 @@ test.describe('Map Page', () => {
     await expect(leafletMap).toBeVisible({ timeout: 15_000 });
   });
 
-  test('map shows station markers', async ({ page }) => {
-    // Wait for Leaflet to load and markers to appear
-    const marker = page.locator('.leaflet-marker-icon, .leaflet-interactive').first();
-    await expect(marker).toBeVisible({ timeout: 20_000 });
+  test('map shows circle markers for stations', async ({ page }) => {
+    // StationMap uses L.circleMarker which renders as SVG with .leaflet-interactive
+    const circleMarker = page.locator('.leaflet-interactive').first();
+    await expect(circleMarker).toBeVisible({ timeout: 20_000 });
   });
 });

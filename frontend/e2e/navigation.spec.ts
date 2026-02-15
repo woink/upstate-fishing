@@ -121,4 +121,31 @@ test.describe('API Routes', () => {
     expect(body.success).toBe(true);
     expect(body.data).toBeDefined();
   });
+
+  test('GET /api/streams/{id} returns 404 for unknown stream', async ({ request }) => {
+    const response = await request.get('/api/streams/nonexistent-stream-xyz');
+    expect(response.status()).toBe(404);
+
+    const body = await response.json();
+    expect(body.success).toBe(false);
+    expect(body.error).toBeDefined();
+  });
+
+  test('GET /api/hatches/{id} returns 404 for unknown hatch', async ({ request }) => {
+    const response = await request.get('/api/hatches/nonexistent-hatch-xyz');
+    expect(response.status()).toBe(404);
+
+    const body = await response.json();
+    expect(body.success).toBe(false);
+    expect(body.error).toBeDefined();
+  });
+
+  test('GET /api/streams with invalid region still returns 200', async ({ request }) => {
+    const response = await request.get('/api/streams?region=nonexistent');
+    expect(response.ok()).toBeTruthy();
+
+    const body = await response.json();
+    expect(body.success).toBe(true);
+    expect(body.data).toEqual([]);
+  });
 });

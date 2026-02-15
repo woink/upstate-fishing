@@ -29,12 +29,12 @@
     "lineWidth": 100,
     "indentWidth": 2,
     "singleQuote": true,
-    "exclude": ["README.md", "frontend/node_modules", "frontend/playwright-report"]
+    "exclude": ["README.md", "frontend/node_modules", "frontend/playwright-report", "frontend/playwright.config.ts", "frontend/e2e"]
   },
   "lint": {
     "rules": {
       "tags": ["recommended"]
     },
-    "exclude": ["frontend/_fresh", "frontend/node_modules", "frontend/playwright-report"]
+    "exclude": ["frontend/_fresh", "frontend/node_modules", "frontend/playwright-report", "frontend/playwright.config.ts", "frontend/e2e"]
   }
 }
