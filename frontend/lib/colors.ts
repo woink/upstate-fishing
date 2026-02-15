@@ -91,7 +91,7 @@ export const parameterStatusDisplay: Record<
     classes: 'text-amber-500',
   },
   no_data: {
-    text: '\u2014',
+    text: '—', // em dash
     title: 'Sensor equipped but no data received',
     classes: 'text-slate-400',
   },
