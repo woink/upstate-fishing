@@ -186,3 +186,22 @@ Deno.test('apiError - includes timestamp', async () => {
 
   assertExists(json.timestamp);
 });
+
+// ============================================================================
+// Content-Type Header Tests
+// ============================================================================
+
+Deno.test('apiSuccess - has Content-Type application/json', () => {
+  const response = apiSuccess({ id: 'test' });
+  assertEquals(response.headers.get('Content-Type'), 'application/json');
+});
+
+Deno.test('apiError - has Content-Type application/json', () => {
+  const response = apiError('Not found', 'NOT_FOUND', 404);
+  assertEquals(response.headers.get('Content-Type'), 'application/json');
+});
+
+Deno.test('apiSuccessList - has Content-Type application/json', () => {
+  const response = apiSuccessList([]);
+  assertEquals(response.headers.get('Content-Type'), 'application/json');
+});

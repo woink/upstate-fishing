@@ -4,7 +4,12 @@
  */
 
 import { assertEquals, assertExists } from '@std/assert';
-import { getStreamsByRegion, getStreamsByState, STREAMS } from '@shared/data/streams.ts';
+import {
+  filterStreamsByQuery,
+  getStreamsByRegion,
+  getStreamsByState,
+  STREAMS,
+} from '@shared/data/streams.ts';
 import { HATCHES } from '@shared/data/hatches.ts';
 
 // ============================================================================
@@ -289,4 +294,73 @@ Deno.test('streams page handler - state filter when no region', () => {
   for (const s of streams) {
     assertEquals(s.state, 'NJ');
   }
+});
+
+// ============================================================================
+// filterStreamsByQuery Tests
+// ============================================================================
+
+Deno.test('filterStreamsByQuery - region connecticut returns CT streams', () => {
+  const result = filterStreamsByQuery({ region: 'connecticut' });
+  assertEquals(result.streams.length > 0, true, 'Should have connecticut streams');
+  for (const s of result.streams) {
+    assertEquals(s.region, 'connecticut');
+    assertEquals(s.state, 'CT');
+  }
+  assertEquals(result.region, 'connecticut');
+});
+
+Deno.test('filterStreamsByQuery - region nc-highcountry returns NC high country streams', () => {
+  const result = filterStreamsByQuery({ region: 'nc-highcountry' });
+  assertEquals(result.streams.length > 0, true, 'Should have nc-highcountry streams');
+  for (const s of result.streams) {
+    assertEquals(s.region, 'nc-highcountry');
+    assertEquals(s.state, 'NC');
+  }
+  assertEquals(result.region, 'nc-highcountry');
+});
+
+Deno.test('filterStreamsByQuery - region nc-foothills returns NC foothills streams', () => {
+  const result = filterStreamsByQuery({ region: 'nc-foothills' });
+  assertEquals(result.streams.length > 0, true, 'Should have nc-foothills streams');
+  for (const s of result.streams) {
+    assertEquals(s.region, 'nc-foothills');
+    assertEquals(s.state, 'NC');
+  }
+  assertEquals(result.region, 'nc-foothills');
+});
+
+Deno.test('filterStreamsByQuery - state NC returns all NC streams', () => {
+  const result = filterStreamsByQuery({ state: 'NC' });
+  assertEquals(result.streams.length > 0, true, 'Should have NC streams');
+  for (const s of result.streams) {
+    assertEquals(s.state, 'NC');
+  }
+  assertEquals(result.state, 'NC');
+});
+
+Deno.test('filterStreamsByQuery - state CT returns all CT streams', () => {
+  const result = filterStreamsByQuery({ state: 'CT' });
+  assertEquals(result.streams.length > 0, true, 'Should have CT streams');
+  for (const s of result.streams) {
+    assertEquals(s.state, 'CT');
+  }
+  assertEquals(result.state, 'CT');
+});
+
+Deno.test('filterStreamsByQuery - invalid region returns all streams', () => {
+  const result = filterStreamsByQuery({ region: 'invalid-region' });
+  assertEquals(result.streams.length, STREAMS.length);
+  assertEquals(result.region, undefined);
+  assertEquals(result.state, undefined);
+});
+
+Deno.test('filterStreamsByQuery - null region returns all streams', () => {
+  const result = filterStreamsByQuery({ region: null });
+  assertEquals(result.streams.length, STREAMS.length);
+});
+
+Deno.test('filterStreamsByQuery - empty params returns all streams', () => {
+  const result = filterStreamsByQuery({});
+  assertEquals(result.streams.length, STREAMS.length);
 });

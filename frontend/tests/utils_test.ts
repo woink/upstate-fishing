@@ -60,6 +60,21 @@ Deno.test('regionLabels - has human-readable names', () => {
   assertEquals(regionLabels.delaware, 'Delaware System');
 });
 
+Deno.test('regionLabels - connecticut is NOT present', () => {
+  // Documents gap -- see issue #49 for region navigation improvements
+  assertEquals('connecticut' in regionLabels, false);
+});
+
+Deno.test('regionLabels - nc-highcountry is NOT present', () => {
+  // Documents gap -- see issue #49 for region navigation improvements
+  assertEquals('nc-highcountry' in regionLabels, false);
+});
+
+Deno.test('regionLabels - nc-foothills is NOT present', () => {
+  // Documents gap -- see issue #49 for region navigation improvements
+  assertEquals('nc-foothills' in regionLabels, false);
+});
+
 // ============================================================================
 // Confidence Color Mapping Tests
 // ============================================================================
