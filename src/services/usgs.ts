@@ -53,12 +53,29 @@ type USGSTimeSeries = z.infer<typeof USGSTimeSeriesSchema>;
 // ============================================================================
 
 /**
- * USGS uses these values to indicate missing/invalid readings
- * Common sentinel values per USGS IV API documentation:
- * - -999999: Ice-affected/Equipment malfunction
- * - -99999: Other invalid reading conditions
+ * USGS numeric sentinel values indicating missing or invalid readings.
  *
- * Source: https://help.waterdata.usgs.gov/codes-and-parameters
+ * -999999  The canonical "noDataValue" defined in the WaterML 1.1 schema
+ *          returned by the IV API (`<noDataValue>-999999.0</noDataValue>`).
+ *          Appears when a sensor cannot produce a valid measurement for any
+ *          reason (ice, equipment failure, etc.).
+ *
+ * -99999   Secondary sentinel observed in legacy NWIS responses and some
+ *          edge-case DCP (Data Collection Platform) transmissions.
+ *
+ * Note: USGS also attaches string-based qualifier / status codes to each
+ * value entry (e.g. "Ice", "Eqp", "Dry", "Fld", "Ssn", "Mnt", "Dis", "Rat").
+ * These are carried in the JSON response's `qualifiers` array alongside
+ * data-quality flags ("P" provisional, "A" approved, "e" estimated).
+ * We do not currently inspect qualifier strings — we rely solely on numeric
+ * sentinel detection plus NaN/Infinity filtering.  If qualifier-aware
+ * filtering is needed in the future, the qualifiers are already preserved
+ * by the Zod schema's `.passthrough()` calls.
+ *
+ * Sources:
+ *   https://waterservices.usgs.gov/docs/instantaneous-values/instantaneous-values-details/
+ *   https://help.waterdata.usgs.gov/codes-and-parameters/instantaneous-and-daily-value-status-codes
+ *   https://help.waterdata.usgs.gov/codes-and-parameters/instantaneous-value-qualification-code-uv_rmk_cd
  */
 export const USGS_SENTINEL_VALUES = new Set([-999999, -99999]);
 

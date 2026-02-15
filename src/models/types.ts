@@ -61,7 +61,7 @@ export type StationData = z.infer<typeof StationDataSchema>;
 export const ParameterStatusSchema = z.enum([
   'available', // valid reading present
   'not_equipped', // station does not monitor this parameter
-  'sentinel', // USGS returned sentinel value (-999999, -99999)
+  'sentinel', // USGS returned a numeric sentinel (noDataValue -999999 or legacy -99999)
   'no_data', // parameter expected but value missing/unparseable
 ]);
 export type ParameterStatus = z.infer<typeof ParameterStatusSchema>;

@@ -26,8 +26,9 @@ Deno.test('USGS_PARAMS - has correct parameter codes', () => {
 // ============================================================================
 
 Deno.test('isValidReading - filters USGS sentinel values', () => {
-  // Sentinel values should be filtered
+  // -999999: WaterML noDataValue (primary sentinel)
   assertEquals(isValidReading(-999999), false);
+  // -99999: Legacy NWIS / DCP sentinel
   assertEquals(isValidReading(-99999), false);
 
   // NaN should be filtered
@@ -43,6 +44,17 @@ Deno.test('isValidReading - filters USGS sentinel values', () => {
   assertEquals(isValidReading(100), true);
   assertEquals(isValidReading(-5), true); // Negative temps are valid
   assertEquals(isValidReading(-999998), true); // Not a sentinel
+});
+
+Deno.test('isValidReading - near-sentinel boundary values are valid', () => {
+  // Values close to sentinels but not equal should be accepted
+  assertEquals(isValidReading(-999998), true);
+  assertEquals(isValidReading(-1000000), true);
+  assertEquals(isValidReading(-99998), true);
+  assertEquals(isValidReading(-100000), true);
+  // Fractional sentinel values are not in the set and should pass
+  assertEquals(isValidReading(-999999.1), true);
+  assertEquals(isValidReading(-99999.5), true);
 });
 
 // ============================================================================
@@ -302,6 +314,37 @@ Deno.test('USGSService - sentinel values produce sentinel availability', async (
     assertEquals(result[0].dischargeCfs, 150.0);
     assertEquals(result[0].dataAvailability?.waterTemp, 'sentinel');
     assertEquals(result[0].dataAvailability?.discharge, 'available');
+    assertEquals(result[0].dataAvailability?.gageHeight, 'available');
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('USGSService - secondary sentinel (-99999) also produces sentinel availability', async () => {
+  const mockResponse = buildMockUSGSResponse([
+    { stationId: '01000010', stationName: 'Legacy Station', paramCode: '00010', value: '-99999' },
+    { stationId: '01000010', stationName: 'Legacy Station', paramCode: '00060', value: '-99999' },
+    { stationId: '01000010', stationName: 'Legacy Station', paramCode: '00065', value: '3.1' },
+  ]);
+
+  const server = Deno.serve({ port: 0 }, (_req) => {
+    return new Response(JSON.stringify(mockResponse), {
+      headers: { 'content-type': 'application/json' },
+    });
+  });
+
+  try {
+    const addr = server.addr;
+    const service = new USGSService({ baseUrl: `http://localhost:${addr.port}/` });
+    const result = await service.getInstantaneousValues(['01000010']);
+
+    assertEquals(result.length, 1);
+    assertEquals(result[0].waterTempF, null);
+    assertEquals(result[0].waterTempC, null);
+    assertEquals(result[0].dischargeCfs, null);
+    assertEquals(result[0].gageHeightFt, 3.1);
+    assertEquals(result[0].dataAvailability?.waterTemp, 'sentinel');
+    assertEquals(result[0].dataAvailability?.discharge, 'sentinel');
     assertEquals(result[0].dataAvailability?.gageHeight, 'available');
   } finally {
     await server.shutdown();
