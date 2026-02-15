@@ -164,6 +164,226 @@ Deno.test('PredictionService - empty station data produces limited completeness'
   assertEquals(conditions.dataCompleteness, 'limited');
 });
 
+// ============================================================================
+// assessFishingQuality boundary tests (tested via generateConditions)
+// ============================================================================
+
+Deno.test('PredictionService - waterTempF at 38F boundary is not poor (>= 38 is ok)', () => {
+  const service = new PredictionService();
+
+  const stationData: StationData[] = [
+    {
+      stationId: '01420500',
+      stationName: 'Test Station',
+      timestamp: new Date().toISOString(),
+      waterTempF: 38,
+      waterTempC: 3.3,
+      dischargeCfs: 150,
+      gageHeightFt: 2.5,
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    },
+  ];
+
+  // Use a month/date where hatches are unlikely so we isolate the temp logic
+  const january = new Date(2024, 0, 15, 12, 0, 0);
+  const conditions = service.generateConditions(testStream, stationData, null, january);
+  // At 38°F the temperature check (< 38) should NOT trigger 'poor'.
+  // Quality may still be 'poor' if there are zero hatches above 0.5 probability,
+  // but that's the hatch-count logic, not the temperature guard.
+  if (conditions.predictedHatches.filter((p) => p.probability >= 0.5).length > 0) {
+    assertEquals(
+      conditions.fishingQuality !== 'poor',
+      true,
+      '38°F should not trigger cold-temperature poor',
+    );
+  }
+});
+
+Deno.test('PredictionService - waterTempF at 37F is poor (< 38)', () => {
+  const service = new PredictionService();
+
+  const stationData: StationData[] = [
+    {
+      stationId: '01420500',
+      stationName: 'Test Station',
+      timestamp: new Date().toISOString(),
+      waterTempF: 37,
+      waterTempC: 2.8,
+      dischargeCfs: 150,
+      gageHeightFt: 2.5,
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    },
+  ];
+
+  const april = new Date(2024, 3, 15, 14, 0, 0);
+  const conditions = service.generateConditions(testStream, stationData, null, april);
+  assertEquals(conditions.fishingQuality, 'poor', 'At 37F, quality should be poor (< 38)');
+});
+
+Deno.test('PredictionService - waterTempF at 68F is not poor (only > 68 is poor)', () => {
+  const service = new PredictionService();
+
+  const stationData: StationData[] = [
+    {
+      stationId: '01420500',
+      stationName: 'Test Station',
+      timestamp: new Date().toISOString(),
+      waterTempF: 68,
+      waterTempC: 20,
+      dischargeCfs: 150,
+      gageHeightFt: 2.5,
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    },
+  ];
+
+  const july = new Date(2024, 6, 15, 18, 0, 0);
+  const conditions = service.generateConditions(testStream, stationData, null, july);
+  assertEquals(
+    conditions.fishingQuality !== 'poor',
+    true,
+    'At 68F exactly, quality should NOT be poor (only > 68 triggers poor)',
+  );
+});
+
+Deno.test('PredictionService - waterTempF at 69F is poor (> 68)', () => {
+  const service = new PredictionService();
+
+  const stationData: StationData[] = [
+    {
+      stationId: '01420500',
+      stationName: 'Test Station',
+      timestamp: new Date().toISOString(),
+      waterTempF: 69,
+      waterTempC: 20.6,
+      dischargeCfs: 150,
+      gageHeightFt: 2.5,
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    },
+  ];
+
+  const july = new Date(2024, 6, 15, 18, 0, 0);
+  const conditions = service.generateConditions(testStream, stationData, null, july);
+  assertEquals(conditions.fishingQuality, 'poor', 'At 69F, quality should be poor (> 68)');
+});
+
+Deno.test('PredictionService - generateConditions with weather data has all expected fields', () => {
+  const service = new PredictionService();
+
+  const stationData: StationData[] = [
+    {
+      stationId: '01420500',
+      stationName: 'Test Station',
+      timestamp: new Date().toISOString(),
+      waterTempF: 54,
+      waterTempC: 12.2,
+      dischargeCfs: 150,
+      gageHeightFt: 2.5,
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    },
+  ];
+
+  const weather: WeatherConditions = {
+    timestamp: new Date().toISOString(),
+    airTempF: 58,
+    cloudCoverPercent: 60,
+    precipProbability: 10,
+    windSpeedMph: 8,
+    shortForecast: 'Partly Cloudy',
+    isDaylight: true,
+  };
+
+  const april = new Date(2024, 3, 15, 14, 0, 0);
+  const conditions = service.generateConditions(testStream, stationData, weather, april);
+
+  assertEquals(typeof conditions.stream, 'object');
+  assertEquals(typeof conditions.timestamp, 'string');
+  assertEquals(Array.isArray(conditions.stationData), true);
+  assertEquals(Array.isArray(conditions.predictedHatches), true);
+  assertEquals(typeof conditions.fishingQuality, 'string');
+  assertEquals(typeof conditions.summary, 'string');
+  assertEquals(typeof conditions.dataCompleteness, 'string');
+  assertEquals(conditions.weather !== undefined, true);
+});
+
+Deno.test('PredictionService - wind speed exactly 20mph does NOT return fair', () => {
+  const service = new PredictionService();
+
+  const stationData: StationData[] = [
+    {
+      stationId: '01420500',
+      stationName: 'Test Station',
+      timestamp: new Date().toISOString(),
+      waterTempF: 54,
+      waterTempC: 12.2,
+      dischargeCfs: 150,
+      gageHeightFt: 2.5,
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    },
+  ];
+
+  const weather: WeatherConditions = {
+    timestamp: new Date().toISOString(),
+    airTempF: 58,
+    cloudCoverPercent: 80,
+    precipProbability: 20,
+    windSpeedMph: 20,
+    shortForecast: 'Mostly Cloudy',
+    isDaylight: true,
+  };
+
+  const april = new Date(2024, 3, 15, 14, 0, 0);
+  const conditions = service.generateConditions(testStream, stationData, weather, april);
+  const topHatches = conditions.predictedHatches.filter((p) => p.probability >= 0.5);
+  if (topHatches.length >= 3) {
+    assertEquals(
+      conditions.fishingQuality,
+      'excellent',
+      '20mph wind with 3+ hatches should give excellent quality (wind boundary not crossed)',
+    );
+  } else if (topHatches.length >= 2) {
+    assertEquals(
+      conditions.fishingQuality,
+      'good',
+      '20mph wind with 2+ hatches should give good quality (wind boundary not crossed)',
+    );
+  }
+});
+
+Deno.test('PredictionService - wind speed 21mph returns fair', () => {
+  const service = new PredictionService();
+
+  const stationData: StationData[] = [
+    {
+      stationId: '01420500',
+      stationName: 'Test Station',
+      timestamp: new Date().toISOString(),
+      waterTempF: 54,
+      waterTempC: 12.2,
+      dischargeCfs: 150,
+      gageHeightFt: 2.5,
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    },
+  ];
+
+  const weather: WeatherConditions = {
+    timestamp: new Date().toISOString(),
+    airTempF: 58,
+    cloudCoverPercent: 80,
+    precipProbability: 20,
+    windSpeedMph: 21,
+    shortForecast: 'Mostly Cloudy',
+    isDaylight: true,
+  };
+
+  const april = new Date(2024, 3, 15, 14, 0, 0);
+  const conditions = service.generateConditions(testStream, stationData, weather, april);
+  assertEquals(conditions.fishingQuality, 'fair', 'At wind 21mph, quality should be fair');
+});
+
+// ============================================================================
+// Month-only fallback tests
+// ============================================================================
+
 Deno.test('PredictionService - month-only fallback uses updated reasoning', () => {
   const service = new PredictionService();
 

@@ -109,6 +109,233 @@ Deno.test('WeatherService - temperature conversion logic', () => {
 });
 
 // ============================================================================
+// WeatherService - Mock Server Tests for parseWindSpeed and estimateCloudCover
+// ============================================================================
+
+/**
+ * Build a mock NWS points response
+ */
+function buildMockPointsResponse(gridId: string, gridX: number, gridY: number) {
+  return {
+    properties: {
+      gridId,
+      gridX,
+      gridY,
+      forecast: `https://mock/gridpoints/${gridId}/${gridX},${gridY}/forecast`,
+      forecastHourly: `https://mock/gridpoints/${gridId}/${gridX},${gridY}/forecast/hourly`,
+    },
+  };
+}
+
+/**
+ * Build a mock NWS hourly forecast response with a single period
+ */
+function buildMockForecastResponse(
+  windSpeed: string,
+  shortForecast: string,
+  opts: { temperature?: number; isDaytime?: boolean } = {},
+) {
+  return {
+    properties: {
+      generatedAt: '2024-04-15T12:00:00Z',
+      periods: [
+        {
+          startTime: '2024-04-15T14:00:00-04:00',
+          endTime: '2024-04-15T15:00:00-04:00',
+          temperature: opts.temperature ?? 58,
+          temperatureUnit: 'F',
+          probabilityOfPrecipitation: { value: 10 },
+          windSpeed,
+          shortForecast,
+          isDaytime: opts.isDaytime ?? true,
+        },
+      ],
+    },
+  };
+}
+
+/**
+ * Build a mock gridpoints response (sky cover data)
+ * Returns empty sky cover so the service falls back to estimateCloudCover
+ */
+function buildMockGridpointsResponse() {
+  return {
+    properties: {},
+  };
+}
+
+/**
+ * Create a mock NWS server that handles points, forecast/hourly, and gridpoints endpoints.
+ * Returns both the server and its port number.
+ */
+function createMockWeatherServer(
+  windSpeed: string,
+  shortForecast: string,
+): Deno.HttpServer {
+  return Deno.serve({ port: 0 }, (req) => {
+    const url = new URL(req.url);
+    const path = url.pathname;
+
+    if (path.startsWith('/points/')) {
+      return new Response(JSON.stringify(buildMockPointsResponse('TST', 50, 50)), {
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+
+    if (path.includes('/forecast/hourly')) {
+      return new Response(
+        JSON.stringify(buildMockForecastResponse(windSpeed, shortForecast)),
+        { headers: { 'content-type': 'application/json' } },
+      );
+    }
+
+    if (path.includes('/gridpoints/')) {
+      return new Response(JSON.stringify(buildMockGridpointsResponse()), {
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+
+    return new Response('Not Found', { status: 404 });
+  });
+}
+
+function getServerPort(server: Deno.HttpServer): number {
+  return (server.addr as Deno.NetAddr).port;
+}
+
+Deno.test('WeatherService - parseWindSpeed "10 mph" returns 10', async () => {
+  const server = createMockWeatherServer('10 mph', 'Clear');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].windSpeedMph, 10);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - parseWindSpeed "5 to 10 mph" returns 8 (average, rounded)', async () => {
+  const server = createMockWeatherServer('5 to 10 mph', 'Clear');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].windSpeedMph, 8);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - parseWindSpeed "15 mph" returns 15', async () => {
+  const server = createMockWeatherServer('15 mph', 'Clear');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].windSpeedMph, 15);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - parseWindSpeed "20 to 30 mph" returns 25', async () => {
+  const server = createMockWeatherServer('20 to 30 mph', 'Clear');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].windSpeedMph, 25);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - estimateCloudCover "Sunny" returns 10', async () => {
+  const server = createMockWeatherServer('5 mph', 'Sunny');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].cloudCoverPercent, 10);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - estimateCloudCover "Mostly Sunny" returns 25', async () => {
+  const server = createMockWeatherServer('5 mph', 'Mostly Sunny');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].cloudCoverPercent, 25);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - estimateCloudCover "Partly Cloudy" returns 50', async () => {
+  const server = createMockWeatherServer('5 mph', 'Partly Cloudy');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].cloudCoverPercent, 50);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - estimateCloudCover "Mostly Cloudy" returns 75', async () => {
+  const server = createMockWeatherServer('5 mph', 'Mostly Cloudy');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].cloudCoverPercent, 75);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - estimateCloudCover "Overcast" returns 90', async () => {
+  const server = createMockWeatherServer('5 mph', 'Overcast');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].cloudCoverPercent, 90);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - estimateCloudCover "Rain Likely" returns 85', async () => {
+  const server = createMockWeatherServer('5 mph', 'Rain Likely');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].cloudCoverPercent, 85);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - estimateCloudCover "Some Unknown Text" returns 50 (default)', async () => {
+  const server = createMockWeatherServer('5 mph', 'Some Unknown Text');
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    const forecast = await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+    assertEquals(forecast.periods[0].cloudCoverPercent, 50);
+  } finally {
+    await server.shutdown();
+  }
+});
+
+// ============================================================================
 // WeatherService - Integration Test (requires network, skipped by default)
 // ============================================================================
 

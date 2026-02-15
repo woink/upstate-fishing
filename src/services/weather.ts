@@ -210,10 +210,10 @@ export class WeatherService {
   private estimateCloudCover(forecast: string): number {
     const lower = forecast.toLowerCase();
 
-    if (lower.includes('sunny') || lower.includes('clear')) return 10;
     if (lower.includes('mostly sunny') || lower.includes('mostly clear')) return 25;
-    if (lower.includes('partly')) return 50;
+    if (lower.includes('sunny') || lower.includes('clear')) return 10;
     if (lower.includes('mostly cloudy')) return 75;
+    if (lower.includes('partly')) return 50;
     if (lower.includes('cloudy') || lower.includes('overcast')) return 90;
     if (lower.includes('rain') || lower.includes('storm') || lower.includes('shower')) return 85;
 
