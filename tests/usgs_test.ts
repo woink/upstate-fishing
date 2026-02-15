@@ -218,6 +218,28 @@ Deno.test('computeDataCompleteness - one station partial makes overall partial',
   assertEquals(computeDataCompleteness(stations), 'partial');
 });
 
+Deno.test('computeDataCompleteness - missing dataAvailability (cached entry) returns limited', () => {
+  const stations: StationData[] = [
+    makeStationData({
+      stationId: '01420500',
+      dataAvailability: { waterTemp: 'available', discharge: 'available', gageHeight: 'available' },
+    }),
+    makeStationData({
+      stationId: '01418500',
+      // No dataAvailability — simulates a pre-metadata cached entry
+    }),
+  ];
+  assertEquals(computeDataCompleteness(stations), 'limited');
+});
+
+Deno.test('computeDataCompleteness - all stations missing dataAvailability returns limited', () => {
+  const stations: StationData[] = [
+    makeStationData({ stationId: '01420500' }),
+    makeStationData({ stationId: '01418500' }),
+  ];
+  assertEquals(computeDataCompleteness(stations), 'limited');
+});
+
 // ============================================================================
 // USGSService - Mock Response Transformation Tests
 // ============================================================================
@@ -336,6 +358,65 @@ Deno.test('USGSService - valid readings produce available status', async () => {
     assertEquals(result[0].dataAvailability?.waterTemp, 'available');
     assertEquals(result[0].dataAvailability?.discharge, 'available');
     assertEquals(result[0].dataAvailability?.gageHeight, 'available');
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('USGSService - empty values array produces no_data availability', async () => {
+  // Water temp time series exists but has zero data points;
+  // discharge has valid data so the station still gets a timestamp
+  const mockResponse = {
+    value: {
+      timeSeries: [
+        {
+          sourceInfo: {
+            siteCode: [{ value: '01000004' }],
+            siteName: 'Empty Values Station',
+            geoLocation: { geogLocation: { latitude: 42.0, longitude: -74.0 } },
+          },
+          variable: {
+            variableCode: [{ value: '00010' }],
+            variableName: 'Temperature',
+            unit: { unitCode: 'deg C' },
+          },
+          values: [{ value: [] }], // equipped but no data points
+        },
+        {
+          sourceInfo: {
+            siteCode: [{ value: '01000004' }],
+            siteName: 'Empty Values Station',
+            geoLocation: { geogLocation: { latitude: 42.0, longitude: -74.0 } },
+          },
+          variable: {
+            variableCode: [{ value: '00060' }],
+            variableName: 'Discharge',
+            unit: { unitCode: 'ft3/s' },
+          },
+          values: [{ value: [{ value: '150.0', dateTime: '2024-04-15T12:00:00.000Z' }] }],
+        },
+      ],
+    },
+  };
+
+  const server = Deno.serve({ port: 0 }, (_req) => {
+    return new Response(JSON.stringify(mockResponse), {
+      headers: { 'content-type': 'application/json' },
+    });
+  });
+
+  try {
+    const addr = server.addr;
+    const service = new USGSService({ baseUrl: `http://localhost:${addr.port}/` });
+    const result = await service.getInstantaneousValues(['01000004']);
+
+    assertEquals(result.length, 1);
+    assertEquals(result[0].waterTempF, null);
+    assertEquals(result[0].waterTempC, null);
+    assertEquals(result[0].dischargeCfs, 150.0);
+    assertEquals(result[0].dataAvailability?.waterTemp, 'no_data');
+    assertEquals(result[0].dataAvailability?.discharge, 'available');
+    assertEquals(result[0].dataAvailability?.gageHeight, 'not_equipped');
   } finally {
     await server.shutdown();
   }

@@ -87,16 +87,18 @@ export const USGS_PARAMS = {
 export function computeDataCompleteness(stationData: StationData[]): DataCompleteness {
   if (stationData.length === 0) return 'limited';
 
+  // Stations without dataAvailability are pre-metadata cached entries — can't assess quality
+  if (stationData.some((s) => !s.dataAvailability)) return 'limited';
+
   const allAvailable = stationData.every((s) => {
-    const a = s.dataAvailability;
-    return a &&
-      a.waterTemp === 'available' &&
+    const a = s.dataAvailability!;
+    return a.waterTemp === 'available' &&
       a.discharge === 'available' &&
       a.gageHeight === 'available';
   });
   if (allAvailable) return 'full';
 
-  const anyWaterTemp = stationData.some((s) => s.dataAvailability?.waterTemp === 'available');
+  const anyWaterTemp = stationData.some((s) => s.dataAvailability!.waterTemp === 'available');
   if (!anyWaterTemp) return 'limited';
 
   return 'partial';
@@ -207,44 +209,28 @@ export class USGSService {
         stationData.timestamp = latestValue.dateTime;
       }
 
-      // Set value based on parameter code (filter NaN and USGS sentinel values)
-      switch (paramCode) {
-        case USGS_PARAMS.WATER_TEMP: {
-          if (isNaN(value)) {
-            availability.waterTemp = 'no_data';
-          } else if (USGS_SENTINEL_VALUES.has(value)) {
-            availability.waterTemp = 'sentinel';
-          } else {
-            stationData.waterTempC = value;
-            stationData.waterTempF = celsiusToFahrenheit(value);
-            availability.waterTemp = 'available';
-          }
-          break;
+      // Validate reading and set availability status
+      const validated = this.validateReading(value, availability, paramCode);
+      if (validated !== null) {
+        switch (paramCode) {
+          case USGS_PARAMS.WATER_TEMP:
+            stationData.waterTempC = validated;
+            stationData.waterTempF = celsiusToFahrenheit(validated);
+            break;
+          case USGS_PARAMS.DISCHARGE:
+            stationData.dischargeCfs = validated;
+            break;
+          case USGS_PARAMS.GAGE_HEIGHT:
+            stationData.gageHeightFt = validated;
+            break;
         }
-        case USGS_PARAMS.DISCHARGE:
-          if (isNaN(value)) {
-            availability.discharge = 'no_data';
-          } else if (USGS_SENTINEL_VALUES.has(value)) {
-            availability.discharge = 'sentinel';
-          } else {
-            stationData.dischargeCfs = value;
-            availability.discharge = 'available';
-          }
-          break;
-        case USGS_PARAMS.GAGE_HEIGHT:
-          if (isNaN(value)) {
-            availability.gageHeight = 'no_data';
-          } else if (USGS_SENTINEL_VALUES.has(value)) {
-            availability.gageHeight = 'sentinel';
-          } else {
-            stationData.gageHeightFt = value;
-            availability.gageHeight = 'available';
-          }
-          break;
       }
     }
 
-    // Convert map to array and validate
+    // Filter out stations where no parameter produced a valid timestamp.
+    // This happens when every time series had empty values or only sentinel/NaN readings.
+    // Stations with partial data (e.g. discharge but no water temp) are kept —
+    // the timestamp comes from whichever parameter had a valid reading.
     return Array.from(stationMap.values())
       .filter((s): s is StationData => !!s.timestamp && !!s.stationId && !!s.stationName)
       .map((s) => ({
@@ -257,6 +243,27 @@ export class USGSService {
         gageHeightFt: s.gageHeightFt ?? null,
         dataAvailability: availabilityMap.get(s.stationId!),
       }));
+  }
+
+  /**
+   * Validate a parsed reading: reject NaN and sentinel values, set availability status.
+   * Returns the numeric value if valid, null otherwise.
+   */
+  private validateReading(
+    value: number,
+    availability: DataAvailability,
+    paramCode: string | undefined,
+  ): number | null {
+    if (isNaN(value)) {
+      this.setParamStatus(availability, paramCode, 'no_data');
+      return null;
+    }
+    if (USGS_SENTINEL_VALUES.has(value)) {
+      this.setParamStatus(availability, paramCode, 'sentinel');
+      return null;
+    }
+    this.setParamStatus(availability, paramCode, 'available');
+    return value;
   }
 
   /**

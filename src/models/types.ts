@@ -42,18 +42,6 @@ export const StreamSchema = z.object({
 });
 export type Stream = z.infer<typeof StreamSchema>;
 
-export const StationDataSchema = z.object({
-  stationId: z.string(),
-  stationName: z.string(),
-  timestamp: z.string().datetime(),
-  waterTempF: z.number().nullable(),
-  waterTempC: z.number().nullable(),
-  dischargeCfs: z.number().nullable(), // cubic feet per second
-  gageHeightFt: z.number().nullable(),
-  dataAvailability: z.lazy(() => DataAvailabilitySchema).optional(),
-});
-export type StationData = z.infer<typeof StationDataSchema>;
-
 // ============================================================================
 // Data Availability Types
 // ============================================================================
@@ -75,6 +63,18 @@ export type DataAvailability = z.infer<typeof DataAvailabilitySchema>;
 
 export const DataCompletenessSchema = z.enum(['full', 'partial', 'limited']);
 export type DataCompleteness = z.infer<typeof DataCompletenessSchema>;
+
+export const StationDataSchema = z.object({
+  stationId: z.string(),
+  stationName: z.string(),
+  timestamp: z.string().datetime(),
+  waterTempF: z.number().nullable(),
+  waterTempC: z.number().nullable(),
+  dischargeCfs: z.number().nullable(), // cubic feet per second
+  gageHeightFt: z.number().nullable(),
+  dataAvailability: DataAvailabilitySchema.optional(),
+});
+export type StationData = z.infer<typeof StationDataSchema>;
 
 // ============================================================================
 // Weather Types
