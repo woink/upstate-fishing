@@ -7,7 +7,8 @@
     "test": "deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/ && cd frontend && deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/",
     "check": "deno check src/**/*.ts",
     "lint": "deno lint",
-    "fmt": "deno fmt"
+    "fmt": "deno fmt",
+    "e2e": "cd frontend && npx playwright test"
   },
   "imports": {
     "@shared/": "./src/",
@@ -28,12 +29,12 @@
     "lineWidth": 100,
     "indentWidth": 2,
     "singleQuote": true,
-    "exclude": ["README.md"]
+    "exclude": ["README.md", "frontend/node_modules", "frontend/playwright-report"]
   },
   "lint": {
     "rules": {
       "tags": ["recommended"]
     },
-    "exclude": ["frontend/_fresh"]
+    "exclude": ["frontend/_fresh", "frontend/node_modules", "frontend/playwright-report"]
   }
 }

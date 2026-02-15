@@ -36,3 +36,14 @@ jobs:
 
       - name: Test (frontend)
         run: cd frontend && deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Playwright dependencies
+        run: cd frontend && npm ci && npx playwright install --with-deps chromium
+
+      - name: E2E tests (Playwright)
+        run: cd frontend && npx playwright test

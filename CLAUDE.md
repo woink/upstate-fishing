@@ -35,6 +35,18 @@ Frontend tests:
 cd frontend && deno test --allow-net --allow-env --allow-read tests/routes_test.ts
 ```
 
+### E2E Tests (Playwright)
+
+```bash
+deno task e2e              # Run Playwright E2E tests (requires Fresh dev server)
+cd frontend && npm run e2e # Same, from frontend directory
+cd frontend && npm run e2e:headed  # Run with visible browser
+```
+
+Tests live in `frontend/e2e/` and use Node-based Playwright (`@playwright/test`). The Playwright
+config (`frontend/playwright.config.ts`) auto-starts the Fresh dev server via `webServer`. Chromium
+must be installed first: `cd frontend && npx playwright install --with-deps chromium`.
+
 ### Environment
 
 Copy `.env.example` to `.env`. Key variable: `RUN_INTEGRATION_TESTS`.
@@ -47,7 +59,8 @@ Copy `.env.example` to `.env`. Key variable: `RUN_INTEGRATION_TESTS`.
 src/           -> Shared library (types, services, data)
 frontend/      -> Fresh app (Deno Fresh + Preact + Tailwind)
 tests/         -> Shared library tests
-frontend/tests/ -> Frontend tests
+frontend/tests/ -> Frontend unit/integration tests (Deno)
+frontend/e2e/  -> End-to-end browser tests (Playwright/Node)
 ```
 
 The `@shared/` import alias maps to `src/` and is used by both backend and frontend to share Zod
@@ -112,8 +125,12 @@ Steps run sequentially and fail fast:
    `deno.json`)
 5. **Test (backend)** -- `deno test ... tests/` (root `deno.json`)
 6. **Test (frontend)** -- `cd frontend && deno test ... tests/` (frontend `deno.json`)
+7. **E2E tests (Playwright)** -- Installs Chromium, starts Fresh dev server, runs browser tests
 
 Backend and frontend tests **must** run separately because they use different `deno.json` configs.
 The frontend config has `$fresh/`, Preact, and Leaflet import mappings that don't exist in the root
 config. Running `deno test` from the root without specifying `tests/` would discover frontend tests
 and fail on unresolved `$fresh/` imports
+
+E2E tests use Node/Playwright (not Deno) and are excluded from `deno check`, `deno fmt`, and
+`deno lint` via the `exclude` fields in both `deno.json` configs.

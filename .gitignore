@@ -6,6 +6,10 @@ dist/
 .deno/
 frontend/_fresh/
 
+# Playwright
+frontend/playwright-report/
+frontend/test-results/
+
 # Environment
 .env
 .env.local

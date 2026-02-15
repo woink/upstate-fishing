@@ -31,6 +31,11 @@
   },
   "nodeModulesDir": "auto",
   "exclude": [
-    "**/_fresh/*"
+    "**/_fresh/*",
+    "e2e/**",
+    "playwright.config.ts",
+    "node_modules/**",
+    "playwright-report/**",
+    "test-results/**"
   ]
 }
