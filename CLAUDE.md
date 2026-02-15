@@ -14,7 +14,7 @@ Weather.gov forecasts, and insect hatch predictions to recommend where to fish.
 
 ```bash
 deno task dev              # Start Fresh dev server with hot reload
-deno task test             # Run all tests (requires --unstable-kv)
+deno task test             # Run all tests (backend + frontend, requires --unstable-kv)
 deno task check            # Type-check src/**/*.ts
 deno task lint             # Lint
 deno task fmt              # Format
@@ -98,4 +98,22 @@ prediction service falls back to month-based predictions when water temp is unav
 - **API responses**: Standardized `{ success, data, error, timestamp }` wrapper
 - **Fishing quality enum**: `excellent | good | fair | poor` with consistent color coding
   (green/blue/yellow/red)
-- **CI runs**: fmt check -> lint -> type check -> tests (GitHub Actions)
+- **CI**: GitHub Actions on push to `main` and PRs (see below)
+
+## CI Pipeline
+
+The CI workflow (`.github/workflows/ci.yml`) runs on every push to `main` and on pull requests.
+Steps run sequentially and fail fast:
+
+1. **Format check** -- `deno fmt --check`
+2. **Lint** -- `deno lint`
+3. **Type check (shared)** -- `deno check src/**/*.ts` (root `deno.json`)
+4. **Type check (frontend)** -- `cd frontend && deno check --unstable-kv **/*.ts **/*.tsx` (frontend
+   `deno.json`)
+5. **Test (backend)** -- `deno test ... tests/` (root `deno.json`)
+6. **Test (frontend)** -- `cd frontend && deno test ... tests/` (frontend `deno.json`)
+
+Backend and frontend tests **must** run separately because they use different `deno.json` configs.
+The frontend config has `$fresh/`, Preact, and Leaflet import mappings that don't exist in the root
+config. Running `deno test` from the root without specifying `tests/` would discover frontend tests
+and fail on unresolved `$fresh/` imports
