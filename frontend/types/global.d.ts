@@ -32,6 +32,7 @@ declare namespace L {
 
   interface Map {
     setView(center: [number, number], zoom: number): this;
+    invalidateSize(): this;
     remove(): void;
     addLayer(layer: Layer): this;
     removeLayer(layer: Layer): this;

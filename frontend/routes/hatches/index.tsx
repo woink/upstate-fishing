@@ -114,7 +114,7 @@ export default function HatchesPage({ data }: PageProps<HatchesPageData>) {
             <label class='block text-sm font-medium text-slate-700 mb-1'>Month</label>
             <select
               class='rounded-lg border border-slate-300 px-3 py-1 text-sm'
-              onchange='window.location.href = this.value'
+              {...{ onchange: 'window.location.href = this.value' }}
             >
               <option value={`/hatches${filterOrder ? `?order=${filterOrder}` : ''}`}>
                 All Months

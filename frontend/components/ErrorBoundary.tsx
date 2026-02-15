@@ -35,11 +35,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static override getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: { componentStack: string }) {
+  override componentDidCatch(error: Error, errorInfo: { componentStack: string }) {
     console.error(`Error in ${this.props.name ?? 'component'}:`, error);
     console.error('Component stack:', errorInfo.componentStack);
 

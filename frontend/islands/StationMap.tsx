@@ -206,7 +206,4 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
   );
 }
 
-// Declare Leaflet types
-declare global {
-  const L: typeof import('leaflet');
-}
+// Leaflet types are declared in types/global.d.ts
