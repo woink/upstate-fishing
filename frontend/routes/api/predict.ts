@@ -22,7 +22,7 @@ const WEATHER_DEFAULTS = {
   isDaylight: true,
 } as const;
 
-const PredictRequestSchema = z.object({
+export const PredictRequestSchema = z.object({
   waterTempF: z.number().optional(),
   airTempF: z.number().optional(),
   cloudCoverPercent: z.number().min(0).max(100).optional(),

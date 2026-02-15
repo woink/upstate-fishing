@@ -517,3 +517,64 @@ Deno.test('stations - cache header construction', () => {
   const notCached = false;
   assertEquals(notCached ? 'HIT' : 'MISS', 'MISS');
 });
+
+// ============================================================================
+// Predict Route - Zod Schema Validation (safeParse)
+// ============================================================================
+
+import { PredictRequestSchema } from '../routes/api/predict.ts';
+
+Deno.test('predict schema - waterTempF only is valid', () => {
+  const result = PredictRequestSchema.safeParse({ waterTempF: 50 });
+  assertEquals(result.success, true);
+});
+
+Deno.test('predict schema - airTempF only is valid', () => {
+  const result = PredictRequestSchema.safeParse({ airTempF: 60 });
+  assertEquals(result.success, true);
+});
+
+Deno.test('predict schema - both temps provided is valid', () => {
+  const result = PredictRequestSchema.safeParse({ waterTempF: 50, airTempF: 60 });
+  assertEquals(result.success, true);
+});
+
+Deno.test('predict schema - empty object fails (need at least one temp)', () => {
+  const result = PredictRequestSchema.safeParse({});
+  assertEquals(result.success, false);
+});
+
+Deno.test('predict schema - non-number waterTempF fails', () => {
+  const result = PredictRequestSchema.safeParse({ waterTempF: 'not a number' });
+  assertEquals(result.success, false);
+});
+
+Deno.test('predict schema - cloudCoverPercent above 100 fails', () => {
+  const result = PredictRequestSchema.safeParse({ waterTempF: 50, cloudCoverPercent: 150 });
+  assertEquals(result.success, false);
+});
+
+Deno.test('predict schema - cloudCoverPercent below 0 fails', () => {
+  const result = PredictRequestSchema.safeParse({ waterTempF: 50, cloudCoverPercent: -1 });
+  assertEquals(result.success, false);
+});
+
+Deno.test('predict schema - precipProbability below 0 fails', () => {
+  const result = PredictRequestSchema.safeParse({ waterTempF: 50, precipProbability: -1 });
+  assertEquals(result.success, false);
+});
+
+Deno.test('predict schema - precipProbability above 100 fails', () => {
+  const result = PredictRequestSchema.safeParse({ waterTempF: 50, precipProbability: 101 });
+  assertEquals(result.success, false);
+});
+
+Deno.test('predict schema - waterTempF zero is valid', () => {
+  const result = PredictRequestSchema.safeParse({ waterTempF: 0 });
+  assertEquals(result.success, true);
+});
+
+Deno.test('predict schema - airTempF zero is valid', () => {
+  const result = PredictRequestSchema.safeParse({ airTempF: 0 });
+  assertEquals(result.success, true);
+});
