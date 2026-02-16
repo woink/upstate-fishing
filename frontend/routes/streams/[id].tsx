@@ -61,7 +61,11 @@ export default function StreamDetail({ data }: PageProps<StreamDetailData>) {
     return (
       <div class='bg-red-50 border border-red-200 rounded-lg p-6 text-center'>
         <p class='text-red-700'>{error ?? 'Stream not found'}</p>
-        <a href='/streams' class='text-stream-600 hover:underline mt-2 inline-block'>
+        <a
+          href='/streams'
+          data-testid='back-to-streams'
+          class='text-stream-600 hover:underline mt-2 inline-block'
+        >
           ← Back to streams
         </a>
       </div>
@@ -70,7 +74,11 @@ export default function StreamDetail({ data }: PageProps<StreamDetailData>) {
 
   return (
     <div>
-      <a href='/streams' class='text-stream-600 hover:underline text-sm mb-4 inline-block'>
+      <a
+        href='/streams'
+        data-testid='back-to-streams'
+        class='text-stream-600 hover:underline text-sm mb-4 inline-block'
+      >
         ← Back to streams
       </a>
 

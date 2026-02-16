@@ -19,6 +19,7 @@ deno task check            # Type-check src/**/*.ts
 deno task lint             # Lint
 deno task fmt              # Format
 deno task fmt --check      # Check formatting without writing
+deno task e2e              # Run E2E browser tests (Astral + Chromium)
 cd frontend && deno task build    # Production build
 cd frontend && deno task check    # Type-check frontend
 ```
@@ -35,6 +36,19 @@ Frontend tests:
 cd frontend && deno test --allow-net --allow-env --allow-read tests/routes_test.ts
 ```
 
+### E2E Tests (Astral)
+
+```bash
+deno task e2e              # Run all E2E tests
+cd frontend && deno test --allow-all --unstable-kv e2e/homepage_test.ts  # Run a single E2E test
+```
+
+E2E tests use **Astral** (`jsr:@astral/astral`), a Deno-native browser automation library. No
+Node.js, npm, or Playwright needed. Astral auto-downloads Chromium on first run. Tests live in
+`frontend/e2e/` and use `@std/testing/bdd` + `@std/assert`. A shared helper module at
+`frontend/e2e/helpers/mod.ts` provides server lifecycle management, browser launch, and assertion
+utilities (replacing Playwright's `expect()` API).
+
 ### Environment
 
 Copy `.env.example` to `.env`. Key variable: `RUN_INTEGRATION_TESTS`.
@@ -47,7 +61,8 @@ Copy `.env.example` to `.env`. Key variable: `RUN_INTEGRATION_TESTS`.
 src/           -> Shared library (types, services, data)
 frontend/      -> Fresh app (Deno Fresh + Preact + Tailwind)
 tests/         -> Shared library tests
-frontend/tests/ -> Frontend tests
+frontend/tests/ -> Frontend unit/integration tests (Deno)
+frontend/e2e/  -> End-to-end browser tests (Astral/Deno)
 ```
 
 The `@shared/` import alias maps to `src/` and is used by both backend and frontend to share Zod
@@ -112,8 +127,11 @@ Steps run sequentially and fail fast:
    `deno.json`)
 5. **Test (backend)** -- `deno test ... tests/` (root `deno.json`)
 6. **Test (frontend)** -- `cd frontend && deno test ... tests/` (frontend `deno.json`)
+7. **E2E tests (Astral)** -- `deno task e2e` (auto-downloads Chromium, starts Fresh dev server)
 
 Backend and frontend tests **must** run separately because they use different `deno.json` configs.
 The frontend config has `$fresh/`, Preact, and Leaflet import mappings that don't exist in the root
 config. Running `deno test` from the root without specifying `tests/` would discover frontend tests
 and fail on unresolved `$fresh/` imports
+
+E2E tests use Astral (not Playwright/Node.js) -- no `package.json` or `node_modules` needed.
