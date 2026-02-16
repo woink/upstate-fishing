@@ -44,10 +44,12 @@ jobs:
           node-version: 22
 
       - name: Install Playwright dependencies
-        run: cd frontend && npm ci && npx playwright install --with-deps chromium
+        run: rm -rf frontend/node_modules && cd frontend && npm ci && npx playwright install --with-deps chromium
 
       - name: E2E tests (Playwright)
         run: cd frontend && npx playwright test
+        env:
+          DENO_NO_PACKAGE_JSON: '1'
 
   claude-review:
     needs: ci
