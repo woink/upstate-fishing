@@ -70,8 +70,10 @@ describe('Homepage', () => {
   });
 
   it('loads Top Picks island with stream recommendations', async () => {
-    // TopPicks island loads async — wait for either success ("Top Picks") or
-    // loading/error state to resolve. The loading state shows "Checking conditions..."
+    // TopPicks island loads async and hits live USGS/Weather APIs, so we can't
+    // assert on specific data. Instead, verify the island resolved to any terminal
+    // state — success ("Top Picks"), error ("No conditions data"), or retry prompt.
+    // This confirms the island hydrated, fetched, and rendered.
     const deadline = Date.now() + 30_000;
     while (Date.now() < deadline) {
       const bodyText = await page.evaluate(() => document.body.innerText);

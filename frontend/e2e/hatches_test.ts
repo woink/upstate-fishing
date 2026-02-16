@@ -114,8 +114,9 @@ describe('Hatch Chart Page', () => {
   });
 
   it('HatchChart island renders the interactive table', async () => {
-    // The HatchChart island should render with hatch names visible
-    // Wait for any well-known hatch name to appear
+    // These hatch names are static entries from src/data/hatches.ts, not dynamic
+    // API data — they won't change unexpectedly. We poll for any of them to
+    // confirm the HatchChart island hydrated and rendered.
     const deadline = Date.now() + 10_000;
     let found = false;
     while (Date.now() < deadline) {

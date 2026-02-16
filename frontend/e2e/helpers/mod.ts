@@ -225,18 +225,3 @@ export async function elementCount(page: Page, selector: string): Promise<number
   const elements = await page.$$(selector);
   return elements.length;
 }
-
-/**
- * Get the value of an attribute on the first matching element.
- */
-export async function getAttribute(
-  page: Page,
-  selector: string,
-  attribute: string,
-): Promise<string | null> {
-  const el = await page.waitForSelector(selector, { timeout: 10_000 });
-  return await el.evaluate(
-    (node: Element, attr: string) => node.getAttribute(attr),
-    { args: [attribute] },
-  );
-}

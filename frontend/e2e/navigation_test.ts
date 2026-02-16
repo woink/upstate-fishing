@@ -190,6 +190,9 @@ describe('API Routes', () => {
   });
 
   it('GET /api/streams with invalid region still returns 200', async () => {
+    // Documents current API behavior: invalid region filters are ignored and all
+    // streams are returned. Changing the API to return 400 or an empty array for
+    // invalid regions is a separate concern from E2E test coverage.
     const response = await fetch(url('/api/streams?region=nonexistent'));
     assert(response.ok);
 
