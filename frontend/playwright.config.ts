@@ -31,7 +31,7 @@ export default defineConfig({
 
   webServer: {
     command: process.env.CI
-      ? 'deno run -A --unstable-kv --node-modules-dir=none --watch=static/,routes/ dev.ts'
+      ? 'deno run -A --unstable-kv --node-modules-dir=none dev.ts'
       : 'deno task dev',
     url: 'http://localhost:8000',
     reuseExistingServer: !process.env.CI,
