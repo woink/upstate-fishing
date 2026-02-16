@@ -83,7 +83,14 @@ function delay(ms: number): Promise<void> {
 
 /** Launch a headless browser for E2E tests. */
 export async function launchBrowser(): Promise<Browser> {
-  return await launch({ headless: true });
+  const args = ['--disable-dev-shm-usage'];
+
+  // CI environments need --no-sandbox since they run as root
+  if (Deno.env.get('CI')) {
+    args.push('--no-sandbox', '--disable-setuid-sandbox');
+  }
+
+  return await launch({ headless: true, args });
 }
 
 /** Full URL from a path (e.g. "/streams" -> "http://localhost:8000/streams"). */
