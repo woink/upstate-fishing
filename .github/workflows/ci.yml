@@ -30,13 +30,13 @@ jobs:
         run: deno check src/**/*.ts
 
       - name: Type check (frontend)
-        run: cd frontend && deno check --unstable-kv **/*.ts **/*.tsx
+        run: cd frontend && deno check --unstable-kv --node-modules-dir=none **/*.ts **/*.tsx
 
       - name: Test (backend)
         run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/
 
       - name: Test (frontend)
-        run: cd frontend && deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/
+        run: cd frontend && deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv --node-modules-dir=none tests/
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -45,6 +45,14 @@ jobs:
 
       - name: Install Playwright dependencies
         run: rm -rf frontend/node_modules && cd frontend && npm ci && npx playwright install --with-deps chromium
+
+      - name: Verify clean node_modules
+        run: |
+          if [ -d "frontend/node_modules/.deno" ]; then
+            echo "ERROR: Deno contaminated node_modules with .deno/ directory"
+            ls -la frontend/node_modules/.deno/
+            exit 1
+          fi
 
       - name: E2E tests (Playwright)
         run: cd frontend && npx playwright test
