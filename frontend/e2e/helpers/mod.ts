@@ -55,7 +55,7 @@ export async function startServer(): Promise<ServerHandle> {
             // Process may have already exited
           }
           // Await the status to clean up the resource
-          await statusPromise.catch((err) => {
+          await statusPromise.catch(() => {
             // Process terminated, expected during cleanup
           });
         },
