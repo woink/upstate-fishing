@@ -101,6 +101,45 @@ No database -- uses Deno KV for caching and static TypeScript arrays for stream/
 Some USGS stations lack water temperature sensors (e.g., Croton watershed, Shetucket River) -- the
 prediction service falls back to month-based predictions when water temp is unavailable.
 
+## Testing Philosophy
+
+This project follows **Test-Driven Development (TDD)** and **Domain-Driven Design (DDD)**
+principles. The goal is as close to 100% unit test and E2E test coverage as realistically possible.
+
+### When writing new code
+
+1. **Write tests first** -- define expected behavior before implementing. For backend services,
+   write unit tests in `tests/`. For frontend routes/components, write tests in `frontend/tests/`.
+   For user-facing features, write E2E tests in `frontend/e2e/`.
+2. **Domain types drive design** -- all domain concepts are modeled as Zod schemas in
+   `src/models/types.ts`. New features should start by defining or extending domain types, then flow
+   outward to services and UI.
+3. **Every PR should include tests** -- bug fixes need a regression test, new features need unit +
+   E2E coverage, refactors must not reduce coverage.
+
+### Test layers
+
+| Layer         | Location          | Scope                            | Runner                            |
+| ------------- | ----------------- | -------------------------------- | --------------------------------- |
+| Backend unit  | `tests/`          | Services, data, utils, types     | `deno task test`                  |
+| Frontend unit | `frontend/tests/` | Routes, API handlers, components | `cd frontend && deno test tests/` |
+| E2E (browser) | `frontend/e2e/`   | Full user flows via Chromium     | `deno task e2e`                   |
+
+### E2E coverage map
+
+E2E tests verify complete user-facing flows through a real browser (Astral + Chromium):
+
+- `homepage_test.ts` -- hero content, navigation links, TopPicks island hydration
+- `streams_test.ts` -- stream list rendering, region filtering, search
+- `stream_detail_test.ts` -- individual stream page with conditions card
+- `hatches_test.ts` -- hatch chart page, interactive table rendering
+- `map_test.ts` -- Leaflet map island, station markers
+- `navigation_test.ts` -- cross-page navigation, API route responses, error handling
+
+When adding a new page or island, **add a corresponding E2E test file** in `frontend/e2e/`. Use the
+shared helpers in `frontend/e2e/helpers/mod.ts` for server lifecycle, browser launch, and
+assertions.
+
 ## Conventions
 
 - **Deno runtime** with `--unstable-kv` flag required for caching
