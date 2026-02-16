@@ -30,9 +30,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: process.env.CI
-      ? 'deno run -A --unstable-kv --node-modules-dir=none dev.ts'
-      : 'deno task dev',
+    command: 'deno task dev',
     url: 'http://localhost:8000',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,

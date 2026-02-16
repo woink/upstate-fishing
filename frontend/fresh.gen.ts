@@ -2,48 +2,48 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $_app from './routes/_app.tsx';
-import * as $api_hatches_id_ from './routes/api/hatches/[id].ts';
-import * as $api_hatches_index from './routes/api/hatches/index.ts';
-import * as $api_predict from './routes/api/predict.ts';
-import * as $api_stations_id_ from './routes/api/stations/[id].ts';
-import * as $api_streams_id_conditions from './routes/api/streams/[id]/conditions.ts';
-import * as $api_streams_id_index from './routes/api/streams/[id]/index.ts';
-import * as $api_streams_index from './routes/api/streams/index.ts';
-import * as $hatches_index from './routes/hatches/index.tsx';
-import * as $index from './routes/index.tsx';
-import * as $map from './routes/map.tsx';
-import * as $streams_id_ from './routes/streams/[id].tsx';
-import * as $streams_index from './routes/streams/index.tsx';
-import * as $HatchChart from './islands/HatchChart.tsx';
-import * as $StationMap from './islands/StationMap.tsx';
-import * as $StreamConditionsCard from './islands/StreamConditionsCard.tsx';
-import * as $StreamList from './islands/StreamList.tsx';
-import * as $TopPicks from './islands/TopPicks.tsx';
-import type { Manifest } from '$fresh/server.ts';
+import * as $_app from "./routes/_app.tsx";
+import * as $api_hatches_id_ from "./routes/api/hatches/[id].ts";
+import * as $api_hatches_index from "./routes/api/hatches/index.ts";
+import * as $api_predict from "./routes/api/predict.ts";
+import * as $api_stations_id_ from "./routes/api/stations/[id].ts";
+import * as $api_streams_id_conditions from "./routes/api/streams/[id]/conditions.ts";
+import * as $api_streams_id_index from "./routes/api/streams/[id]/index.ts";
+import * as $api_streams_index from "./routes/api/streams/index.ts";
+import * as $hatches_index from "./routes/hatches/index.tsx";
+import * as $index from "./routes/index.tsx";
+import * as $map from "./routes/map.tsx";
+import * as $streams_id_ from "./routes/streams/[id].tsx";
+import * as $streams_index from "./routes/streams/index.tsx";
+import * as $HatchChart from "./islands/HatchChart.tsx";
+import * as $StationMap from "./islands/StationMap.tsx";
+import * as $StreamConditionsCard from "./islands/StreamConditionsCard.tsx";
+import * as $StreamList from "./islands/StreamList.tsx";
+import * as $TopPicks from "./islands/TopPicks.tsx";
+import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
   routes: {
-    './routes/_app.tsx': $_app,
-    './routes/api/hatches/[id].ts': $api_hatches_id_,
-    './routes/api/hatches/index.ts': $api_hatches_index,
-    './routes/api/predict.ts': $api_predict,
-    './routes/api/stations/[id].ts': $api_stations_id_,
-    './routes/api/streams/[id]/conditions.ts': $api_streams_id_conditions,
-    './routes/api/streams/[id]/index.ts': $api_streams_id_index,
-    './routes/api/streams/index.ts': $api_streams_index,
-    './routes/hatches/index.tsx': $hatches_index,
-    './routes/index.tsx': $index,
-    './routes/map.tsx': $map,
-    './routes/streams/[id].tsx': $streams_id_,
-    './routes/streams/index.tsx': $streams_index,
+    "./routes/_app.tsx": $_app,
+    "./routes/api/hatches/[id].ts": $api_hatches_id_,
+    "./routes/api/hatches/index.ts": $api_hatches_index,
+    "./routes/api/predict.ts": $api_predict,
+    "./routes/api/stations/[id].ts": $api_stations_id_,
+    "./routes/api/streams/[id]/conditions.ts": $api_streams_id_conditions,
+    "./routes/api/streams/[id]/index.ts": $api_streams_id_index,
+    "./routes/api/streams/index.ts": $api_streams_index,
+    "./routes/hatches/index.tsx": $hatches_index,
+    "./routes/index.tsx": $index,
+    "./routes/map.tsx": $map,
+    "./routes/streams/[id].tsx": $streams_id_,
+    "./routes/streams/index.tsx": $streams_index,
   },
   islands: {
-    './islands/HatchChart.tsx': $HatchChart,
-    './islands/StationMap.tsx': $StationMap,
-    './islands/StreamConditionsCard.tsx': $StreamConditionsCard,
-    './islands/StreamList.tsx': $StreamList,
-    './islands/TopPicks.tsx': $TopPicks,
+    "./islands/HatchChart.tsx": $HatchChart,
+    "./islands/StationMap.tsx": $StationMap,
+    "./islands/StreamConditionsCard.tsx": $StreamConditionsCard,
+    "./islands/StreamList.tsx": $StreamList,
+    "./islands/TopPicks.tsx": $TopPicks,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

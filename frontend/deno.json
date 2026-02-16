@@ -29,7 +29,7 @@
     "strict": true,
     "types": ["./types/global.d.ts"]
   },
-  "nodeModulesDir": "auto",
+  "nodeModulesDir": "none",
   "exclude": [
     "**/_fresh/*",
     "e2e/**",
