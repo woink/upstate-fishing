@@ -38,6 +38,14 @@ jobs:
       - name: Test (frontend)
         run: cd frontend && deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/
 
+      - name: Install browser dependencies
+        if: hashFiles('frontend/e2e/**') != ''
+        run: sudo apt-get update && sudo apt-get install -y libnss3 libatk-bridge2.0-0 libcups2 libxdamage1 libgbm1 libpango-1.0-0 libasound2t64
+
+      - name: E2E tests (Astral)
+        if: hashFiles('frontend/e2e/**') != ''
+        run: deno task e2e
+
   claude-review:
     needs: ci
     if: github.event_name == 'pull_request'
