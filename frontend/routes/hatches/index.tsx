@@ -113,6 +113,7 @@ export default function HatchesPage({ data }: PageProps<HatchesPageData>) {
           <div>
             <label class='block text-sm font-medium text-slate-700 mb-1'>Month</label>
             <select
+              data-testid='month-filter'
               class='rounded-lg border border-slate-300 px-3 py-1 text-sm'
               {...{ onchange: 'window.location.href = this.value' }}
             >

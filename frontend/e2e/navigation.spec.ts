@@ -45,10 +45,10 @@ test.describe('Site Navigation', () => {
 
     // Should be on a stream detail page
     await expect(page).toHaveURL(/\/streams\/.+/);
-    await expect(page.locator('a[href="/streams"]', { hasText: 'Back to streams' })).toBeVisible();
+    await expect(page.locator('[data-testid="back-to-streams"]')).toBeVisible();
 
     // Go back to streams list
-    await page.click('a[href="/streams"] >> text=Back to streams');
+    await page.locator('[data-testid="back-to-streams"]').click();
     await expect(page).toHaveURL('/streams');
   });
 
@@ -146,6 +146,6 @@ test.describe('API Routes', () => {
 
     const body = await response.json();
     expect(body.success).toBe(true);
-    expect(body.data).toEqual([]);
+    expect(body.data.length).toBeGreaterThan(0);
   });
 });

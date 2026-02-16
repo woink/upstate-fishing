@@ -20,10 +20,11 @@ test.describe('Hatch Chart Page', () => {
   });
 
   test('shows month dropdown filter', async ({ page }) => {
-    await expect(page.locator('select')).toBeVisible();
-    await expect(page.locator('option', { hasText: 'All Months' })).toBeVisible();
-    await expect(page.locator('option', { hasText: 'January' })).toBeVisible();
-    await expect(page.locator('option', { hasText: 'December' })).toBeVisible();
+    const select = page.locator('[data-testid="month-filter"]');
+    await expect(select).toBeVisible();
+    await expect(select).toContainText('All Months');
+    await expect(select).toContainText('January');
+    await expect(select).toContainText('December');
   });
 
   test('shows hatch count', async ({ page }) => {

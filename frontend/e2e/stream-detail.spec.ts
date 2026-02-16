@@ -5,7 +5,7 @@ test.describe('Stream Detail Page', () => {
     await page.goto('/streams/beaverkill');
 
     // Back link should be present
-    await expect(page.locator('a[href="/streams"]', { hasText: 'Back to streams' })).toBeVisible();
+    await expect(page.locator('[data-testid="back-to-streams"]')).toBeVisible();
 
     // StreamConditionsCard island loads data -- wait for the stream name or an error state
     const conditionsCard = page.locator('[class*="rounded-lg"]').first();
@@ -15,7 +15,7 @@ test.describe('Stream Detail Page', () => {
   test('shows back link that navigates to streams list', async ({ page }) => {
     await page.goto('/streams/beaverkill');
 
-    const backLink = page.locator('a[href="/streams"]', { hasText: 'Back to streams' });
+    const backLink = page.locator('[data-testid="back-to-streams"]');
     await expect(backLink).toBeVisible();
 
     await backLink.click();
@@ -27,7 +27,7 @@ test.describe('Stream Detail Page', () => {
 
     // Should show error state with link back
     await expect(page.locator('text=Stream not found')).toBeVisible();
-    await expect(page.locator('a[href="/streams"]')).toBeVisible();
+    await expect(page.locator('[data-testid="back-to-streams"]')).toBeVisible();
   });
 
   test('stream detail page has correct page title', async ({ page }) => {
