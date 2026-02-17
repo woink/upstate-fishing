@@ -2,6 +2,9 @@ import { useSignal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import type { Stream, StreamConditions } from '@shared/models/types.ts';
 import { defaultBorderColor, defaultMarkerColor, qualityHexColors } from '../lib/colors.ts';
+import { promisePool } from '../lib/promise-pool.ts';
+
+const FAILED_MARKER_COLOR = '#94a3b8'; // slate-400
 
 interface StationMapProps {
   streams: Stream[];
@@ -87,6 +90,7 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
     if (!loaded.value || !mapInstance.current) return;
 
     const map = mapInstance.current;
+    const markers = new Map<string, L.CircleMarker>();
 
     // Add stream markers
     streams.forEach((stream) => {
@@ -104,6 +108,8 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
         },
       ).addTo(map);
 
+      markers.set(stream.id, marker);
+
       // Initial popup
       marker.bindPopup(`
         <div style="min-width: 150px">
@@ -112,18 +118,31 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
           <span style="color: #94a3b8; font-size: 11px">Loading conditions...</span>
         </div>
       `);
+    });
 
-      // Fetch conditions and update marker
-      fetch(`${apiUrl}/api/streams/${stream.id}/conditions`)
-        .then((res) => res.json())
-        .then((json) => {
-          if (!json.success || !json.data) return;
+    // Fetch conditions with concurrency limiting
+    const tasks = streams
+      .filter((s) => s.coordinates)
+      .map((stream) => async () => {
+        const res = await fetch(`${apiUrl}/api/streams/${stream.id}/conditions`);
+        const json = await res.json();
+        return { stream, json };
+      });
 
-          const cond: StreamConditions = json.data;
-          conditionsMap.value = {
-            ...conditionsMap.value,
-            [stream.id]: cond,
-          };
+    promisePool(tasks, 4).then((results) => {
+      const newConditions: Record<string, StreamConditions> = {};
+
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+        const stream = streams.filter((s) => s.coordinates)[i];
+        if (!stream) continue;
+
+        const marker = markers.get(stream.id);
+        if (!marker) continue;
+
+        if (result.status === 'fulfilled' && result.value.json.success && result.value.json.data) {
+          const cond: StreamConditions = result.value.json.data;
+          newConditions[stream.id] = cond;
 
           // Update marker color
           marker.setStyle({
@@ -142,9 +161,9 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
               <span style="color: #64748b; font-size: 12px">${stream.region} • ${stream.state}</span>
               <hr style="margin: 8px 0; border: none; border-top: 1px solid #e2e8f0">
               <div style="font-size: 13px">
-                ${waterTemp != null ? `💧 Water: <strong>${waterTemp}°F</strong><br>` : ''}
-                ${flow != null ? `🌊 Flow: <strong>${flow} cfs</strong><br>` : ''}
-                ${topHatch ? `🪰 ${topHatch}<br>` : ''}
+                ${waterTemp != null ? `Water: <strong>${waterTemp}°F</strong><br>` : ''}
+                ${flow != null ? `Flow: <strong>${flow} cfs</strong><br>` : ''}
+                ${topHatch ? `${topHatch}<br>` : ''}
               </div>
               <div style="margin-top: 8px">
                 <span style="
@@ -161,11 +180,26 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
                 margin-top: 8px;
                 color: #0ea5e9;
                 font-size: 12px;
-              ">View details →</a>
+              ">View details</a>
             </div>
           `);
-        })
-        .catch(console.error);
+        } else {
+          // Failed — update marker to indicate error
+          marker.setStyle({
+            fillColor: FAILED_MARKER_COLOR,
+            color: FAILED_MARKER_COLOR,
+          });
+          marker.setPopupContent(`
+            <div style="min-width: 150px">
+              <strong>${stream.name}</strong><br>
+              <span style="color: #64748b; font-size: 12px">${stream.region} • ${stream.state}</span><br>
+              <span style="color: #ef4444; font-size: 11px">Failed to load conditions</span>
+            </div>
+          `);
+        }
+      }
+
+      conditionsMap.value = { ...conditionsMap.value, ...newConditions };
     });
   }, [loaded.value, streams, apiUrl]);
 
@@ -174,7 +208,7 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
     return (
       <div class='flex items-center justify-center h-full bg-red-50'>
         <div class='text-center'>
-          <div class='text-red-500 text-lg mb-2'>⚠️ Map Error</div>
+          <div class='text-red-500 text-lg mb-2'>Map Error</div>
           <div class='text-red-400 text-sm'>{error.value}</div>
         </div>
       </div>
@@ -197,8 +231,7 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
           style={{ zIndex: 2 }}
         >
           <div class='text-center'>
-            <div class='animate-pulse text-slate-500 text-lg'>🗺️</div>
-            <div class='text-slate-500 mt-2'>Loading map...</div>
+            <div class='animate-pulse text-slate-500 text-lg'>Loading map...</div>
           </div>
         </div>
       )}
