@@ -6,8 +6,9 @@
  */
 
 import type { Coordinates, HourlyForecast, WeatherConditions } from '../models/types.ts';
-import { cacheService, makeWeatherKey, TTL } from './cache.ts';
+import { type CacheLike, cacheService, makeWeatherKey, TTL } from './cache.ts';
 import { WeatherService } from './weather.ts';
+import { logger } from '../utils/logger.ts';
 
 export interface CachedWeatherResult<T> {
   data: T;
@@ -17,9 +18,11 @@ export interface CachedWeatherResult<T> {
 
 export class CachedWeatherService {
   private readonly weather: WeatherService;
+  private readonly cache: CacheLike;
 
-  constructor(weather?: WeatherService) {
+  constructor(weather?: WeatherService, cache?: CacheLike) {
     this.weather = weather ?? new WeatherService();
+    this.cache = cache ?? cacheService;
   }
 
   /**
@@ -28,8 +31,17 @@ export class CachedWeatherService {
   async getHourlyForecast(coords: Coordinates): Promise<CachedWeatherResult<HourlyForecast>> {
     const key = makeWeatherKey(coords.latitude, coords.longitude);
 
-    // Try cache first
-    const cached = await cacheService.get<HourlyForecast>(key);
+    // Try cache first — treat failure as cache miss
+    let cached: { data: HourlyForecast; hit: boolean; cachedAt: number | null } | null = null;
+    try {
+      cached = await this.cache.get<HourlyForecast>(key);
+    } catch (err) {
+      logger.warn('Cache read failed, falling back to API', {
+        key: key.join('/'),
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+
     if (cached) {
       return {
         data: cached.data,
@@ -41,8 +53,15 @@ export class CachedWeatherService {
     // Fetch from API
     const data = await this.weather.getHourlyForecast(coords);
 
-    // Cache the result
-    await cacheService.set(key, data, TTL.WEATHER_MS);
+    // Cache the result — swallow failure, data already fetched
+    try {
+      await this.cache.set(key, data, TTL.WEATHER_MS);
+    } catch (err) {
+      logger.warn('Cache write failed', {
+        key: key.join('/'),
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
 
     return {
       data,
@@ -71,7 +90,7 @@ export class CachedWeatherService {
    */
   async invalidate(coords: Coordinates): Promise<void> {
     const key = makeWeatherKey(coords.latitude, coords.longitude);
-    await cacheService.delete(key);
+    await this.cache.delete(key);
   }
 }
 

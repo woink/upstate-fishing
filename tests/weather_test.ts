@@ -336,6 +336,113 @@ Deno.test('WeatherService - estimateCloudCover "Some Unknown Text" returns 50 (d
 });
 
 // ============================================================================
+// WeatherService - User-Agent Header Tests
+// ============================================================================
+
+/**
+ * Mock server that captures the User-Agent header from the first request.
+ */
+function createHeaderCapturingServer(): {
+  server: Deno.HttpServer;
+  getCapturedUserAgent: () => string | null;
+} {
+  let capturedUserAgent: string | null = null;
+
+  const server = Deno.serve({ port: 0 }, (req) => {
+    if (capturedUserAgent === null) {
+      capturedUserAgent = req.headers.get('user-agent');
+    }
+
+    const url = new URL(req.url);
+    const path = url.pathname;
+
+    if (path.startsWith('/points/')) {
+      return new Response(JSON.stringify(buildMockPointsResponse('TST', 50, 50)), {
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+    if (path.includes('/forecast/hourly')) {
+      return new Response(
+        JSON.stringify(buildMockForecastResponse('5 mph', 'Clear')),
+        { headers: { 'content-type': 'application/json' } },
+      );
+    }
+    if (path.includes('/gridpoints/')) {
+      return new Response(JSON.stringify(buildMockGridpointsResponse()), {
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+    return new Response('Not Found', { status: 404 });
+  });
+
+  return { server, getCapturedUserAgent: () => capturedUserAgent };
+}
+
+Deno.test('WeatherService - default User-Agent contains project identifier, not placeholder', async () => {
+  const { server, getCapturedUserAgent } = createHeaderCapturingServer();
+  try {
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+
+    const ua = getCapturedUserAgent();
+    assertEquals(
+      ua?.includes('contact@example.com'),
+      false,
+      'Default UA must not use placeholder email',
+    );
+    assertEquals(ua?.includes('UpstateFishing'), true, 'Default UA should identify the project');
+  } finally {
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - WEATHER_USER_AGENT env var overrides default', async () => {
+  const { server, getCapturedUserAgent } = createHeaderCapturingServer();
+  const original = Deno.env.get('WEATHER_USER_AGENT');
+  try {
+    Deno.env.set('WEATHER_USER_AGENT', 'CustomApp/2.0 (custom@test.com)');
+    const port = getServerPort(server);
+    const service = new WeatherService({ baseUrl: `http://localhost:${port}` });
+    await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+
+    const ua = getCapturedUserAgent();
+    assertEquals(ua, 'CustomApp/2.0 (custom@test.com)');
+  } finally {
+    if (original !== undefined) {
+      Deno.env.set('WEATHER_USER_AGENT', original);
+    } else {
+      Deno.env.delete('WEATHER_USER_AGENT');
+    }
+    await server.shutdown();
+  }
+});
+
+Deno.test('WeatherService - explicit userAgent option overrides env var', async () => {
+  const { server, getCapturedUserAgent } = createHeaderCapturingServer();
+  const original = Deno.env.get('WEATHER_USER_AGENT');
+  try {
+    Deno.env.set('WEATHER_USER_AGENT', 'EnvApp/1.0');
+    const port = getServerPort(server);
+    const service = new WeatherService({
+      baseUrl: `http://localhost:${port}`,
+      userAgent: 'ExplicitApp/3.0 (explicit@test.com)',
+    });
+    await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
+
+    const ua = getCapturedUserAgent();
+    assertEquals(ua, 'ExplicitApp/3.0 (explicit@test.com)');
+  } finally {
+    if (original !== undefined) {
+      Deno.env.set('WEATHER_USER_AGENT', original);
+    } else {
+      Deno.env.delete('WEATHER_USER_AGENT');
+    }
+    await server.shutdown();
+  }
+});
+
+// ============================================================================
 // WeatherService - Integration Test (requires network, skipped by default)
 // ============================================================================
 

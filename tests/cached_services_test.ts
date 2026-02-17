@@ -6,7 +6,13 @@ import { assertEquals, assertExists, assertNotEquals } from '@std/assert';
 import { afterAll, beforeAll, describe, it } from '@std/testing/bdd';
 import { CachedUSGSService } from '../src/services/cached-usgs.ts';
 import { CachedWeatherService } from '../src/services/cached-weather.ts';
-import { cacheService, makeUSGSKey, makeWeatherKey } from '../src/services/cache.ts';
+import {
+  type CacheLike,
+  type CacheResult,
+  cacheService,
+  makeUSGSKey,
+  makeWeatherKey,
+} from '../src/services/cache.ts';
 import { USGSService } from '../src/services/usgs.ts';
 import type { StationData } from '../src/models/types.ts';
 
@@ -270,5 +276,127 @@ describe({
       // Allow ephemeral server resources to drain
       await new Promise((resolve) => setTimeout(resolve, 50));
     }
+  });
+});
+
+// ============================================================================
+// Cache Graceful Degradation Tests
+// ============================================================================
+
+/**
+ * A CacheService stub that throws on get() and/or set() to simulate KV failures.
+ */
+class FailingCacheService implements CacheLike {
+  failGet: boolean;
+  failSet: boolean;
+
+  constructor(opts: { failGet?: boolean; failSet?: boolean } = {}) {
+    this.failGet = opts.failGet ?? false;
+    this.failSet = opts.failSet ?? false;
+  }
+
+  get<T>(_key: string[]): Promise<CacheResult<T> | null> {
+    if (this.failGet) return Promise.reject(new Error('KV unavailable (get)'));
+    return Promise.resolve(null); // cache miss
+  }
+
+  set<T>(_key: string[], _data: T, _ttlMs: number): Promise<void> {
+    if (this.failSet) return Promise.reject(new Error('KV unavailable (set)'));
+    return Promise.resolve();
+  }
+
+  delete(_key: string[]): Promise<void> {
+    return Promise.resolve();
+  }
+}
+
+describe('CachedUSGSService - cache graceful degradation', () => {
+  it('cache.get() failure falls back to upstream API', async () => {
+    const mockUSGS = new MockUSGSService();
+    const failingCache = new FailingCacheService({ failGet: true });
+
+    // @ts-ignore - Mock services have compatible interfaces
+    const service = new CachedUSGSService(mockUSGS, failingCache);
+
+    const result = await service.getInstantaneousValues(['01417500']);
+
+    assertEquals(mockUSGS.callCount, 1, 'Should call upstream API');
+    assertEquals(result.data.length, 1);
+    assertEquals(result.data[0].stationId, '01417500');
+    assertEquals(result.cached, false);
+  });
+
+  it('cache.set() failure still returns data', async () => {
+    const mockUSGS = new MockUSGSService();
+    const failingCache = new FailingCacheService({ failSet: true });
+
+    // @ts-ignore - Mock services have compatible interfaces
+    const service = new CachedUSGSService(mockUSGS, failingCache);
+
+    const result = await service.getInstantaneousValues(['01417500']);
+
+    assertEquals(mockUSGS.callCount, 1, 'Should call upstream API');
+    assertEquals(result.data.length, 1);
+    assertEquals(result.cached, false);
+  });
+
+  it('both cache.get() and cache.set() fail still returns data', async () => {
+    const mockUSGS = new MockUSGSService();
+    const failingCache = new FailingCacheService({ failGet: true, failSet: true });
+
+    // @ts-ignore - Mock services have compatible interfaces
+    const service = new CachedUSGSService(mockUSGS, failingCache);
+
+    const result = await service.getInstantaneousValues(['01417500']);
+
+    assertEquals(mockUSGS.callCount, 1);
+    assertEquals(result.data.length, 1);
+    assertEquals(result.cached, false);
+  });
+});
+
+describe('CachedWeatherService - cache graceful degradation', () => {
+  const coords = { latitude: 41.9628, longitude: -74.3051 };
+
+  it('cache.get() failure falls back to upstream API', async () => {
+    const mockWeather = new MockWeatherService();
+    const failingCache = new FailingCacheService({ failGet: true });
+
+    // @ts-ignore - Mock services have compatible interfaces
+    const service = new CachedWeatherService(mockWeather, failingCache);
+
+    const result = await service.getHourlyForecast(coords);
+
+    assertEquals(mockWeather.callCount, 1, 'Should call upstream API');
+    assertEquals(result.data.location.latitude, 41.9628);
+    assertEquals(result.cached, false);
+  });
+
+  it('cache.set() failure still returns data', async () => {
+    const mockWeather = new MockWeatherService();
+    const failingCache = new FailingCacheService({ failSet: true });
+
+    // @ts-ignore - Mock services have compatible interfaces
+    const service = new CachedWeatherService(mockWeather, failingCache);
+
+    const result = await service.getHourlyForecast(coords);
+
+    assertEquals(mockWeather.callCount, 1, 'Should call upstream API');
+    assertEquals(result.data.location.latitude, 41.9628);
+    assertEquals(result.cached, false);
+  });
+
+  it('both cache.get() and cache.set() fail still returns data', async () => {
+    const mockWeather = new MockWeatherService();
+    const failingCache = new FailingCacheService({ failGet: true, failSet: true });
+
+    // @ts-ignore - Mock services have compatible interfaces
+    const service = new CachedWeatherService(mockWeather, failingCache);
+
+    const result = await service.getHourlyForecast(coords);
+
+    assertEquals(mockWeather.callCount, 1);
+    assertEquals(result.data.location.latitude, 41.9628);
+    assertEquals(result.cached, false);
   });
 });

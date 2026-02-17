@@ -21,6 +21,30 @@ frontend/_fresh/
 .claude/settings.local.json
 .serena/
 
+# Other-agent skill symlink directories (created by `npx skills add`)
+# We only commit .agents/ (source) and .claude/skills/ (Claude Code symlinks)
+.adal/
+.agent/
+.augment/
+.commandcode/
+.continue/
+.crush/
+.factory/
+.goose/
+.junie/
+.kode/
+.mux/
+.neovate/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.trae/
+.vibe/
+.windsurf/
+.zencoder/
+
 # OS
 .DS_Store
 Thumbs.db

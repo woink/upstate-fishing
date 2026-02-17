@@ -6,8 +6,9 @@
  */
 
 import type { StationData } from '../models/types.ts';
-import { cacheService, makeUSGSKey, TTL } from './cache.ts';
+import { type CacheLike, cacheService, makeUSGSKey, TTL } from './cache.ts';
 import { USGS_PARAMS, USGSService } from './usgs.ts';
+import { logger } from '../utils/logger.ts';
 
 export interface CachedUSGSResult {
   data: StationData[];
@@ -17,9 +18,11 @@ export interface CachedUSGSResult {
 
 export class CachedUSGSService {
   private readonly usgs: USGSService;
+  private readonly cache: CacheLike;
 
-  constructor(usgs?: USGSService) {
+  constructor(usgs?: USGSService, cache?: CacheLike) {
     this.usgs = usgs ?? new USGSService();
+    this.cache = cache ?? cacheService;
   }
 
   /**
@@ -35,8 +38,17 @@ export class CachedUSGSService {
 
     const key = makeUSGSKey(stationIds, params);
 
-    // Try cache first
-    const cached = await cacheService.get<StationData[]>(key);
+    // Try cache first — treat failure as cache miss
+    let cached: { data: StationData[]; hit: boolean; cachedAt: number | null } | null = null;
+    try {
+      cached = await this.cache.get<StationData[]>(key);
+    } catch (err) {
+      logger.warn('Cache read failed, falling back to API', {
+        key: key.join('/'),
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
+
     if (cached) {
       return {
         data: cached.data,
@@ -48,8 +60,15 @@ export class CachedUSGSService {
     // Fetch from API
     const data = await this.usgs.getInstantaneousValues(stationIds, params);
 
-    // Cache the result
-    await cacheService.set(key, data, TTL.USGS_MS);
+    // Cache the result — swallow failure, data already fetched
+    try {
+      await this.cache.set(key, data, TTL.USGS_MS);
+    } catch (err) {
+      logger.warn('Cache write failed', {
+        key: key.join('/'),
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
 
     return {
       data,
@@ -66,7 +85,7 @@ export class CachedUSGSService {
     params: string[] = [USGS_PARAMS.WATER_TEMP, USGS_PARAMS.DISCHARGE, USGS_PARAMS.GAGE_HEIGHT],
   ): Promise<void> {
     const key = makeUSGSKey(stationIds, params);
-    await cacheService.delete(key);
+    await this.cache.delete(key);
   }
 }
 
