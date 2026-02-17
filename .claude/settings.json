@@ -1,5 +1,4 @@
 {
-  "enabledPlugins": {},
   "hooks": {
     "SessionStart": [
       {
@@ -12,5 +11,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "supabase@claude-plugins-official": true
   }
 }
