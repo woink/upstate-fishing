@@ -2,8 +2,8 @@
  * Cache service tests
  */
 
-import { assertEquals, assertExists } from '@std/assert';
-import { afterAll, beforeAll, describe, it } from '@std/testing/bdd';
+import { assertEquals, assertExists, assertRejects } from '@std/assert';
+import { afterAll, afterEach, beforeAll, describe, it } from '@std/testing/bdd';
 import {
   CacheService,
   makeCacheHeaders,
@@ -221,6 +221,71 @@ describe('CachedWeatherService', () => {
     const key = `weather:${coords.latitude.toFixed(4)},${coords.longitude.toFixed(4)}`;
 
     assertEquals(key, 'weather:41.9628,-74.3051');
+  });
+});
+
+// ============================================================================
+// Init Retry After Failure Tests
+// ============================================================================
+
+describe('CacheService init retry after failure', () => {
+  const originalOpenKv = Deno.openKv;
+
+  afterEach(() => {
+    // Always restore Deno.openKv
+    Deno.openKv = originalOpenKv;
+  });
+
+  it('should allow retry after init failure', async () => {
+    const cache = new CacheService();
+
+    // First call: force Deno.openKv to reject
+    Deno.openKv = () => Promise.reject(new Error('KV unavailable'));
+
+    await assertRejects(
+      () => cache.init(),
+      Error,
+      'KV unavailable',
+    );
+
+    // Restore real Deno.openKv — second call should succeed
+    Deno.openKv = originalOpenKv;
+    await cache.init();
+
+    // Verify the cache is functional
+    const key = ['cache', 'test', 'retry'];
+    await cache.set(key, { recovered: true }, 60000);
+    const result = await cache.get<{ recovered: boolean }>(key);
+    assertExists(result);
+    assertEquals(result.data.recovered, true);
+
+    await cache.delete(key);
+    cache.close();
+  });
+
+  it('should propagate error to concurrent callers on failure', async () => {
+    const cache = new CacheService();
+
+    // Make openKv hang then reject, so multiple callers can queue up
+    Deno.openKv = () =>
+      new Promise((_resolve, reject) => {
+        setTimeout(() => reject(new Error('KV down')), 50);
+      });
+
+    // Launch two concurrent init() calls
+    const results = await Promise.allSettled([
+      cache.init(),
+      cache.init(),
+    ]);
+
+    // Both should have rejected
+    assertEquals(results[0].status, 'rejected');
+    assertEquals(results[1].status, 'rejected');
+
+    // After failure, initPromise should be cleared — retry should work
+    Deno.openKv = originalOpenKv;
+    await cache.init();
+    cache.close();
   });
 });
 

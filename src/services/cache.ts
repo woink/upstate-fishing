@@ -85,7 +85,12 @@ export class CacheService {
       this.kv = await Deno.openKv();
     })();
 
-    await this.initPromise;
+    try {
+      await this.initPromise;
+    } catch (error) {
+      this.initPromise = null;
+      throw error;
+    }
   }
 
   /**
