@@ -56,6 +56,10 @@ upstate-fishing/
 The `@shared/` import alias stays (`"@shared/": "./src/"`) so all 26 files that use it need zero
 import path changes — only the `deno.json` alias target loses the `../`.
 
+> **Note:** The `@std/assert` version specifier differs between configs — root uses `^1` (semver
+> range) while frontend uses `1` (exact major). The merged config should normalize to `^1` for
+> flexibility.
+
 ## Implementation guide
 
 ### 1. Merge `deno.json` configs
@@ -141,8 +145,8 @@ mkdir -p tests/routes tests/e2e
 mv frontend/tests/* tests/routes/
 mv frontend/e2e/* tests/e2e/
 
-# Clean up
-rm -rf frontend/
+# Clean up — only after verifying deno task dev, test, and e2e all pass
+git rm -r frontend/
 ```
 
 ### 3. Fix imports in moved test files
@@ -194,6 +198,7 @@ Search for `frontend/` references across all non-code files and update.
 | Fresh entry points | 5 files  | `dev.ts`, `main.ts`, `fresh.config.ts`, `fresh.gen.ts`, `tailwind.config.ts` |
 | CI/CD workflows    | 2 files  | `ci.yml`, `deploy.yml`                                                       |
 | Config files       | 2 files  | Merge two `deno.json` into one, delete `frontend/deno.lock`                  |
+| Lock files         | 2 files  | Delete `frontend/deno.lock`, regenerate root `deno.lock`                     |
 | Docs               | 2 files  | `CLAUDE.md`, `README.md`                                                     |
 
 ## Risks
