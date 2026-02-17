@@ -1,3 +1,16 @@
 {
-  "enabledPlugins": {}
+  "enabledPlugins": {},
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'if ! command -v gh &>/dev/null && command -v apt-get &>/dev/null; then apt-get update -qq && apt-get install -y -qq gh 2>/dev/null || true; fi'",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
 }

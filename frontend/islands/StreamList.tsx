@@ -2,6 +2,7 @@ import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import type { Stream, StreamConditions } from '@shared/models/types.ts';
 import { parameterStatusDisplay, qualityBadgeClasses, qualityClasses } from '../lib/colors.ts';
+import { promisePool } from '../lib/promise-pool.ts';
 
 function renderStationData(conditions: StreamConditions) {
   const station = conditions.stationData[0];
@@ -58,32 +59,52 @@ interface StreamListProps {
 export default function StreamList({ streams, apiUrl }: StreamListProps) {
   const conditionsMap = useSignal<Record<string, StreamConditions>>({});
   const loadingIds = useSignal<Set<string>>(new Set());
+  const errorIds = useSignal<Set<string>>(new Set());
 
   useEffect(() => {
-    // Load conditions for all streams
-    streams.forEach((stream) => {
-      if (conditionsMap.value[stream.id] || loadingIds.value.has(stream.id)) {
-        return;
+    const streamsToLoad = streams.filter(
+      (s) => !conditionsMap.value[s.id] && !loadingIds.value.has(s.id),
+    );
+    if (streamsToLoad.length === 0) return;
+
+    // Mark all as loading
+    loadingIds.value = new Set([...loadingIds.value, ...streamsToLoad.map((s) => s.id)]);
+
+    const tasks = streamsToLoad.map((stream) => async () => {
+      const res = await fetch(`${apiUrl}/api/streams/${stream.id}/conditions`);
+      const json = await res.json();
+      return { streamId: stream.id, json };
+    });
+
+    promisePool(tasks, 4).then((results) => {
+      const newConditions: Record<string, StreamConditions> = {};
+      const newErrors = new Set(errorIds.value);
+      const doneIds = new Set(loadingIds.value);
+
+      for (const result of results) {
+        if (result.status === 'fulfilled') {
+          const { streamId, json } = result.value;
+          doneIds.delete(streamId);
+          if (json.success && json.data) {
+            newConditions[streamId] = json.data;
+            newErrors.delete(streamId);
+          } else {
+            newErrors.add(streamId);
+          }
+        } else {
+          // Rejected — find the stream ID from the task index
+          const idx = results.indexOf(result);
+          const streamId = streamsToLoad[idx]?.id;
+          if (streamId) {
+            doneIds.delete(streamId);
+            newErrors.add(streamId);
+          }
+        }
       }
 
-      loadingIds.value = new Set([...loadingIds.value, stream.id]);
-
-      fetch(`${apiUrl}/api/streams/${stream.id}/conditions`)
-        .then((res) => res.json())
-        .then((json) => {
-          if (json.success && json.data) {
-            conditionsMap.value = {
-              ...conditionsMap.value,
-              [stream.id]: json.data,
-            };
-          }
-        })
-        .catch(console.error)
-        .finally(() => {
-          const newSet = new Set(loadingIds.value);
-          newSet.delete(stream.id);
-          loadingIds.value = newSet;
-        });
+      conditionsMap.value = { ...conditionsMap.value, ...newConditions };
+      loadingIds.value = doneIds;
+      errorIds.value = newErrors;
     });
   }, [streams, apiUrl]);
 
@@ -100,13 +121,18 @@ export default function StreamList({ streams, apiUrl }: StreamListProps) {
       {streams.map((stream) => {
         const conditions = conditionsMap.value[stream.id];
         const isLoading = loadingIds.value.has(stream.id);
+        const hasError = errorIds.value.has(stream.id);
 
         return (
           <a
             key={stream.id}
             href={`/streams/${stream.id}`}
             class={`block bg-white rounded-lg border-l-4 p-4 shadow hover:shadow-md transition ${
-              conditions ? qualityClasses[conditions.fishingQuality] : 'border-slate-300'
+              conditions
+                ? qualityClasses[conditions.fishingQuality]
+                : hasError
+                ? 'border-red-300'
+                : 'border-slate-300'
             }`}
           >
             <div class='flex items-start justify-between'>
@@ -134,6 +160,12 @@ export default function StreamList({ streams, apiUrl }: StreamListProps) {
             </div>
 
             {conditions && renderStationData(conditions)}
+
+            {hasError && !conditions && (
+              <p class='mt-2 text-sm text-red-700'>
+                Failed to load conditions
+              </p>
+            )}
 
             <div class='mt-2 text-xs text-slate-400'>
               {stream.stationIds.length} USGS station{stream.stationIds.length !== 1 ? 's' : ''}
