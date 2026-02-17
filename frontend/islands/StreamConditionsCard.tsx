@@ -18,17 +18,21 @@ export default function StreamConditionsCard({
 }: StreamConditionsCardProps) {
   const conditions = useSignal(initial);
   const refreshing = useSignal(false);
+  const refreshError = useSignal<string | null>(null);
 
   async function refresh() {
     refreshing.value = true;
+    refreshError.value = null;
     try {
       const res = await fetch(`${apiUrl}/api/streams/${initial.stream.id}/conditions`);
       const json = await res.json();
       if (json.success && json.data) {
         conditions.value = json.data;
+      } else {
+        refreshError.value = 'Server returned an error';
       }
-    } catch (err) {
-      console.error('Failed to refresh:', err);
+    } catch {
+      refreshError.value = 'Failed to refresh conditions';
     } finally {
       refreshing.value = false;
     }
@@ -85,6 +89,10 @@ export default function StreamConditionsCard({
             <span class={refreshing.value ? 'animate-spin inline-block' : ''}>🔄</span>
           </button>
         </div>
+
+        {refreshError.value && (
+          <p class='mt-2 text-sm text-red-700'>{refreshError.value}</p>
+        )}
 
         <div class='mt-4'>
           <span class='text-lg font-semibold capitalize'>{cond.fishingQuality} Conditions</span>
