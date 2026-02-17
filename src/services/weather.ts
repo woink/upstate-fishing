@@ -62,6 +62,8 @@ export interface WeatherServiceOptions {
   timeout?: number;
 }
 
+const DEFAULT_USER_AGENT = 'UpstateFishing/1.0 (https://github.com/woink/upstate-fishing)';
+
 export class WeatherService {
   private readonly baseUrl: string;
   private readonly userAgent: string;
@@ -70,7 +72,9 @@ export class WeatherService {
 
   constructor(options: WeatherServiceOptions = {}) {
     this.baseUrl = options.baseUrl ?? 'https://api.weather.gov';
-    this.userAgent = options.userAgent ?? 'FishingConditionsApp/1.0 (contact@example.com)';
+    this.userAgent = options.userAgent
+      ?? Deno.env.get('WEATHER_USER_AGENT')
+      ?? DEFAULT_USER_AGENT;
     this.timeout = options.timeout ?? 10000;
     this.gridCache = new Map();
   }
