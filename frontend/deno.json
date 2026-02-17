@@ -41,5 +41,9 @@
   "exclude": [
     "**/_fresh/*",
     "node_modules"
-  ]
+  ],
+  "deploy": {
+    "org": "woink",
+    "app": "upstate-fishing"
+  }
 }
