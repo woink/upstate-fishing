@@ -62,10 +62,20 @@ export function makeWeatherKey(latitude: number, longitude: number): string[] {
 }
 
 // ============================================================================
+// Cache Service Interface (for dependency injection / testing)
+// ============================================================================
+
+export interface CacheLike {
+  get<T>(key: string[]): Promise<CacheResult<T> | null>;
+  set<T>(key: string[], data: T, ttlMs: number): Promise<void>;
+  delete(key: string[]): Promise<void>;
+}
+
+// ============================================================================
 // Cache Service
 // ============================================================================
 
-export class CacheService {
+export class CacheService implements CacheLike {
   private kv: Deno.Kv | null = null;
   private stats = { hits: 0, misses: 0 };
   private initPromise: Promise<void> | null = null;
