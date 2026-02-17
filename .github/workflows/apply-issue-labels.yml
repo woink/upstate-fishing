@@ -1,0 +1,115 @@
+name: Apply missing issue labels
+
+on:
+  push:
+    branches:
+      - 'claude/apply-missing-tags-*'
+
+permissions:
+  issues: write
+
+jobs:
+  apply-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply labels and update issue bodies
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = [
+              {
+                number: 109,
+                labels: ['area:frontend', 'good first issue'],
+                removeLabelsText: '\n## Labels\n\nrefactor, frontend, good-first-issue'
+              },
+              {
+                number: 110,
+                labels: ['documentation', 'area:frontend', 'good first issue'],
+                removeLabelsText: '\n## Labels\n\ndocumentation, frontend, good-first-issue'
+              },
+              {
+                number: 111,
+                labels: ['enhancement', 'area:backend'],
+                removeLabelsText: '\n## Labels\n\nenhancement, backend, observability'
+              },
+              {
+                number: 112,
+                labels: ['area:frontend', 'good first issue'],
+                removeLabelsText: '\n## Labels\n\nrefactor, frontend, good-first-issue'
+              },
+              {
+                number: 113,
+                labels: ['documentation', 'area:backend', 'good first issue'],
+                removeLabelsText: '\n## Labels\n\ndocumentation, backend, good-first-issue'
+              }
+            ];
+
+            // First, ensure 'refactor' and 'observability' labels exist
+            const labelsToCreate = [
+              { name: 'refactor', color: 'e6e6e6', description: 'Code refactoring and cleanup' },
+              { name: 'observability', color: 'bfdadc', description: 'Logging, monitoring, and diagnostics' }
+            ];
+
+            for (const label of labelsToCreate) {
+              try {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`Created label: ${label.name}`);
+              } catch (e) {
+                if (e.status === 422) {
+                  console.log(`Label already exists: ${label.name}`);
+                } else {
+                  console.log(`Error creating label ${label.name}: ${e.message}`);
+                }
+              }
+            }
+
+            // Now add 'refactor' to issues 109 and 112, 'observability' to issue 111
+            issues[0].labels.push('refactor');  // issue 109
+            issues[2].labels.push('observability');  // issue 111
+            issues[3].labels.push('refactor');  // issue 112
+
+            for (const issue of issues) {
+              // Get current issue
+              const { data: currentIssue } = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number
+              });
+
+              // Apply labels
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: issue.labels
+              });
+              console.log(`Applied labels to #${issue.number}: ${issue.labels.join(', ')}`);
+
+              // Update body to remove labels text
+              let newBody = currentIssue.body;
+              if (newBody && newBody.includes(issue.removeLabelsText)) {
+                newBody = newBody.replace(issue.removeLabelsText, '');
+                // Also trim trailing whitespace/newlines
+                newBody = newBody.trimEnd();
+
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  body: newBody
+                });
+                console.log(`Updated body for #${issue.number}`);
+              } else {
+                console.log(`Labels text not found in body for #${issue.number}, skipping body update`);
+                console.log(`Looking for: "${issue.removeLabelsText}"`);
+                console.log(`Body ends with: "${newBody?.slice(-100)}"`);
+              }
+            }
+
+            console.log('All issues updated successfully!');
