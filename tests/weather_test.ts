@@ -386,7 +386,11 @@ Deno.test('WeatherService - default User-Agent contains project identifier, not 
     await service.getHourlyForecast({ latitude: 41.0, longitude: -74.0 });
 
     const ua = getCapturedUserAgent();
-    assertEquals(ua?.includes('contact@example.com'), false, 'Default UA must not use placeholder email');
+    assertEquals(
+      ua?.includes('contact@example.com'),
+      false,
+      'Default UA must not use placeholder email',
+    );
     assertEquals(ua?.includes('UpstateFishing'), true, 'Default UA should identify the project');
   } finally {
     await server.shutdown();

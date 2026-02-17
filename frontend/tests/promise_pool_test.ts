@@ -21,7 +21,11 @@ describe('promisePool', () => {
 
     await promisePool(tasks, 3);
 
-    assertEquals(peakConcurrency <= 3, true, `Peak concurrency was ${peakConcurrency}, expected <= 3`);
+    assertEquals(
+      peakConcurrency <= 3,
+      true,
+      `Peak concurrency was ${peakConcurrency}, expected <= 3`,
+    );
   });
 
   it('processes all tasks and preserves result order', async () => {
@@ -43,12 +47,10 @@ describe('promisePool', () => {
   });
 
   it('handles rejections without stopping pool', async () => {
-    const tasks = [
-      async () => 'ok',
-      async () => {
-        throw new Error('fail');
-      },
-      async () => 'also ok',
+    const tasks: (() => Promise<string>)[] = [
+      () => Promise.resolve('ok'),
+      () => Promise.reject(new Error('fail')),
+      () => Promise.resolve('also ok'),
     ];
 
     const results = await promisePool(tasks, 2);
@@ -67,9 +69,9 @@ describe('promisePool', () => {
 
   it('works with concurrency=1 (serial execution)', async () => {
     const order: number[] = [];
-    const tasks = [0, 1, 2].map((i) => async () => {
+    const tasks = [0, 1, 2].map((i) => () => {
       order.push(i);
-      return i;
+      return Promise.resolve(i);
     });
 
     const results = await promisePool(tasks, 1);
@@ -84,7 +86,7 @@ describe('promisePool', () => {
   });
 
   it('works when concurrency exceeds task count', async () => {
-    const tasks = [async () => 1, async () => 2];
+    const tasks = [() => Promise.resolve(1), () => Promise.resolve(2)];
     const results = await promisePool(tasks, 10);
 
     assertEquals(results.length, 2);

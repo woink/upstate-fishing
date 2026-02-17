@@ -72,9 +72,9 @@ export class WeatherService {
 
   constructor(options: WeatherServiceOptions = {}) {
     this.baseUrl = options.baseUrl ?? 'https://api.weather.gov';
-    this.userAgent = options.userAgent
-      ?? Deno.env.get('WEATHER_USER_AGENT')
-      ?? DEFAULT_USER_AGENT;
+    this.userAgent = options.userAgent ??
+      Deno.env.get('WEATHER_USER_AGENT') ??
+      DEFAULT_USER_AGENT;
     this.timeout = options.timeout ?? 10000;
     this.gridCache = new Map();
   }

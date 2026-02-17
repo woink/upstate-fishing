@@ -90,9 +90,7 @@ export default function StreamConditionsCard({
           </button>
         </div>
 
-        {refreshError.value && (
-          <p class='mt-2 text-sm text-red-700'>{refreshError.value}</p>
-        )}
+        {refreshError.value && <p class='mt-2 text-sm text-red-700'>{refreshError.value}</p>}
 
         <div class='mt-4'>
           <span class='text-lg font-semibold capitalize'>{cond.fishingQuality} Conditions</span>
