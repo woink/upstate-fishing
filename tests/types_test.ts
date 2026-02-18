@@ -329,6 +329,20 @@ Deno.test('UserProfileSchema - accepts nullable home coordinates', () => {
   assertEquals(result.homeLongitude, null);
 });
 
+Deno.test('UserProfileSchema - accepts relative avatar storage path', () => {
+  const valid = {
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    displayName: 'Angler Joe',
+    avatarUrl: 'avatars/user123.jpg',
+    homeLatitude: null,
+    homeLongitude: null,
+    createdAt: '2024-04-15T14:00:00Z',
+    updatedAt: '2024-04-15T14:00:00Z',
+  };
+  const result = UserProfileSchema.parse(valid);
+  assertEquals(result.avatarUrl, 'avatars/user123.jpg');
+});
+
 Deno.test('UserProfileSchema - rejects invalid uuid', () => {
   assertThrows(() => {
     UserProfileSchema.parse({

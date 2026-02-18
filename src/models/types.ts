@@ -184,7 +184,7 @@ export const ApiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
 export const UserProfileSchema = z.object({
   id: z.string().uuid(),
   displayName: z.string().nullable(),
-  avatarUrl: z.string().url().nullable(),
+  avatarUrl: z.string().nullable(),
   homeLatitude: z.number().min(-90).max(90).nullable(),
   homeLongitude: z.number().min(-180).max(180).nullable(),
   createdAt: z.string().datetime(),
