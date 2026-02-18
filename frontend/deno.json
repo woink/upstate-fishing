@@ -23,6 +23,8 @@
     "@astral/astral": "jsr:@astral/astral@^0.5",
     "leaflet": "https://esm.sh/leaflet@1.9.4",
     "@shared/": "../src/",
+    "@supabase/supabase-js": "jsr:@supabase/supabase-js@^2",
+    "@supabase/ssr": "npm:@supabase/ssr@^0",
     "zod": "npm:zod@^3.23"
   },
   "compilerOptions": {

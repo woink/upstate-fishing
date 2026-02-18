@@ -25,3 +25,10 @@ export {
 } from './services/cache.ts';
 export { CachedUSGSService, cachedUSGSService } from './services/cached-usgs.ts';
 export { CachedWeatherService, cachedWeatherService } from './services/cached-weather.ts';
+
+// Supabase
+export { SupabaseClientService, supabaseService } from './services/supabase.ts';
+export { createServerSupabaseClient } from './services/supabase-server.ts';
+
+// Feature flags
+export { FEATURES } from './utils/features.ts';
