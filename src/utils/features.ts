@@ -1,6 +1,10 @@
 /**
  * Feature flags derived from environment variables.
  * Enables graceful degradation — the app works without Supabase configured.
+ *
+ * These flags are evaluated at module load time and cannot be changed after
+ * initialization. Environment variables must be set before the module is
+ * first imported.
  */
 
 export const FEATURES = Object.freeze({
