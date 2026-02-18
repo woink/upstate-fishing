@@ -121,6 +121,13 @@ export const HatchSchema = z.object({
 export type Hatch = z.infer<typeof HatchSchema>;
 
 // ============================================================================
+// Fishing Quality Enum (extracted for reuse)
+// ============================================================================
+
+export const FishingQualitySchema = z.enum(['poor', 'fair', 'good', 'excellent']);
+export type FishingQuality = z.infer<typeof FishingQualitySchema>;
+
+// ============================================================================
 // Prediction Types
 // ============================================================================
 
@@ -138,7 +145,7 @@ export const StreamConditionsSchema = z.object({
   stationData: z.array(StationDataSchema),
   weather: WeatherConditionsSchema.optional(),
   predictedHatches: z.array(HatchPredictionSchema),
-  fishingQuality: z.enum(['poor', 'fair', 'good', 'excellent']),
+  fishingQuality: FishingQualitySchema,
   summary: z.string(),
   dataCompleteness: DataCompletenessSchema.optional(),
 });
@@ -169,13 +176,6 @@ export const ApiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
     error: ApiErrorSchema.optional(),
     timestamp: z.string().datetime(),
   });
-
-// ============================================================================
-// Fishing Quality Enum (extracted for reuse)
-// ============================================================================
-
-export const FishingQualitySchema = z.enum(['poor', 'fair', 'good', 'excellent']);
-export type FishingQuality = z.infer<typeof FishingQualitySchema>;
 
 // ============================================================================
 // User & Auth Types (Supabase)
