@@ -23,27 +23,8 @@ frontend/_fresh/
 
 # Other-agent skill symlink directories (created by `npx skills add`)
 # We only commit .agents/ (source) and .claude/skills/ (Claude Code symlinks)
-.adal/
 .agent/
-.augment/
-.commandcode/
-.continue/
-.crush/
-.factory/
-.goose/
-.junie/
-.kode/
-.mux/
-.neovate/
-.openhands/
-.pi/
-.pochi/
-.qoder/
-.qwen/
-.trae/
-.vibe/
-.windsurf/
-.zencoder/
+
 
 # OS
 .DS_Store
@@ -51,16 +32,3 @@ Thumbs.db
 
 # Logs
 *.log
-
-# Lock files (optional - Deno uses deno.lock which we'll keep)
-
-# OpenClaw workspace files
-AGENTS.md
-BOOTSTRAP.md
-HEARTBEAT.md
-IDENTITY.md
-SOUL.md
-TOOLS.md
-USER.md
-MEMORY.md
-memory/
