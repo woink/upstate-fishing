@@ -1,12 +1,13 @@
 ---
-title: "feat: populate display_name and avatar_url from OAuth metadata in handle_new_user trigger"
+title: 'feat: populate display_name and avatar_url from OAuth metadata in handle_new_user trigger'
 labels: [enhancement, phase-2]
-origin: "PR #119 review (Non-Blocking Phase 2 Item)"
+origin: 'PR #119 review (Non-Blocking Phase 2 Item)'
 ---
 
 ## Context
 
-From PR #119 review ([Non-Blocking Phase 2 Item](https://github.com/woink/upstate-fishing/pull/119)).
+From PR #119 review
+([Non-Blocking Phase 2 Item](https://github.com/woink/upstate-fishing/pull/119)).
 
 The `handle_new_user()` trigger currently creates a skeleton profile with only the user ID:
 

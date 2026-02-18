@@ -1,14 +1,16 @@
 ---
-title: "perf: add PostGIS GiST index for weather_snapshots spatial queries"
+title: 'perf: add PostGIS GiST index for weather_snapshots spatial queries'
 labels: [enhancement, phase-2, performance]
-origin: "PR #119 review (Non-Blocking Phase 2 Item)"
+origin: 'PR #119 review (Non-Blocking Phase 2 Item)'
 ---
 
 ## Context
 
-From PR #119 review ([Non-Blocking Phase 2 Item](https://github.com/woink/upstate-fishing/pull/119)).
+From PR #119 review
+([Non-Blocking Phase 2 Item](https://github.com/woink/upstate-fishing/pull/119)).
 
-The `weather_snapshots` table currently uses a btree index on `(latitude, longitude, recorded_at desc)`:
+The `weather_snapshots` table currently uses a btree index on
+`(latitude, longitude, recorded_at desc)`:
 
 ```sql
 create index weather_snapshots_location_recorded_idx
@@ -24,6 +26,7 @@ index will not support efficient spatial lookups.
 ## Proposed Solution
 
 Add a new migration that:
+
 1. Adds a `geography(Point, 4326)` column (or a generated column from latitude/longitude)
 2. Creates a GiST index on the geography column
 3. Optionally drops the btree index if it becomes redundant
