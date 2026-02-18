@@ -106,7 +106,7 @@ create table public.station_readings (
   gage_height_ft double precision
 );
 
-create index station_readings_station_recorded_idx
+create unique index station_readings_station_recorded_idx
   on public.station_readings (station_id, recorded_at desc);
 
 alter table public.station_readings enable row level security;
