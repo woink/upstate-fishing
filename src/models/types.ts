@@ -169,3 +169,107 @@ export const ApiResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
     error: ApiErrorSchema.optional(),
     timestamp: z.string().datetime(),
   });
+
+// ============================================================================
+// Fishing Quality Enum (extracted for reuse)
+// ============================================================================
+
+export const FishingQualitySchema = z.enum(['poor', 'fair', 'good', 'excellent']);
+export type FishingQuality = z.infer<typeof FishingQualitySchema>;
+
+// ============================================================================
+// User & Auth Types (Supabase)
+// ============================================================================
+
+export const UserProfileSchema = z.object({
+  id: z.string().uuid(),
+  displayName: z.string().nullable(),
+  avatarUrl: z.string().url().nullable(),
+  homeLatitude: z.number().min(-90).max(90).nullable(),
+  homeLongitude: z.number().min(-180).max(180).nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type UserProfile = z.infer<typeof UserProfileSchema>;
+
+export const SavedStreamSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  streamId: z.string(),
+  createdAt: z.string().datetime(),
+});
+export type SavedStream = z.infer<typeof SavedStreamSchema>;
+
+export const NotificationPreferencesSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  emailDailyReport: z.boolean(),
+  emailHatchAlerts: z.boolean(),
+  qualityThreshold: FishingQualitySchema,
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type NotificationPreferences = z.infer<typeof NotificationPreferencesSchema>;
+
+// ============================================================================
+// Historical Data Types (Supabase)
+// ============================================================================
+
+export const StationReadingSchema = z.object({
+  id: z.string().uuid(),
+  stationId: z.string(),
+  stationName: z.string(),
+  recordedAt: z.string().datetime(),
+  waterTempF: z.number().nullable(),
+  waterTempC: z.number().nullable(),
+  dischargeCfs: z.number().nullable(),
+  gageHeightFt: z.number().nullable(),
+});
+export type StationReading = z.infer<typeof StationReadingSchema>;
+
+export const WeatherSnapshotSchema = z.object({
+  id: z.string().uuid(),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  recordedAt: z.string().datetime(),
+  airTempF: z.number(),
+  cloudCoverPercent: z.number().min(0).max(100),
+  precipProbability: z.number().min(0).max(100),
+  windSpeedMph: z.number(),
+  shortForecast: z.string(),
+});
+export type WeatherSnapshot = z.infer<typeof WeatherSnapshotSchema>;
+
+// ============================================================================
+// Spatial & Stats Types (Supabase)
+// ============================================================================
+
+export const NearbyStreamSchema = z.object({
+  streamId: z.string(),
+  name: z.string(),
+  region: RegionSchema,
+  state: StateSchema,
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  distanceMiles: z.number().positive(),
+});
+export type NearbyStream = z.infer<typeof NearbyStreamSchema>;
+
+export const TrendDirectionSchema = z.enum(['rising', 'falling', 'stable', 'unknown']);
+export type TrendDirection = z.infer<typeof TrendDirectionSchema>;
+
+const StatsSummarySchema = z.object({
+  min: z.number().nullable(),
+  max: z.number().nullable(),
+  avg: z.number().nullable(),
+  trend: TrendDirectionSchema,
+});
+
+export const StationStatsSchema = z.object({
+  stationId: z.string(),
+  days: z.number().int().positive(),
+  waterTemp: StatsSummarySchema,
+  discharge: StatsSummarySchema,
+  gageHeight: StatsSummarySchema,
+});
+export type StationStats = z.infer<typeof StationStatsSchema>;
