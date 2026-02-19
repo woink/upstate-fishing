@@ -42,7 +42,7 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
         }
 
         // Wait for next frame to ensure DOM is ready
-        await new Promise((resolve) => requestAnimationFrame(resolve));
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         if (!mapRef.current) {
           error.value = 'Map container not found';

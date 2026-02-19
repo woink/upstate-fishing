@@ -11,7 +11,7 @@ export const handler = [
 
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      "script-src 'self' 'unsafe-inline' https://unpkg.com",
       "style-src 'self' 'unsafe-inline' https://unpkg.com",
       "img-src 'self' data: https://*.tile.openstreetmap.org",
       "connect-src 'self'",

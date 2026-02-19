@@ -14,6 +14,11 @@ export default function App({ Component }: PageProps) {
           integrity='sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='
           crossorigin=''
         />
+        <script
+          src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+          integrity='sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='
+          crossorigin=''
+        />
       </head>
       <body class='bg-slate-50 min-h-screen'>
         <nav class='bg-forest-700 text-white shadow-lg'>

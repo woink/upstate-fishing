@@ -58,6 +58,6 @@ describe('Map Page', () => {
 
   it('map shows circle markers for stations', async () => {
     // StationMap uses L.circleMarker which renders as SVG with .leaflet-interactive
-    await assertVisible(page, '.leaflet-interactive', 20_000);
+    await assertVisible(page, '.leaflet-interactive', 30_000);
   });
 });
