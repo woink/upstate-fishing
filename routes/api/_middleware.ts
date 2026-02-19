@@ -17,6 +17,7 @@ export const handler = [
           'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
           'Access-Control-Max-Age': '86400',
+          'Vary': 'Origin',
         },
       });
     }
@@ -26,6 +27,7 @@ export const handler = [
     if (origin && allowedOrigins.includes(origin)) {
       resp.headers.set('Access-Control-Allow-Origin', origin);
     }
+    resp.headers.set('Vary', 'Origin');
 
     return resp;
   },

@@ -26,6 +26,7 @@ Deno.test('CORS - preflight returns 204', async () => {
   });
   const resp = await handler[0](req, createMockContext());
   assertEquals(resp.status, 204);
+  assertEquals(resp.headers.get('Vary'), 'Origin');
 });
 
 // ============================================================================
@@ -38,6 +39,7 @@ Deno.test('CORS - allowed origin gets CORS headers', async () => {
   });
   const resp = await handler[0](req, createMockContext());
   assertEquals(resp.headers.get('Access-Control-Allow-Origin'), 'http://localhost:8000');
+  assertEquals(resp.headers.get('Vary'), 'Origin');
 });
 
 Deno.test('CORS - disallowed origin gets no CORS header', async () => {
@@ -46,4 +48,5 @@ Deno.test('CORS - disallowed origin gets no CORS header', async () => {
   });
   const resp = await handler[0](req, createMockContext());
   assertEquals(resp.headers.has('Access-Control-Allow-Origin'), false);
+  assertEquals(resp.headers.get('Vary'), 'Origin');
 });
