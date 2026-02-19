@@ -6,9 +6,14 @@ import { predictionService } from '@shared/services/predictions.ts';
 import { makeCacheHeaders, TTL } from '@shared/services/cache.ts';
 import { logger } from '@shared/utils/logger.ts';
 import { apiError, CACHE_DYNAMIC } from '../../../../utils/api-response.ts';
+import { isValidRouteId } from '../../../../utils/validation.ts';
 
 export const handler: Handlers = {
   async GET(_req, ctx) {
+    if (!isValidRouteId(ctx.params.id)) {
+      return apiError('Invalid ID format', 'INVALID_PARAMETER', 400);
+    }
+
     const stream = getStreamById(ctx.params.id);
 
     if (!stream) {
@@ -53,10 +58,6 @@ export const handler: Handlers = {
         {
           success: true,
           data: conditions,
-          cache: {
-            usgs: usgsResult.cached ? 'HIT' : 'MISS',
-            weather: stream.coordinates ? (weatherCached ? 'HIT' : 'MISS') : 'N/A',
-          },
           timestamp: new Date().toISOString(),
         },
         { headers: { ...cacheMetaHeaders, 'Cache-Control': CACHE_DYNAMIC } },
@@ -73,7 +74,6 @@ export const handler: Handlers = {
         'Failed to fetch conditions',
         'FETCH_ERROR',
         500,
-        err instanceof Error ? err.message : String(err),
       );
     }
   },

@@ -3,28 +3,44 @@
   "version": "0.1.0",
   "exports": "./src/mod.ts",
   "tasks": {
-    "dev": "cd frontend && deno task dev",
-    "test": "deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/ && cd frontend && deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/",
-    "check": "deno check src/**/*.ts",
+    "dev": "deno run -A --unstable-kv --watch=static/,routes/ dev.ts",
+    "build": "deno run -A --unstable-kv dev.ts build",
+    "preview": "deno run -A --unstable-kv main.ts",
+    "test": "deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/",
+    "check": "deno check --unstable-kv **/*.ts **/*.tsx",
     "lint": "deno lint",
     "fmt": "deno fmt",
-    "e2e": "cd frontend && deno test --allow-all --unstable-kv e2e/"
+    "e2e": "deno test --allow-all --unstable-kv e2e/"
   },
   "imports": {
-    "@shared/": "./src/",
-    "@std/assert": "jsr:@std/assert@^1",
+    "$fresh/": "https://deno.land/x/fresh@1.7.3/",
+    "preact": "https://esm.sh/preact@10.24.3",
+    "preact/": "https://esm.sh/preact@10.24.3/",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.3.0",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.8.0",
+    "tailwindcss": "npm:tailwindcss@3.4.16",
+    "tailwindcss/": "npm:/tailwindcss@3.4.16/",
+    "tailwindcss/plugin": "npm:/tailwindcss@3.4.16/plugin.js",
+    "$std/": "https://deno.land/std@0.224.0/",
+    "@std/assert": "jsr:@std/assert@1",
     "@std/datetime": "jsr:@std/datetime@^0.225",
     "@std/testing/bdd": "jsr:@std/testing@1/bdd",
+    "@astral/astral": "jsr:@astral/astral@^0.5",
+    "leaflet": "https://esm.sh/leaflet@1.9.4",
+    "@shared/": "./src/",
     "@supabase/supabase-js": "jsr:@supabase/supabase-js@^2",
     "@supabase/ssr": "npm:@supabase/ssr@^0",
     "zod": "npm:zod@^3.23"
   },
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "types": ["./types/global.d.ts"]
   },
   "fmt": {
     "useTabs": false,
@@ -37,6 +53,15 @@
     "rules": {
       "tags": ["recommended"]
     },
-    "exclude": ["frontend/_fresh"]
+    "exclude": ["_fresh"]
+  },
+  "nodeModulesDir": "none",
+  "exclude": [
+    "**/_fresh/*",
+    "node_modules"
+  ],
+  "deploy": {
+    "org": "woink",
+    "app": "upstate-fishing"
   }
 }

@@ -24,7 +24,6 @@ jobs:
           deno-version: v2.x
 
       - name: Build Fresh app
-        working-directory: frontend
         run: deno task build
 
       - name: Deploy to Deno Deploy
@@ -32,4 +31,3 @@ jobs:
         with:
           project: upstate-fishing
           entrypoint: main.ts
-          root: frontend

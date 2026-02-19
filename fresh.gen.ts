@@ -3,6 +3,8 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $_app from './routes/_app.tsx';
+import * as $_middleware from './routes/_middleware.ts';
+import * as $api_middleware from './routes/api/_middleware.ts';
 import * as $api_hatches_id_ from './routes/api/hatches/[id].ts';
 import * as $api_hatches_index from './routes/api/hatches/index.ts';
 import * as $api_predict from './routes/api/predict.ts';
@@ -25,6 +27,8 @@ import type { Manifest } from '$fresh/server.ts';
 const manifest = {
   routes: {
     './routes/_app.tsx': $_app,
+    './routes/_middleware.ts': $_middleware,
+    './routes/api/_middleware.ts': $api_middleware,
     './routes/api/hatches/[id].ts': $api_hatches_id_,
     './routes/api/hatches/index.ts': $api_hatches_index,
     './routes/api/predict.ts': $api_predict,

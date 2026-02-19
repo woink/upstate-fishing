@@ -563,7 +563,7 @@ Deno.test('stations - cache header construction', () => {
 // Predict Route - Zod Schema Validation (safeParse)
 // ============================================================================
 
-import { PredictRequestSchema } from '../routes/api/predict.ts';
+import { PredictRequestSchema } from '../../routes/api/predict.ts';
 
 Deno.test('predict schema - waterTempF only is valid', () => {
   const result = PredictRequestSchema.safeParse({ waterTempF: 50 });

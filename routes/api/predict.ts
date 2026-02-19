@@ -2,6 +2,7 @@ import { Handlers } from '$fresh/server.ts';
 import { z } from 'zod';
 import { predictionService } from '@shared/services/predictions.ts';
 import { fahrenheitToCelsius } from '@shared/utils/temperature.ts';
+import { logger } from '@shared/utils/logger.ts';
 import { apiError } from '../../utils/api-response.ts';
 
 const CUSTOM_STATION_ID = 'custom';
@@ -35,6 +36,11 @@ export const PredictRequestSchema = z.object({
 
 export const handler: Handlers = {
   async POST(req, _ctx) {
+    const contentType = req.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      return apiError('Content-Type must be application/json', 'INVALID_CONTENT_TYPE', 415);
+    }
+
     let body;
     try {
       body = await req.json();
@@ -86,11 +92,14 @@ export const handler: Handlers = {
         { headers: { 'Cache-Control': 'no-store' } },
       );
     } catch (err) {
+      logger.error('Prediction failed', {
+        error: err instanceof Error ? err.message : String(err),
+        stack: err instanceof Error ? err.stack : undefined,
+      });
       return apiError(
         'Prediction failed',
         'PREDICTION_ERROR',
         500,
-        err instanceof Error ? err.message : String(err),
       );
     }
   },

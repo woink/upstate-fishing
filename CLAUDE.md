@@ -14,14 +14,13 @@ Weather.gov forecasts, and insect hatch predictions to recommend where to fish.
 
 ```bash
 deno task dev              # Start Fresh dev server with hot reload
+deno task build            # Production build
 deno task test             # Run all tests (backend + frontend, requires --unstable-kv)
-deno task check            # Type-check src/**/*.ts
+deno task check            # Type-check all TS/TSX
 deno task lint             # Lint
 deno task fmt              # Format
 deno task fmt --check      # Check formatting without writing
 deno task e2e              # Run E2E browser tests (Astral + Chromium)
-cd frontend && deno task build    # Production build
-cd frontend && deno task check    # Type-check frontend
 ```
 
 ### Running a Single Test
@@ -33,21 +32,21 @@ deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests
 Frontend tests:
 
 ```bash
-cd frontend && deno test --allow-net --allow-env --allow-read tests/routes_test.ts
+deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/frontend/routes_test.ts
 ```
 
 ### E2E Tests (Astral)
 
 ```bash
 deno task e2e              # Run all E2E tests
-cd frontend && deno test --allow-all --unstable-kv e2e/homepage_test.ts  # Run a single E2E test
+deno test --allow-all --unstable-kv e2e/homepage_test.ts  # Run a single E2E test
 ```
 
 E2E tests use **Astral** (`jsr:@astral/astral`), a Deno-native browser automation library. No
 Node.js, npm, or Playwright needed. Astral auto-downloads Chromium on first run. Tests live in
-`frontend/e2e/` and use `@std/testing/bdd` + `@std/assert`. A shared helper module at
-`frontend/e2e/helpers/mod.ts` provides server lifecycle management, browser launch, and assertion
-utilities (replacing Playwright's `expect()` API).
+`e2e/` and use `@std/testing/bdd` + `@std/assert`. A shared helper module at `e2e/helpers/mod.ts`
+provides server lifecycle management, browser launch, and assertion utilities (replacing
+Playwright's `expect()` API).
 
 ### Environment
 
@@ -55,14 +54,20 @@ Copy `.env.example` to `.env`. Key variable: `RUN_INTEGRATION_TESTS`.
 
 ## Architecture
 
-### Monorepo with Shared Types
+### Project Structure
 
 ```
-src/           -> Shared library (types, services, data)
-frontend/      -> Fresh app (Deno Fresh + Preact + Tailwind)
-tests/         -> Shared library tests
-frontend/tests/ -> Frontend unit/integration tests (Deno)
-frontend/e2e/  -> End-to-end browser tests (Astral/Deno)
+routes/            -> Fresh routes (pages + API)
+islands/           -> Interactive Preact components
+components/        -> Server-only components
+static/            -> Static assets (styles.css)
+utils/             -> Frontend utilities (api-response, validation)
+lib/               -> Frontend libraries (colors, promise-pool)
+types/             -> Type declarations (global.d.ts)
+src/               -> Shared library (types, services, data)
+tests/             -> Backend unit tests
+  frontend/        -> Frontend unit tests
+e2e/               -> End-to-end browser tests (Astral/Deno)
 ```
 
 The `@shared/` import alias maps to `src/` and is used by both backend and frontend to share Zod
@@ -87,7 +92,7 @@ Fresh uses an "islands" pattern -- pages in `routes/` are server-rendered, inter
 Key islands: `StationMap.tsx` (Leaflet map), `StreamList.tsx`, `TopPicks.tsx`, `HatchChart.tsx`,
 `StreamConditionsCard.tsx`.
 
-Fresh API routes in `frontend/routes/api/` serve all endpoints directly (streams, hatches, stations,
+Fresh API routes in `routes/api/` serve all endpoints directly (streams, hatches, stations,
 predictions) using the shared services from `src/`.
 
 ### Data Layer
@@ -109,8 +114,8 @@ principles. The goal is as close to 100% unit test and E2E test coverage as real
 ### When writing new code
 
 1. **Write tests first** -- define expected behavior before implementing. For backend services,
-   write unit tests in `tests/`. For frontend routes/components, write tests in `frontend/tests/`.
-   For user-facing features, write E2E tests in `frontend/e2e/`.
+   write unit tests in `tests/`. For frontend routes/components, write tests in `tests/frontend/`.
+   For user-facing features, write E2E tests in `e2e/`.
 2. **Domain types drive design** -- all domain concepts are modeled as Zod schemas in
    `src/models/types.ts`. New features should start by defining or extending domain types, then flow
    outward to services and UI.
@@ -119,11 +124,11 @@ principles. The goal is as close to 100% unit test and E2E test coverage as real
 
 ### Test layers
 
-| Layer         | Location          | Scope                            | Runner                            |
-| ------------- | ----------------- | -------------------------------- | --------------------------------- |
-| Backend unit  | `tests/`          | Services, data, utils, types     | `deno task test`                  |
-| Frontend unit | `frontend/tests/` | Routes, API handlers, components | `cd frontend && deno test tests/` |
-| E2E (browser) | `frontend/e2e/`   | Full user flows via Chromium     | `deno task e2e`                   |
+| Layer         | Location          | Scope                            | Runner           |
+| ------------- | ----------------- | -------------------------------- | ---------------- |
+| Backend unit  | `tests/`          | Services, data, utils, types     | `deno task test` |
+| Frontend unit | `tests/frontend/` | Routes, API handlers, components | `deno task test` |
+| E2E (browser) | `e2e/`            | Full user flows via Chromium     | `deno task e2e`  |
 
 ### E2E coverage map
 
@@ -136,9 +141,8 @@ E2E tests verify complete user-facing flows through a real browser (Astral + Chr
 - `map_test.ts` -- Leaflet map island, station markers
 - `navigation_test.ts` -- cross-page navigation, API route responses, error handling
 
-When adding a new page or island, **add a corresponding E2E test file** in `frontend/e2e/`. Use the
-shared helpers in `frontend/e2e/helpers/mod.ts` for server lifecycle, browser launch, and
-assertions.
+When adding a new page or island, **add a corresponding E2E test file** in `e2e/`. Use the shared
+helpers in `e2e/helpers/mod.ts` for server lifecycle, browser launch, and assertions.
 
 ## Conventions
 
@@ -156,21 +160,13 @@ assertions.
 
 ## CI Pipeline
 
-The CI workflow (`.github/workflows/ci.yml`) runs on every push to `main` and on pull requests.
-Steps run sequentially and fail fast:
+The CI workflow (`.github/workflows/ci.yml`) runs on pull requests. Steps run sequentially and fail
+fast:
 
 1. **Format check** -- `deno fmt --check`
 2. **Lint** -- `deno lint`
-3. **Type check (shared)** -- `deno check src/**/*.ts` (root `deno.json`)
-4. **Type check (frontend)** -- `cd frontend && deno check --unstable-kv **/*.ts **/*.tsx` (frontend
-   `deno.json`)
-5. **Test (backend)** -- `deno test ... tests/` (root `deno.json`)
-6. **Test (frontend)** -- `cd frontend && deno test ... tests/` (frontend `deno.json`)
-7. **E2E tests (Astral)** -- `deno task e2e` (auto-downloads Chromium, starts Fresh dev server)
-
-Backend and frontend tests **must** run separately because they use different `deno.json` configs.
-The frontend config has `$fresh/`, Preact, and Leaflet import mappings that don't exist in the root
-config. Running `deno test` from the root without specifying `tests/` would discover frontend tests
-and fail on unresolved `$fresh/` imports
+3. **Type check** -- `deno check --unstable-kv **/*.ts **/*.tsx`
+4. **Test** -- `deno test ... tests/` (covers both backend and frontend unit tests)
+5. **E2E tests (Astral)** -- `deno task e2e` (auto-downloads Chromium, starts Fresh dev server)
 
 E2E tests use Astral (not Playwright/Node.js) -- no `package.json` or `node_modules` needed.

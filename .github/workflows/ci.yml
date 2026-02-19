@@ -23,25 +23,43 @@ jobs:
       - name: Lint
         run: deno lint
 
-      - name: Type check (shared)
-        run: deno check src/**/*.ts
+      - name: Type check
+        run: deno check --unstable-kv **/*.ts **/*.tsx
 
-      - name: Type check (frontend)
-        run: cd frontend && deno check --unstable-kv **/*.ts **/*.tsx
-
-      - name: Test (backend)
+      - name: Test
         run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/
 
-      - name: Test (frontend)
-        run: cd frontend && deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/
-
       - name: Install browser dependencies
-        if: hashFiles('frontend/e2e/**') != ''
+        if: hashFiles('e2e/**') != ''
         run: sudo apt-get update && sudo apt-get install -y libnss3 libatk-bridge2.0-0 libcups2 libxdamage1 libgbm1 libpango-1.0-0 libasound2t64
 
       - name: E2E tests (Astral)
-        if: hashFiles('frontend/e2e/**') != ''
+        if: hashFiles('e2e/**') != ''
         run: deno task e2e
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase
+        id: supabase-start
+        run: |
+          supabase start -x realtime,storage,imgproxy,inbucket,edge-runtime,logflare,vector,supavisor
+          echo "anon_key=$(supabase status -o json | jq -r '.ANON_KEY')" >> $GITHUB_OUTPUT
+          echo "service_role_key=$(supabase status -o json | jq -r '.SERVICE_ROLE_KEY')" >> $GITHUB_OUTPUT
+
+      - name: Supabase integration tests
+        run: deno test --allow-all --unstable-kv tests/supabase/
+        env:
+          RUN_SUPABASE_TESTS: 'true'
+          SUPABASE_URL: 'http://localhost:54321'
+          SUPABASE_ANON_KEY: ${{ steps.supabase-start.outputs.anon_key }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ steps.supabase-start.outputs.service_role_key }}
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop
 
   claude-review:
     needs: ci
