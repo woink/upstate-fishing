@@ -31,5 +31,8 @@ memory/
 .DS_Store
 Thumbs.db
 
+# Supabase
+supabase/.temp/
+
 # Logs
 *.log
