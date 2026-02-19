@@ -1,8 +1,7 @@
 name: Claude Review
 
 on:
-  pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
+  workflow_call:
 
 jobs:
   claude-review:
