@@ -20,6 +20,7 @@ frontend/_fresh/
 .claude/*.local.json
 .claude/settings.local.json
 .serena/
+memory/
 
 # Other-agent skill symlink directories (created by `npx skills add`)
 # We only commit .agents/ (source) and .claude/skills/ (Claude Code symlinks)
