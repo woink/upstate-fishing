@@ -24,6 +24,7 @@
     "jsr:@std/path@^1.0.6": "1.1.4",
     "jsr:@std/path@^1.0.8": "1.1.4",
     "jsr:@std/testing@1": "1.0.17",
+    "jsr:@std/yaml@*": "1.0.11",
     "jsr:@supabase/functions-js@^0.0.0-automated": "0.0.0-jsr-test.1",
     "jsr:@supabase/supabase-js@2": "2.96.0",
     "jsr:@zip-js/zip-js@^2.7.52": "2.8.20",
@@ -124,6 +125,9 @@
         "jsr:@std/assert@^1.0.17",
         "jsr:@std/internal"
       ]
+    },
+    "@std/yaml@1.0.11": {
+      "integrity": "bd139ce77f2d06cbed3713c8b26d301d2a2e12ecc7986130a268107e212143ee"
     },
     "@supabase/functions-js@0.0.0-jsr-test.1": {
       "integrity": "b1b37924af1f0011b4753201e1585a37b030e996c6682492e02575eb27d902b2"
