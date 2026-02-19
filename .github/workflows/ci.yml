@@ -69,9 +69,3 @@ jobs:
       - name: Stop Supabase
         if: always() && hashFiles('tests/supabase/**', 'supabase/**') != ''
         run: supabase stop
-
-  review:
-    needs: ci
-    if: github.event_name == 'pull_request'
-    uses: ./.github/workflows/claude-review.yml
-    secrets: inherit
