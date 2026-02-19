@@ -33,6 +33,10 @@ jobs:
         if: hashFiles('e2e/**') != ''
         run: sudo apt-get update && sudo apt-get install -y libnss3 libatk-bridge2.0-0 libcups2 libxdamage1 libgbm1 libpango-1.0-0 libasound2t64
 
+      - name: Build Fresh assets
+        if: hashFiles('e2e/**') != ''
+        run: deno task build
+
       - name: E2E tests (Astral)
         if: hashFiles('e2e/**') != ''
         run: deno task e2e

@@ -23,8 +23,9 @@ export interface ServerHandle {
 }
 
 /**
- * Starts the Fresh dev server if not already running.
- * Polls the base URL until it responds (30s timeout).
+ * Starts the Fresh production server if not already running.
+ * Requires `_fresh/` to exist (run `deno task build` first).
+ * Polls the base URL until it responds (15s timeout).
  */
 export async function startServer(): Promise<ServerHandle> {
   // Check if server is already running
@@ -33,7 +34,7 @@ export async function startServer(): Promise<ServerHandle> {
   }
 
   const command = new Deno.Command('deno', {
-    args: ['run', '-A', '--unstable-kv', 'dev.ts'],
+    args: ['run', '-A', '--unstable-kv', 'main.ts'],
     cwd: new URL('../../', import.meta.url).pathname,
     stdout: 'null',
     stderr: 'null',
@@ -44,7 +45,7 @@ export async function startServer(): Promise<ServerHandle> {
   const statusPromise = child.status;
 
   // Poll until the server responds
-  const deadline = Date.now() + 30_000;
+  const deadline = Date.now() + 15_000;
   while (Date.now() < deadline) {
     if (await isServerReady()) {
       return {
@@ -64,9 +65,13 @@ export async function startServer(): Promise<ServerHandle> {
     await delay(500);
   }
 
-  child.kill('SIGTERM');
+  try {
+    child.kill('SIGTERM');
+  } catch { /* already exited */ }
   await statusPromise.catch(() => {});
-  throw new Error('Dev server failed to start within 30 seconds');
+  throw new Error(
+    'Server failed to start within 15 seconds. Ensure _fresh/ exists (run `deno task build` first).',
+  );
 }
 
 async function isServerReady(): Promise<boolean> {
