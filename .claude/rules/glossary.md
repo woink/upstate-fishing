@@ -7,7 +7,7 @@
 | USGS    | US Geological Survey — federal source of real-time water monitoring data       |
 | KV      | Deno KV — built-in key-value store used for caching (requires `--unstable-kv`) |
 | SSR     | Server-side rendering (Fresh/Preact)                                           |
-| E2E     | End-to-end (testing with Playwright)                                           |
+| E2E     | End-to-end (testing with Astral/Chromium)                                      |
 | CI      | Continuous integration — GitHub Actions pipeline                               |
 | TTL     | Time-to-live for cache entries (USGS: 15min, weather: 60min, static: 24hr)     |
 | PWA     | Progressive Web App — making the app installable on mobile (Issue #7)          |
@@ -34,8 +34,6 @@
 | data availability | Metadata indicating which USGS params a station actually reports                            |
 | top picks         | "Where should I fish today?" algorithm ranking streams by conditions (Issue #6)             |
 | On the Water      | Feature set for active fishing sessions: fly recs, access points, wading safety (Issue #52) |
-| Hono              | Previous backend framework, removed in PR #85. Fresh now serves API routes directly.        |
-| Forgejo           | Previous git hosting platform, migrated to GitHub                                           |
 
 ## Regions
 
