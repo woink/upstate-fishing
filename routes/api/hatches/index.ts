@@ -1,6 +1,6 @@
 import { Handlers } from '$fresh/server.ts';
 import { filterHatchesByQuery } from '@shared/data/hatches.ts';
-import { apiSuccessList } from '../../../utils/api-response.ts';
+import { apiSuccessList } from '../../../src/http/api-response.ts';
 
 export const handler: Handlers = {
   GET(req, _ctx) {

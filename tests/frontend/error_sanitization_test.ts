@@ -4,7 +4,7 @@
  */
 
 import { assertEquals } from '@std/assert';
-import { apiError } from '../../utils/api-response.ts';
+import { apiError } from '../../src/http/api-response.ts';
 
 // ============================================================================
 // Details Field Behavior

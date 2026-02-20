@@ -1,7 +1,7 @@
 import { Handlers } from '$fresh/server.ts';
 import { getStreamById } from '@shared/data/streams.ts';
-import { apiError, apiSuccess } from '../../../../utils/api-response.ts';
-import { isValidRouteId } from '../../../../utils/validation.ts';
+import { apiError, apiSuccess } from '../../../../src/http/api-response.ts';
+import { isValidRouteId } from '../../../../src/http/validation.ts';
 
 export const handler: Handlers = {
   GET(_req, ctx) {
