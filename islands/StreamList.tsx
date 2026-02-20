@@ -1,8 +1,8 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import type { Stream, StreamConditions } from '@shared/models/types.ts';
-import { parameterStatusDisplay, qualityBadgeClasses, qualityClasses } from '../lib/colors.ts';
-import { promisePool } from '../lib/promise-pool.ts';
+import { parameterStatusDisplay, qualityBadgeClasses, qualityClasses } from '../src/lib/colors.ts';
+import { promisePool } from '../src/lib/promise-pool.ts';
 
 function renderStationData(conditions: StreamConditions) {
   const station = conditions.stationData[0];

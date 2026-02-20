@@ -5,7 +5,7 @@ import {
   confidenceClasses,
   parameterStatusDisplay,
   qualityClasses,
-} from '../lib/colors.ts';
+} from '../src/lib/colors.ts';
 
 interface StreamConditionsCardProps {
   conditions: StreamConditions;

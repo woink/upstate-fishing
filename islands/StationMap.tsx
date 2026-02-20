@@ -1,8 +1,8 @@
 import { useSignal } from '@preact/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import type { Stream, StreamConditions } from '@shared/models/types.ts';
-import { defaultBorderColor, defaultMarkerColor, qualityHexColors } from '../lib/colors.ts';
-import { promisePool } from '../lib/promise-pool.ts';
+import { defaultBorderColor, defaultMarkerColor, qualityHexColors } from '../src/lib/colors.ts';
+import { promisePool } from '../src/lib/promise-pool.ts';
 
 const FAILED_MARKER_COLOR = '#94a3b8'; // slate-400
 
