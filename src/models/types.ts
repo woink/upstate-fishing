@@ -275,3 +275,44 @@ export const StationStatsSchema = z.object({
   gageHeight: StatsSummarySchema,
 });
 export type StationStats = z.infer<typeof StationStatsSchema>;
+
+// ============================================================================
+// Data Ingestion Types
+// ============================================================================
+
+export const IngestionTableSchema = z.enum(['station_readings', 'weather_snapshots']);
+export type IngestionTable = z.infer<typeof IngestionTableSchema>;
+
+export const IngestionResultSchema = z.object({
+  table: IngestionTableSchema,
+  inserted: z.number().int().nonnegative(),
+  skipped: z.number().int().nonnegative(),
+  errors: z.number().int().nonnegative(),
+  durationMs: z.number().nonnegative(),
+});
+export type IngestionResult = z.infer<typeof IngestionResultSchema>;
+
+/** Shape of a row inserted into station_readings (excludes id/created_at auto-columns). */
+export const StationReadingInsertSchema = z.object({
+  station_id: z.string(),
+  station_name: z.string(),
+  recorded_at: z.string(),
+  water_temp_f: z.number().nullable(),
+  water_temp_c: z.number().nullable(),
+  discharge_cfs: z.number().nullable(),
+  gage_height_ft: z.number().nullable(),
+});
+export type StationReadingInsert = z.infer<typeof StationReadingInsertSchema>;
+
+/** Shape of a row inserted into weather_snapshots (excludes id/created_at auto-columns). */
+export const WeatherSnapshotInsertSchema = z.object({
+  latitude: z.number(),
+  longitude: z.number(),
+  recorded_at: z.string(),
+  air_temp_f: z.number(),
+  cloud_cover_percent: z.number(),
+  precip_probability: z.number(),
+  wind_speed_mph: z.number(),
+  short_forecast: z.string(),
+});
+export type WeatherSnapshotInsert = z.infer<typeof WeatherSnapshotInsertSchema>;
