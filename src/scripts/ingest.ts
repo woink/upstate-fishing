@@ -89,4 +89,4 @@ function deduplicateCoordinates(coords: Coordinates[]): Coordinates[] {
   });
 }
 
-main();
+await main();

@@ -20,6 +20,7 @@ import type {
 import { USGSService } from './usgs.ts';
 import { WeatherService } from './weather.ts';
 import { logger } from '../utils/logger.ts';
+import { promisePool } from '../../lib/promise-pool.ts';
 
 // ============================================================================
 // Mapping functions (exported for unit testing)
@@ -44,8 +45,8 @@ export function mapWeatherToSnapshot(
   coords: Coordinates,
 ): WeatherSnapshotInsert {
   return {
-    latitude: coords.latitude,
-    longitude: coords.longitude,
+    latitude: Math.round(coords.latitude * 1e4) / 1e4,
+    longitude: Math.round(coords.longitude * 1e4) / 1e4,
     recorded_at: weather.timestamp,
     air_temp_f: weather.airTempF,
     cloud_cover_percent: weather.cloudCoverPercent,
@@ -77,6 +78,8 @@ export async function ingestStationReadings(
     durationMs: 0,
   };
 
+  let rows: StationReadingInsert[] = [];
+
   try {
     const stationData = await usgs.getInstantaneousValues(stationIds);
     if (stationData.length === 0) {
@@ -84,7 +87,7 @@ export async function ingestStationReadings(
       return result;
     }
 
-    const rows = stationData.map(mapStationDataToReading);
+    rows = stationData.map(mapStationDataToReading);
 
     const { data, error } = await client
       .from('station_readings')
@@ -105,7 +108,7 @@ export async function ingestStationReadings(
     logger.error('station readings ingestion failed', {
       error: err instanceof Error ? err.message : String(err),
     });
-    result.errors++;
+    result.errors += rows.length || 1;
   }
 
   result.durationMs = Math.round(performance.now() - start);
@@ -133,17 +136,19 @@ export async function ingestWeatherSnapshots(
 
   const rows: WeatherSnapshotInsert[] = [];
 
-  for (const coords of coordinates) {
-    try {
-      const conditions = await weather.getCurrentConditions(coords);
-      if (conditions) {
-        rows.push(mapWeatherToSnapshot(conditions, coords));
-      }
-    } catch (err) {
+  const tasks = coordinates.map((coords) => async () => {
+    const conditions = await weather.getCurrentConditions(coords);
+    return conditions ? mapWeatherToSnapshot(conditions, coords) : null;
+  });
+
+  const settled = await promisePool(tasks, 5);
+
+  for (const entry of settled) {
+    if (entry.status === 'fulfilled' && entry.value) {
+      rows.push(entry.value);
+    } else if (entry.status === 'rejected') {
       logger.warn('Failed to fetch weather for coordinates', {
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        error: err instanceof Error ? err.message : String(err),
+        error: entry.reason instanceof Error ? entry.reason.message : String(entry.reason),
       });
       result.errors++;
     }

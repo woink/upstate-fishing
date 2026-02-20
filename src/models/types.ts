@@ -296,7 +296,7 @@ export type IngestionResult = z.infer<typeof IngestionResultSchema>;
 export const StationReadingInsertSchema = z.object({
   station_id: z.string(),
   station_name: z.string(),
-  recorded_at: z.string(),
+  recorded_at: z.string().datetime(),
   water_temp_f: z.number().nullable(),
   water_temp_c: z.number().nullable(),
   discharge_cfs: z.number().nullable(),
@@ -308,7 +308,7 @@ export type StationReadingInsert = z.infer<typeof StationReadingInsertSchema>;
 export const WeatherSnapshotInsertSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
-  recorded_at: z.string(),
+  recorded_at: z.string().datetime(),
   air_temp_f: z.number(),
   cloud_cover_percent: z.number(),
   precip_probability: z.number(),
