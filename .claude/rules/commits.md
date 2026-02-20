@@ -4,7 +4,9 @@
 
 - **Format**: `type(scope): description`
 - **Types**: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `perf`, `ci`, `build`, `style`
-- **Scope**: match the area of change (e.g., `supabase`, `ci`, `usgs`, `map`, `e2e`, `cache`)
+- **Scope**: match the area of change (e.g., `supabase`, `ci`, `usgs`, `map`, `e2e`, `cache`,
+  `predictions`, `weather`, `streams`, `hatches`, `routes`, `islands`) — see [glossary](glossary.md)
+  for domain terms
 - Max 72 characters, imperative mood, lowercase, no trailing period
 
 ## Atomic Commits
