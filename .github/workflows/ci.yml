@@ -26,8 +26,6 @@ jobs:
               - 'islands/**'
               - 'components/**'
               - 'src/**'
-              - 'src/lib/**'
-              - 'src/http/**'
               - 'static/**'
               - 'tests/e2e/**'
               - 'deno.json'

@@ -1,6 +1,6 @@
 import { Handlers } from '$fresh/server.ts';
 import { filterStreamsByQuery } from '@shared/data/streams.ts';
-import { apiSuccessList } from '../../../src/http/api-response.ts';
+import { apiSuccessList } from '@shared/http/api-response.ts';
 
 export const handler: Handlers = {
   GET(req, _ctx) {
