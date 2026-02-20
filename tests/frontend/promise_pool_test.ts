@@ -4,7 +4,7 @@
 
 import { assertEquals } from '@std/assert';
 import { describe, it } from '@std/testing/bdd';
-import { promisePool } from '../../src/lib/promise-pool.ts';
+import { promisePool } from '@shared/lib/promise-pool.ts';
 
 describe('promisePool', () => {
   it('limits concurrency to specified number', async () => {

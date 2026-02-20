@@ -10,7 +10,7 @@ import {
   apiSuccessList,
   CACHE_DYNAMIC,
   CACHE_STATIC,
-} from '../../src/http/api-response.ts';
+} from '@shared/http/api-response.ts';
 
 // ============================================================================
 // Cache Constants Tests

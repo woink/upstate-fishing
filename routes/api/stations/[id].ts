@@ -2,8 +2,8 @@ import { Handlers } from '$fresh/server.ts';
 import { cachedUSGSService } from '@shared/services/cached-usgs.ts';
 import { makeCacheHeaders, TTL } from '@shared/services/cache.ts';
 import { logger } from '@shared/utils/logger.ts';
-import { apiError, CACHE_DYNAMIC } from '../../../src/http/api-response.ts';
-import { isValidRouteId } from '../../../src/http/validation.ts';
+import { apiError, CACHE_DYNAMIC } from '@shared/http/api-response.ts';
+import { isValidRouteId } from '@shared/http/validation.ts';
 
 export const handler: Handlers = {
   async GET(_req, ctx) {
