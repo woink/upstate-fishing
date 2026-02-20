@@ -39,14 +39,14 @@ deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests
 
 ```bash
 deno task e2e              # Run all E2E tests
-deno test --allow-all --unstable-kv e2e/homepage_test.ts  # Run a single E2E test
+deno test --allow-all --unstable-kv tests/e2e/homepage_test.ts  # Run a single E2E test
 ```
 
 E2E tests use **Astral** (`jsr:@astral/astral`), a Deno-native browser automation library. No
 Node.js, npm, or Playwright needed. Astral auto-downloads Chromium on first run. Tests live in
-`e2e/` and use `@std/testing/bdd` + `@std/assert`. A shared helper module at `e2e/helpers/mod.ts`
-provides server lifecycle management, browser launch, and assertion utilities (replacing
-Playwright's `expect()` API).
+`tests/e2e/` and use `@std/testing/bdd` + `@std/assert`. A shared helper module at
+`tests/e2e/helpers/mod.ts` provides server lifecycle management, browser launch, and assertion
+utilities (replacing Playwright's `expect()` API).
 
 ### Environment
 
@@ -61,13 +61,19 @@ routes/            -> Fresh routes (pages + API)
 islands/           -> Interactive Preact components
 components/        -> Server-only components
 static/            -> Static assets (styles.css)
-utils/             -> Frontend utilities (api-response, validation)
-lib/               -> Frontend libraries (colors, promise-pool)
 types/             -> Type declarations (global.d.ts)
 src/               -> Shared library (types, services, data)
-tests/             -> Backend unit tests
+  http/            -> HTTP utilities (api-response, validation)
+  lib/             -> Frontend libraries (colors, promise-pool)
+  models/          -> Zod schemas and domain types
+  services/        -> Backend services (USGS, weather, cache)
+  data/            -> Static data arrays (streams, hatches)
+  utils/           -> General utilities (logger, temperature)
+tests/             -> All tests
+  e2e/             -> End-to-end browser tests (Astral/Chromium)
   frontend/        -> Frontend unit tests
-e2e/               -> End-to-end browser tests (Astral/Deno)
+  helpers/         -> Test helpers
+  supabase/        -> Supabase integration tests
 ```
 
 The `@shared/` import alias maps to `src/` and is used by both backend and frontend to share Zod
@@ -115,7 +121,7 @@ principles. The goal is as close to 100% unit test and E2E test coverage as real
 
 1. **Write tests first** -- define expected behavior before implementing. For backend services,
    write unit tests in `tests/`. For frontend routes/components, write tests in `tests/frontend/`.
-   For user-facing features, write E2E tests in `e2e/`.
+   For user-facing features, write E2E tests in `tests/e2e/`.
 2. **Domain types drive design** -- all domain concepts are modeled as Zod schemas in
    `src/models/types.ts`. New features should start by defining or extending domain types, then flow
    outward to services and UI.
@@ -128,7 +134,7 @@ principles. The goal is as close to 100% unit test and E2E test coverage as real
 | ------------- | ----------------- | -------------------------------- | ---------------- |
 | Backend unit  | `tests/`          | Services, data, utils, types     | `deno task test` |
 | Frontend unit | `tests/frontend/` | Routes, API handlers, components | `deno task test` |
-| E2E (browser) | `e2e/`            | Full user flows via Chromium     | `deno task e2e`  |
+| E2E (browser) | `tests/e2e/`      | Full user flows via Chromium     | `deno task e2e`  |
 
 ### E2E coverage map
 
@@ -141,8 +147,8 @@ E2E tests verify complete user-facing flows through a real browser (Astral + Chr
 - `map_test.ts` -- Leaflet map island, station markers
 - `navigation_test.ts` -- cross-page navigation, API route responses, error handling
 
-When adding a new page or island, **add a corresponding E2E test file** in `e2e/`. Use the shared
-helpers in `e2e/helpers/mod.ts` for server lifecycle, browser launch, and assertions.
+When adding a new page or island, **add a corresponding E2E test file** in `tests/e2e/`. Use the
+shared helpers in `tests/e2e/helpers/mod.ts` for server lifecycle, browser launch, and assertions.
 
 ## Conventions
 
