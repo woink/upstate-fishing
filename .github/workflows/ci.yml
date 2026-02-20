@@ -10,21 +10,34 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
+      e2e: ${{ steps.filter.outputs.e2e }}
       supabase: ${{ steps.filter.outputs.supabase }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Detect changed paths
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
         id: filter
         with:
           filters: |
+            e2e:
+              - 'routes/**'
+              - 'islands/**'
+              - 'components/**'
+              - 'src/**'
+              - 'lib/**'
+              - 'utils/**'
+              - 'static/**'
+              - 'e2e/**'
+              - 'deno.json'
+              - 'fresh.gen.ts'
             supabase:
               - 'supabase/**'
               - 'tests/supabase/**'
 
   ci:
+    needs: [changes]
     runs-on: ubuntu-latest
 
     steps:
@@ -49,15 +62,15 @@ jobs:
         run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/
 
       - name: Install browser dependencies
-        if: hashFiles('e2e/**') != ''
+        if: needs.changes.outputs.e2e == 'true'
         run: sudo apt-get update && sudo apt-get install -y libnss3 libatk-bridge2.0-0 libcups2 libxdamage1 libgbm1 libpango-1.0-0 libasound2t64
 
       - name: Build Fresh assets
-        if: hashFiles('e2e/**') != ''
+        if: needs.changes.outputs.e2e == 'true'
         run: deno task build
 
       - name: E2E tests (Astral)
-        if: hashFiles('e2e/**') != ''
+        if: needs.changes.outputs.e2e == 'true'
         run: deno task e2e
 
   supabase:
@@ -75,16 +88,17 @@ jobs:
           deno-version: v2.x
 
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@b60b5899c73b63a2d2d651b1e90db8d4c9392f51 # v1.6.0
         with:
-          version: latest
+          version: 2.75.0
 
       - name: Start Supabase
         id: supabase-start
         run: |
           supabase start -x realtime,storage,imgproxy,inbucket,edge-runtime,logflare,vector,supavisor
-          echo "anon_key=$(supabase status -o json | jq -r '.ANON_KEY')" >> $GITHUB_OUTPUT
-          echo "service_role_key=$(supabase status -o json | jq -r '.SERVICE_ROLE_KEY')" >> $GITHUB_OUTPUT
+          SUPABASE_STATUS=$(supabase status -o json)
+          echo "anon_key=$(echo "$SUPABASE_STATUS" | jq -r '.ANON_KEY')" >> $GITHUB_OUTPUT
+          echo "service_role_key=$(echo "$SUPABASE_STATUS" | jq -r '.SERVICE_ROLE_KEY')" >> $GITHUB_OUTPUT
 
       - name: Supabase integration tests
         run: deno test --allow-all --unstable-kv tests/supabase/
