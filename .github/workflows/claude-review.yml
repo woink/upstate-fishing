@@ -1,20 +1,16 @@
 name: Claude Review
 
 on:
-  workflow_run:
-    workflows: ['CI']
-    types: [completed]
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
 
 concurrency:
-  group: claude-review-${{ github.event.workflow_run.pull_requests[0].number }}
+  group: claude-review-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
   claude-review:
-    if: >-
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.pull_requests[0] != null
+    if: '!github.event.pull_request.draft'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -23,10 +19,9 @@ jobs:
       id-token: write
 
     steps:
-      - name: Checkout PR branch
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 1
 
       - name: Run Claude Code Review
@@ -38,7 +33,7 @@ jobs:
           track_progress: true
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
 
             Review this pull request thoroughly, focusing on:
             - Code quality and best practices
@@ -52,8 +47,8 @@ jobs:
             Use `gh pr comment` for top-level summary feedback.
 
             After completing your review, you MUST submit a formal GitHub review verdict:
-            - If the PR is acceptable: `gh pr review ${{ github.event.workflow_run.pull_requests[0].number }} --approve -b "your summary"`
-            - If changes are needed: `gh pr review ${{ github.event.workflow_run.pull_requests[0].number }} --request-changes -b "your summary"`
+            - If the PR is acceptable: `gh pr review ${{ github.event.pull_request.number }} --approve -b "your summary"`
+            - If changes are needed: `gh pr review ${{ github.event.pull_request.number }} --request-changes -b "your summary"`
 
             Every review must end with one of these two commands. Do not skip the verdict.
 
