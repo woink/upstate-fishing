@@ -442,9 +442,11 @@ Deno.test('StationReadingSchema - accepts valid reading', () => {
     waterTempC: 12.2,
     dischargeCfs: 150,
     gageHeightFt: 2.5,
+    createdAt: '2024-04-15T14:05:00Z',
   };
   const result = StationReadingSchema.parse(valid);
   assertEquals(result.stationId, '01420500');
+  assertEquals(result.createdAt, '2024-04-15T14:05:00Z');
 });
 
 Deno.test('StationReadingSchema - accepts nullable number fields', () => {
@@ -457,6 +459,7 @@ Deno.test('StationReadingSchema - accepts nullable number fields', () => {
     waterTempC: null,
     dischargeCfs: null,
     gageHeightFt: null,
+    createdAt: '2024-04-15T14:05:00Z',
   };
   const result = StationReadingSchema.parse(valid);
   assertEquals(result.waterTempF, null);
@@ -473,6 +476,7 @@ Deno.test('StationReadingSchema - requires recordedAt datetime', () => {
       waterTempC: 12.2,
       dischargeCfs: 150,
       gageHeightFt: 2.5,
+      createdAt: '2024-04-15T14:05:00Z',
     });
   });
 });
@@ -492,9 +496,11 @@ Deno.test('WeatherSnapshotSchema - accepts valid snapshot', () => {
     precipProbability: 20,
     windSpeedMph: 8,
     shortForecast: 'Mostly Cloudy',
+    createdAt: '2024-04-15T14:05:00Z',
   };
   const result = WeatherSnapshotSchema.parse(valid);
   assertEquals(result.airTempF, 58);
+  assertEquals(result.createdAt, '2024-04-15T14:05:00Z');
 });
 
 Deno.test('WeatherSnapshotSchema - rejects cloud cover over 100', () => {
@@ -509,6 +515,7 @@ Deno.test('WeatherSnapshotSchema - rejects cloud cover over 100', () => {
       precipProbability: 20,
       windSpeedMph: 8,
       shortForecast: 'Cloudy',
+      createdAt: '2024-04-15T14:05:00Z',
     });
   });
 });

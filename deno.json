@@ -6,7 +6,7 @@
     "dev": "deno run -A --unstable-kv --watch=static/,routes/ dev.ts",
     "build": "deno run -A --unstable-kv dev.ts build",
     "preview": "deno run -A --unstable-kv main.ts",
-    "test": "deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/",
+    "test": "deno test --env-file --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/",
     "check": "deno check --unstable-kv **/*.ts **/*.tsx",
     "lint": "deno lint",
     "fmt": "deno fmt",

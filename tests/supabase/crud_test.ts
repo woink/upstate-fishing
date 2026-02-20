@@ -8,6 +8,7 @@ import { afterAll, beforeAll, describe, it } from '@std/testing/bdd';
 import {
   createTestUser,
   deleteTestUser,
+  getAnonClient,
   getAuthenticatedClient,
   getServiceClient,
 } from '../helpers/supabase.ts';
@@ -220,7 +221,8 @@ describe(
     });
 
     it('anon can read the station reading', async () => {
-      const { data, error } = await serviceClient
+      const anonClient = getAnonClient();
+      const { data, error } = await anonClient
         .from('station_readings')
         .select('*')
         .eq('id', insertedId)
@@ -284,7 +286,8 @@ describe(
     });
 
     it('anon can read the weather snapshot', async () => {
-      const { data, error } = await serviceClient
+      const anonClient = getAnonClient();
+      const { data, error } = await anonClient
         .from('weather_snapshots')
         .select('*')
         .eq('id', insertedId)

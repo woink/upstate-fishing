@@ -224,6 +224,7 @@ export const StationReadingSchema = z.object({
   waterTempC: z.number().nullable(),
   dischargeCfs: z.number().nullable(),
   gageHeightFt: z.number().nullable(),
+  createdAt: z.string().datetime(),
 });
 export type StationReading = z.infer<typeof StationReadingSchema>;
 
@@ -237,6 +238,7 @@ export const WeatherSnapshotSchema = z.object({
   precipProbability: z.number().min(0).max(100),
   windSpeedMph: z.number(),
   shortForecast: z.string(),
+  createdAt: z.string().datetime(),
 });
 export type WeatherSnapshot = z.infer<typeof WeatherSnapshotSchema>;
 
