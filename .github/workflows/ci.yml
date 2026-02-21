@@ -66,8 +66,11 @@ jobs:
       - name: Type check
         run: deno check --unstable-kv **/*.ts **/*.tsx
 
-      - name: Test
-        run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv --ignore=tests/e2e/,tests/supabase/ tests/
+      - name: Backend unit tests
+        run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv --ignore=tests/e2e/,tests/supabase/,tests/frontend/ tests/
+
+      - name: Frontend unit tests
+        run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/frontend/
 
       - name: Install browser dependencies
         if: needs.changes.outputs.e2e == 'true'
