@@ -5,7 +5,14 @@
  * while keeping the implementation dependency-free.
  */
 
-type LogLevel = 'warn' | 'error';
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+const LOG_LEVEL_ORDER: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
+};
 
 interface LogEntry {
   level: LogLevel;
@@ -14,7 +21,21 @@ interface LogEntry {
   [key: string]: unknown;
 }
 
+function getMinLevel(): LogLevel {
+  const envLevel = Deno.env.get('LOG_LEVEL')?.toLowerCase();
+  if (envLevel && envLevel in LOG_LEVEL_ORDER) {
+    return envLevel as LogLevel;
+  }
+  return 'info';
+}
+
+function shouldLog(level: LogLevel): boolean {
+  return LOG_LEVEL_ORDER[level] >= LOG_LEVEL_ORDER[getMinLevel()];
+}
+
 function emit(level: LogLevel, message: string, context?: Record<string, unknown>): void {
+  if (!shouldLog(level)) return;
+
   const entry: LogEntry = {
     level,
     message,
@@ -22,14 +43,24 @@ function emit(level: LogLevel, message: string, context?: Record<string, unknown
     ...context,
   };
 
-  if (level === 'error') {
-    console.error(JSON.stringify(entry));
-  } else {
-    console.warn(JSON.stringify(entry));
-  }
+  const consoleMethod = level === 'error'
+    ? console.error
+    : level === 'warn'
+    ? console.warn
+    : level === 'info'
+    ? console.info
+    : console.debug;
+
+  consoleMethod(JSON.stringify(entry));
 }
 
 export const logger = {
+  debug(message: string, context?: Record<string, unknown>): void {
+    emit('debug', message, context);
+  },
+  info(message: string, context?: Record<string, unknown>): void {
+    emit('info', message, context);
+  },
   warn(message: string, context?: Record<string, unknown>): void {
     emit('warn', message, context);
   },
