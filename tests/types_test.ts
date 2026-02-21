@@ -7,10 +7,13 @@ import { assertEquals, assertThrows } from '@std/assert';
 import {
   CoordinatesSchema,
   FishingQualitySchema,
+  FishingReportSchema,
   HatchSchema,
   NearbyStreamSchema,
   NotificationPreferencesSchema,
   RegionSchema,
+  ReportSourceSchema,
+  ReportSourceTypeSchema,
   SavedStreamSchema,
   StationDataSchema,
   StationReadingSchema,
@@ -623,4 +626,97 @@ Deno.test('StationStatsSchema - requires positive days', () => {
       gageHeight: { min: null, max: null, avg: null, trend: 'unknown' },
     });
   });
+});
+
+// ============================================================================
+// ReportSourceType Schema Tests
+// ============================================================================
+
+Deno.test('ReportSourceTypeSchema - accepts valid source types', () => {
+  assertEquals(ReportSourceTypeSchema.parse('rss'), 'rss');
+  assertEquals(ReportSourceTypeSchema.parse('scrape'), 'scrape');
+  assertEquals(ReportSourceTypeSchema.parse('api'), 'api');
+  assertEquals(ReportSourceTypeSchema.parse('manual'), 'manual');
+});
+
+Deno.test('ReportSourceTypeSchema - rejects invalid type', () => {
+  assertThrows(() => ReportSourceTypeSchema.parse('email'));
+});
+
+// ============================================================================
+// ReportSource Schema Tests
+// ============================================================================
+
+Deno.test('ReportSourceSchema - accepts valid report source', () => {
+  const valid = {
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    name: 'Beaverkill Angler Reports',
+    type: 'rss',
+    url: 'https://beaverkillangler.com/feed',
+    lastFetchedAt: '2024-04-15T14:00:00Z',
+    fetchFrequencyMinutes: 60,
+    active: true,
+    createdAt: '2024-04-01T00:00:00Z',
+    updatedAt: '2024-04-15T14:00:00Z',
+  };
+  const result = ReportSourceSchema.parse(valid);
+  assertEquals(result.name, 'Beaverkill Angler Reports');
+  assertEquals(result.type, 'rss');
+});
+
+Deno.test('ReportSourceSchema - rejects non-positive fetch frequency', () => {
+  assertThrows(() =>
+    ReportSourceSchema.parse({
+      id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+      name: 'Test',
+      type: 'rss',
+      url: null,
+      lastFetchedAt: null,
+      fetchFrequencyMinutes: 0,
+      active: true,
+      createdAt: '2024-04-01T00:00:00Z',
+      updatedAt: '2024-04-01T00:00:00Z',
+    })
+  );
+});
+
+// ============================================================================
+// FishingReport Schema Tests
+// ============================================================================
+
+Deno.test('FishingReportSchema - accepts valid fishing report', () => {
+  const valid = {
+    id: 'b1ffbc99-9c0b-4ef8-bb6d-6bb9bd380b22',
+    streamId: 'beaverkill',
+    sourceId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    sourceUrl: 'https://example.com/report/123',
+    reportDate: '2024-04-15',
+    rawText: 'Good fishing today.',
+    waterTempMentioned: 54.5,
+    flowMentioned: 200,
+    confidenceScore: 0.85,
+    createdAt: '2024-04-15T18:00:00Z',
+    updatedAt: '2024-04-15T18:00:00Z',
+  };
+  const result = FishingReportSchema.parse(valid);
+  assertEquals(result.streamId, 'beaverkill');
+  assertEquals(result.confidenceScore, 0.85);
+});
+
+Deno.test('FishingReportSchema - rejects confidence score out of range', () => {
+  assertThrows(() =>
+    FishingReportSchema.parse({
+      id: 'b1ffbc99-9c0b-4ef8-bb6d-6bb9bd380b22',
+      streamId: 'beaverkill',
+      sourceId: null,
+      sourceUrl: null,
+      reportDate: '2024-04-15',
+      rawText: 'Text',
+      waterTempMentioned: null,
+      flowMentioned: null,
+      confidenceScore: 1.5,
+      createdAt: '2024-04-15T18:00:00Z',
+      updatedAt: '2024-04-15T18:00:00Z',
+    })
+  );
 });
