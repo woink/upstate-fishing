@@ -13,6 +13,17 @@ const regionLabels: Record<Region, string> = {
   'nc-foothills': 'NC Foothills',
 };
 
+/** Pre-computed centroids (avg lat/lng of streams per region from src/data/streams.ts). */
+const REGION_CENTROIDS: Record<Region, { lat: number; lon: number }> = {
+  catskills: { lat: 41.9357, lon: -74.6519 },
+  delaware: { lat: 42.0797, lon: -74.8864 },
+  croton: { lat: 41.4323, lon: -73.6729 },
+  raritan: { lat: 40.7629, lon: -74.7967 },
+  connecticut: { lat: 41.8235, lon: -72.9096 },
+  'nc-highcountry': { lat: 36.2346, lon: -81.5441 },
+  'nc-foothills': { lat: 35.7218, lon: -81.7774 },
+};
+
 const regions = Object.keys(regionLabels) as Region[];
 
 export default function StreamWizard() {
@@ -67,32 +78,8 @@ export default function StreamWizard() {
     error.value = null;
     locationLabel.value = regionLabels[region];
 
-    // Use a central coordinate for the region by fetching all streams and picking the midpoint
-    const res = await fetch(`/api/streams?region=${region}`);
-    const json = await res.json();
-    if (!json.success || !json.data || json.data.length === 0) {
-      error.value = 'No streams found for this region.';
-      loading.value = false;
-      return;
-    }
-
-    // Compute centroid of streams in this region
-    const coords = json.data
-      .filter((s: { coordinates?: { latitude: number; longitude: number } }) => s.coordinates)
-      .map((s: { coordinates: { latitude: number; longitude: number } }) => s.coordinates);
-
-    if (coords.length === 0) {
-      error.value = 'No coordinates available for this region.';
-      loading.value = false;
-      return;
-    }
-
-    const lat = coords.reduce((sum: number, c: { latitude: number }) => sum + c.latitude, 0) /
-      coords.length;
-    const lon = coords.reduce((sum: number, c: { longitude: number }) => sum + c.longitude, 0) /
-      coords.length;
-
-    await fetchNearbyStreams(lat, lon, 200);
+    const centroid = REGION_CENTROIDS[region];
+    await fetchNearbyStreams(centroid.lat, centroid.lon, 200);
   }
 
   async function fetchNearbyStreams(lat: number, lon: number, radius = 50) {
