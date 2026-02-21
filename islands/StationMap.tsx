@@ -27,14 +27,14 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
           if (!document.querySelector('link[href*="leaflet"]')) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
-            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+            link.href = '/leaflet/leaflet.css';
             document.head.appendChild(link);
           }
 
           // Load Leaflet JS
           await new Promise<void>((resolve, reject) => {
             const script = document.createElement('script');
-            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+            script.src = '/leaflet/leaflet.js';
             script.onload = () => resolve();
             script.onerror = () => reject(new Error('Failed to load Leaflet'));
             document.head.appendChild(script);
