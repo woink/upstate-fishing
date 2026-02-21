@@ -74,16 +74,15 @@ describe('createServerSupabaseClient', () => {
 });
 
 describe('cookie parsing pattern (used by getAll adapter)', () => {
-  // Tests the exact parsing logic from supabase-server.ts lines 30-32:
-  //   cookieHeader.split(';').filter(Boolean).map((c) => {
-  //     const [name, ...rest] = c.trim().split('=');
-  //     return { name, value: rest.join('=') };
-  //   });
+  // Mirrors the parsing logic from supabase-server.ts getAll():
+  //   RFC 6265 §4.1.1 compliant — trims names, strips quoted values
 
   function parseCookies(cookieHeader: string): { name: string; value: string }[] {
     return cookieHeader.split(';').filter(Boolean).map((c) => {
-      const [name, ...rest] = c.trim().split('=');
-      return { name, value: rest.join('=') };
+      const [rawName, ...rest] = c.trim().split('=');
+      const name = rawName.trim();
+      const value = rest.join('=').replace(/^"(.*)"$/, '$1');
+      return { name, value };
     });
   }
 
@@ -128,6 +127,27 @@ describe('cookie parsing pattern (used by getAll adapter)', () => {
       { name: 'session', value: 'abc' },
       { name: 'token', value: 'xyz' },
     ]);
+  });
+
+  it('strips double-quoted values per RFC 6265', () => {
+    const cookies = parseCookies('session="abc123"; token="xyz=789"');
+    assertEquals(cookies, [
+      { name: 'session', value: 'abc123' },
+      { name: 'token', value: 'xyz=789' },
+    ]);
+  });
+
+  it('trims cookie names independently of pair trimming', () => {
+    const cookies = parseCookies(' session =abc;  token =xyz');
+    assertEquals(cookies, [
+      { name: 'session', value: 'abc' },
+      { name: 'token', value: 'xyz' },
+    ]);
+  });
+
+  it('preserves values with internal quotes (not wrapped)', () => {
+    const cookies = parseCookies('data=he said "hello"');
+    assertEquals(cookies, [{ name: 'data', value: 'he said "hello"' }]);
   });
 });
 
