@@ -2,17 +2,38 @@ import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import type { TopPickScore } from '@shared/models/types.ts';
 import { qualityClasses, qualityLabels } from '@shared/lib/colors.ts';
+import { Icon } from '../components/ui/Icon.tsx';
 
 function renderStationSummary(pick: TopPickScore) {
   return (
     <div class='text-sm space-y-1 mb-3'>
       {pick.waterTempF != null
-        ? <p>💧 Water: {pick.waterTempF}°F</p>
-        : <p class='text-slate-400' title='Not monitored at this station'>💧 Water: N/A</p>}
-      {pick.airTempF != null && <p>🌡️ Air: {pick.airTempF}°F</p>}
+        ? (
+          <p>
+            <Icon name='droplets' size='sm' /> Water: {pick.waterTempF}°F
+          </p>
+        )
+        : (
+          <p class='text-slate-400' title='Not monitored at this station'>
+            <Icon name='droplets' size='sm' /> Water: N/A
+          </p>
+        )}
+      {pick.airTempF != null && (
+        <p>
+          <Icon name='thermometer' size='sm' /> Air: {pick.airTempF}°F
+        </p>
+      )}
       {pick.dischargeCfs != null
-        ? <p>🌊 Flow: {pick.dischargeCfs} cfs</p>
-        : <p class='text-slate-400' title='Not monitored at this station'>🌊 Flow: N/A</p>}
+        ? (
+          <p>
+            <Icon name='waves' size='sm' /> Flow: {pick.dischargeCfs} cfs
+          </p>
+        )
+        : (
+          <p class='text-slate-400' title='Not monitored at this station'>
+            <Icon name='waves' size='sm' /> Flow: N/A
+          </p>
+        )}
     </div>
   );
 }
@@ -87,7 +108,9 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
 
   return (
     <div>
-      <h2 class='text-xl font-semibold text-slate-800 mb-4'>🎣 Today's Top Picks</h2>
+      <h2 class='text-xl font-semibold text-slate-800 mb-4'>
+        <Icon name='fish' size='md' class='inline-block' /> Today's Top Picks
+      </h2>
       <div class='grid md:grid-cols-3 gap-4'>
         {picks.value.map((pick, i) => (
           <a
@@ -99,7 +122,7 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
           >
             <div class='flex items-start justify-between mb-2'>
               <h3 class='font-semibold'>{pick.stream.name}</h3>
-              {i === 0 && <span class='text-lg'>⭐</span>}
+              {i === 0 && <Icon name='star' size='md' class='text-yellow-500' />}
             </div>
 
             {renderStationSummary(pick)}
