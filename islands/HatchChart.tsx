@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { Icon } from '../components/ui/Icon.tsx';
 import type { Hatch, InsectOrder } from '@shared/models/types.ts';
 
 interface HatchChartProps {
@@ -30,11 +31,11 @@ const ORDER_COLORS: Record<InsectOrder, { bg: string; border: string; text: stri
 };
 
 const TIME_LABELS: Record<string, string> = {
-  morning: '🌅 Morning',
-  midday: '☀️ Midday',
-  afternoon: '🌤️ Afternoon',
-  evening: '🌆 Evening',
-  any: '🕐 Any time',
+  morning: 'Morning',
+  midday: 'Midday',
+  afternoon: 'Afternoon',
+  evening: 'Evening',
+  any: 'Any time',
 };
 
 export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
@@ -127,8 +128,12 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
                     <span class={`w-2 h-2 rounded-full ${ORDER_COLORS[hatch.order].bg}`}></span>
                     <span class='font-medium text-slate-800'>{hatch.commonName}</span>
                     {hatch.prefersOvercast
-                      ? <span title='Prefers overcast'>☁️</span>
-                      : <span title='Prefers sunny' class='opacity-50'>☀️</span>}
+                      ? <Icon name='cloud' size='sm' aria-label='Prefers overcast' />
+                      : (
+                        <span class='opacity-50'>
+                          <Icon name='sun' size='sm' aria-label='Prefers sunny' />
+                        </span>
+                      )}
                   </div>
                   {hatch.scientificName && (
                     <div class='text-xs text-slate-400 italic ml-4'>
@@ -248,7 +253,8 @@ export default function HatchChart({ hatches, currentMonth }: HatchChartProps) {
               href={`/streams?hatch=${selectedHatch.value.id}`}
               class='text-sm text-sky-600 hover:text-sky-700 flex items-center gap-1'
             >
-              🗺️ View streams with {selectedHatch.value.commonName} activity →
+              <Icon name='map-pin' size='sm' class='inline-block' /> View streams with{' '}
+              {selectedHatch.value.commonName} activity →
             </a>
           </div>
         </div>
