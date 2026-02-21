@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "exports": "./src/mod.ts",
   "tasks": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "deno run -A npm:vite@6",
+    "build": "deno run -A npm:vite@6 build",
     "preview": "deno serve -A --unstable-kv _fresh/server.js",
     "test": "deno test --env-file --allow-net --allow-env --allow-read --allow-write --unstable-kv --ignore=tests/e2e/ tests/",
     "check": "deno check --unstable-kv **/*.ts **/*.tsx",
