@@ -312,6 +312,23 @@ export const FlyShopSchema = z.object({
 });
 export type FlyShop = z.infer<typeof FlyShopSchema>;
 
+/** Extended fly shop schema for Supabase-persisted records. */
+export const FlyShopSupabaseSchema = FlyShopSchema.extend({
+  id: z.string().uuid(),
+  slug: z.string(),
+  hours: z.record(z.string()).nullable().optional(),
+  services: z.array(z.string()).optional(),
+  brandsCarried: z.array(z.string()).optional(),
+  guideService: z.boolean(),
+  onlineStoreUrl: z.string().nullable().optional(),
+  reportSourceId: z.string().uuid().nullable().optional(),
+  rating: z.number().min(0).max(5).nullable().optional(),
+  verified: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type FlyShopSupabase = z.infer<typeof FlyShopSupabaseSchema>;
+
 // ============================================================================
 // Fishing Report Types (Supabase)
 // ============================================================================
