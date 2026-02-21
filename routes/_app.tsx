@@ -18,8 +18,6 @@ export default function App({ Component }: PageProps) {
         <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
         <meta name='apple-mobile-web-app-title' content='Upstate Fishing' />
         <link rel='stylesheet' href='/styles.css' />
-        <link rel='stylesheet' href='/leaflet/leaflet.css' />
-        <script src='/leaflet/leaflet.js' />
       </head>
       <body class='bg-slate-50 min-h-screen'>
         <nav class='bg-forest-700 text-white shadow-lg'>
