@@ -4,7 +4,7 @@
 
 import { assertEquals, assertExists, assertStringIncludes } from '@std/assert';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
-import { logger } from '@shared/utils/logger.ts';
+import { createRequestLogger, logger } from '@shared/utils/logger.ts';
 
 describe('logger', () => {
   let captured: string[] = [];
@@ -403,6 +403,69 @@ describe('logger', () => {
         // expected
       }
       assertEquals(isJson, false, 'dev mode should not output JSON');
+    });
+  });
+
+  describe('createRequestLogger()', () => {
+    it('includes requestId in every log entry', () => {
+      console.info = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+      console.warn = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+
+      const reqLogger = createRequestLogger('abc-123');
+      reqLogger.info('request started');
+      reqLogger.warn('slow response');
+
+      assertEquals(captured.length, 2);
+      const infoEntry = JSON.parse(captured[0]);
+      const warnEntry = JSON.parse(captured[1]);
+      assertEquals(infoEntry.requestId, 'abc-123');
+      assertEquals(warnEntry.requestId, 'abc-123');
+    });
+
+    it('merges additional context with requestId', () => {
+      console.info = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+
+      const reqLogger = createRequestLogger('req-456');
+      reqLogger.info('handling request', { method: 'GET', path: '/api/hatches' });
+
+      const entry = JSON.parse(captured[0]);
+      assertEquals(entry.requestId, 'req-456');
+      assertEquals(entry.method, 'GET');
+      assertEquals(entry.path, '/api/hatches');
+    });
+
+    it('has all four log level methods', () => {
+      Deno.env.set('LOG_LEVEL', 'debug');
+      console.debug = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+      console.info = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+      console.warn = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+      console.error = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+
+      const reqLogger = createRequestLogger('req-789');
+      reqLogger.debug('d');
+      reqLogger.info('i');
+      reqLogger.warn('w');
+      reqLogger.error('e');
+
+      assertEquals(captured.length, 4);
+      for (const raw of captured) {
+        const entry = JSON.parse(raw);
+        assertEquals(entry.requestId, 'req-789');
+      }
     });
   });
 });

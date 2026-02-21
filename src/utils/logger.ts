@@ -97,7 +97,14 @@ function emit(level: LogLevel, message: string, context?: Record<string, unknown
   consoleMethod(JSON.stringify(entry));
 }
 
-export const logger = {
+export interface Logger {
+  debug(message: string, context?: Record<string, unknown>): void;
+  info(message: string, context?: Record<string, unknown>): void;
+  warn(message: string, context?: Record<string, unknown>): void;
+  error(message: string, context?: Record<string, unknown>): void;
+}
+
+export const logger: Logger = {
   debug(message: string, context?: Record<string, unknown>): void {
     emit('debug', message, context);
   },
@@ -111,3 +118,23 @@ export const logger = {
     emit('error', message, context);
   },
 };
+
+/**
+ * Create a logger that automatically includes a requestId in every log entry.
+ */
+export function createRequestLogger(requestId: string): Logger {
+  return {
+    debug(message: string, context?: Record<string, unknown>): void {
+      emit('debug', message, { requestId, ...context });
+    },
+    info(message: string, context?: Record<string, unknown>): void {
+      emit('info', message, { requestId, ...context });
+    },
+    warn(message: string, context?: Record<string, unknown>): void {
+      emit('warn', message, { requestId, ...context });
+    },
+    error(message: string, context?: Record<string, unknown>): void {
+      emit('error', message, { requestId, ...context });
+    },
+  };
+}
