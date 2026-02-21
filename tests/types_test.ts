@@ -538,19 +538,20 @@ Deno.test('NearbyStreamSchema - accepts valid nearby stream', () => {
   assertEquals(result.distanceMiles, 5.3);
 });
 
-Deno.test('NearbyStreamSchema - rejects non-positive distance', () => {
-  assertThrows(() => {
-    NearbyStreamSchema.parse({
-      streamId: 'beaverkill',
-      name: 'Beaverkill',
-      region: 'catskills',
-      state: 'NY',
-      latitude: 41.9365,
-      longitude: -74.9201,
-      distanceMiles: 0,
-    });
+Deno.test('NearbyStreamSchema - accepts zero distance', () => {
+  const result = NearbyStreamSchema.parse({
+    streamId: 'beaverkill',
+    name: 'Beaverkill',
+    region: 'catskills',
+    state: 'NY',
+    latitude: 41.9365,
+    longitude: -74.9201,
+    distanceMiles: 0,
   });
+  assertEquals(result.distanceMiles, 0);
+});
 
+Deno.test('NearbyStreamSchema - rejects negative distance', () => {
   assertThrows(() => {
     NearbyStreamSchema.parse({
       streamId: 'beaverkill',
