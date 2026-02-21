@@ -15,6 +15,10 @@ import tailwindcss from 'tailwindcss';
 function denoNpmSpecifiers(): Plugin {
   return {
     name: 'deno-npm-specifiers',
+    // Run before @fresh/plugin-vite (which also uses enforce:"pre") so we
+    // intercept npm: specifiers from JSR-loaded @fresh/core source before
+    // Vite's built-in vite:resolve can reject them as built-in modules.
+    enforce: 'pre',
     resolveId(id) {
       if (!id.startsWith('npm:')) return null;
       const spec = id.slice(4); // strip "npm:"
