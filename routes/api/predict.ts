@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { predictionService } from '@shared/services/predictions.ts';
 import { fahrenheitToCelsius } from '@shared/utils/temperature.ts';
 import { logger } from '@shared/utils/logger.ts';
-import { apiError } from '../../utils/api-response.ts';
+import { apiError } from '@shared/http/api-response.ts';
 
 const CUSTOM_STATION_ID = 'custom';
 const CUSTOM_STATION_NAME = 'Custom Input';

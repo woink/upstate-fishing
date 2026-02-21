@@ -20,7 +20,7 @@ import type {
 import { USGSService } from './usgs.ts';
 import { WeatherService } from './weather.ts';
 import { logger } from '../utils/logger.ts';
-import { promisePool } from '../../lib/promise-pool.ts';
+import { promisePool } from '../lib/promise-pool.ts';
 
 // ============================================================================
 // Mapping functions (exported for unit testing)

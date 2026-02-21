@@ -1,7 +1,7 @@
 import { Handlers } from '$fresh/server.ts';
 import { HATCHES } from '@shared/data/hatches.ts';
-import { apiError, apiSuccess } from '../../../utils/api-response.ts';
-import { isValidRouteId } from '../../../utils/validation.ts';
+import { apiError, apiSuccess } from '@shared/http/api-response.ts';
+import { isValidRouteId } from '@shared/http/validation.ts';
 
 export const handler: Handlers = {
   GET(_req, ctx) {

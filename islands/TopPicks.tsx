@@ -6,7 +6,7 @@ import {
   qualityClasses,
   qualityLabels,
   qualityOrder,
-} from '../lib/colors.ts';
+} from '@shared/lib/colors.ts';
 
 function renderStationSummary(cond: StreamConditions) {
   const station = cond.stationData[0];

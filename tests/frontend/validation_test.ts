@@ -4,7 +4,7 @@
  */
 
 import { assertEquals } from '@std/assert';
-import { isValidRouteId } from '../../utils/validation.ts';
+import { isValidRouteId } from '@shared/http/validation.ts';
 
 // ============================================================================
 // Valid IDs

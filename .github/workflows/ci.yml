@@ -26,10 +26,8 @@ jobs:
               - 'islands/**'
               - 'components/**'
               - 'src/**'
-              - 'lib/**'
-              - 'utils/**'
               - 'static/**'
-              - 'e2e/**'
+              - 'tests/e2e/**'
               - 'deno.json'
               - 'fresh.gen.ts'
             supabase:
@@ -59,7 +57,7 @@ jobs:
         run: deno check --unstable-kv **/*.ts **/*.tsx
 
       - name: Test
-        run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/
+        run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv --ignore=tests/e2e/,tests/supabase/ tests/
 
       - name: Install browser dependencies
         if: needs.changes.outputs.e2e == 'true'
