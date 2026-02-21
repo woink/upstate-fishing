@@ -32,7 +32,10 @@ export const handler: Handlers<ShopDetailData> = {
     const shop = getShopById(id);
 
     if (!shop) {
-      return ctx.render({ shop: null, nearbyStreams: [], error: 'Fly shop not found' });
+      return ctx.render(
+        { shop: null, nearbyStreams: [], error: 'Fly shop not found' },
+        { status: 404 },
+      );
     }
 
     // Find streams within 50 miles, sorted by distance
