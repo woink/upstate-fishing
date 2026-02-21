@@ -351,6 +351,76 @@ export const FishingReportSchema = z.object({
 export type FishingReport = z.infer<typeof FishingReportSchema>;
 
 // ============================================================================
+// Access Point & Stream Metadata Types (Supabase)
+// ============================================================================
+
+export const AccessPointTypeSchema = z.enum([
+  'parking',
+  'bridge',
+  'trail',
+  'put-in',
+  'take-out',
+]);
+export type AccessPointType = z.infer<typeof AccessPointTypeSchema>;
+
+export const AccessPointSchema = z.object({
+  id: z.string().uuid(),
+  streamId: z.string(),
+  name: z.string(),
+  type: AccessPointTypeSchema,
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  description: z.string().nullable(),
+  parkingAvailable: z.boolean(),
+  handicapAccessible: z.boolean(),
+  publicLand: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type AccessPoint = z.infer<typeof AccessPointSchema>;
+
+export const RegulationTypeSchema = z.enum([
+  'catch_and_release',
+  'trophy',
+  'general',
+  'delayed_harvest',
+  'special',
+]);
+export type RegulationType = z.infer<typeof RegulationTypeSchema>;
+
+export const DifficultyRatingSchema = z.enum(['easy', 'moderate', 'difficult', 'expert']);
+export type DifficultyRating = z.infer<typeof DifficultyRatingSchema>;
+
+export const WadingSafetySchema = z.enum(['safe', 'moderate', 'caution', 'dangerous']);
+export type WadingSafety = z.infer<typeof WadingSafetySchema>;
+
+export const StreamRegulationSchema = z.object({
+  id: z.string().uuid(),
+  streamId: z.string(),
+  regulationType: RegulationTypeSchema,
+  seasonStart: z.string().nullable(),
+  seasonEnd: z.string().nullable(),
+  specialRules: z.string().nullable(),
+  sourceUrl: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type StreamRegulation = z.infer<typeof StreamRegulationSchema>;
+
+export const StreamMetadataSchema = z.object({
+  id: z.string().uuid(),
+  streamId: z.string(),
+  difficultyRating: DifficultyRatingSchema.nullable(),
+  wadingSafety: WadingSafetySchema.nullable(),
+  bestSeasons: z.array(z.string()),
+  fishSpecies: z.array(z.string()),
+  stockingInfo: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type StreamMetadata = z.infer<typeof StreamMetadataSchema>;
+
+// ============================================================================
 // Data Ingestion Types
 // ============================================================================
 
