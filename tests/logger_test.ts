@@ -381,6 +381,7 @@ describe('logger', () => {
 
       assertEquals(captured.length, 1);
       // Strip ANSI codes and match [HH:MM:SS]
+      // deno-lint-ignore no-control-regex
       const stripped = captured[0].replace(/\x1b\[\d+m/g, '');
       const timeMatch = stripped.match(/\[(\d{2}:\d{2}:\d{2})\]/);
       assertExists(timeMatch, 'should contain HH:MM:SS timestamp');
