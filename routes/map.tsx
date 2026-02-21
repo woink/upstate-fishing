@@ -1,4 +1,4 @@
-import { type PageProps, type RouteHandler } from 'fresh';
+import { type PageProps } from 'fresh';
 import type { Stream } from '@shared/models/types.ts';
 import { STREAMS } from '@shared/data/streams.ts';
 import StationMap from '../islands/StationMap.tsx';
@@ -8,7 +8,7 @@ interface MapPageData {
   apiUrl: string;
 }
 
-export const handler: RouteHandler<MapPageData> = {
+export const handler = {
   GET(ctx) {
     return ctx.render({
       streams: [...STREAMS],

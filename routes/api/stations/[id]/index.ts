@@ -1,11 +1,10 @@
-import { type RouteHandler } from 'fresh';
 import { cachedUSGSService } from '@shared/services/cached-usgs.ts';
 import { makeCacheHeaders, TTL } from '@shared/services/cache.ts';
 import { logger } from '@shared/utils/logger.ts';
 import { apiError, CACHE_DYNAMIC } from '@shared/http/api-response.ts';
 import { isValidRouteId } from '@shared/http/validation.ts';
 
-export const handler: RouteHandler = {
+export const handler = {
   async GET(ctx) {
     const id = ctx.params.id;
 

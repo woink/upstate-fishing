@@ -1,4 +1,3 @@
-import { type RouteHandler } from 'fresh';
 import { getStreamById } from '@shared/data/streams.ts';
 import { cachedUSGSService } from '@shared/services/cached-usgs.ts';
 import { cachedWeatherService } from '@shared/services/cached-weather.ts';
@@ -8,7 +7,7 @@ import { logger } from '@shared/utils/logger.ts';
 import { apiError, CACHE_DYNAMIC } from '@shared/http/api-response.ts';
 import { isValidRouteId } from '@shared/http/validation.ts';
 
-export const handler: RouteHandler = {
+export const handler = {
   async GET(ctx) {
     if (!isValidRouteId(ctx.params.id)) {
       return apiError('Invalid ID format', 'INVALID_PARAMETER', 400);

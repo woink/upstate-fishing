@@ -1,9 +1,8 @@
-import { type RouteHandler } from 'fresh';
 import { HATCHES } from '@shared/data/hatches.ts';
 import { apiError, apiSuccess } from '@shared/http/api-response.ts';
 import { isValidRouteId } from '@shared/http/validation.ts';
 
-export const handler: RouteHandler = {
+export const handler = {
   GET(ctx) {
     if (!isValidRouteId(ctx.params.id)) {
       return apiError('Invalid ID format', 'INVALID_PARAMETER', 400);

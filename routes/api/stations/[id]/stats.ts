@@ -1,10 +1,9 @@
-import { type RouteHandler } from 'fresh';
 import { getStationStats } from '@shared/services/historical.ts';
 import { logger } from '@shared/utils/logger.ts';
 import { apiError, CACHE_DYNAMIC } from '@shared/http/api-response.ts';
 import { isValidRouteId } from '@shared/http/validation.ts';
 
-export const handler: RouteHandler = {
+export const handler = {
   async GET(ctx) {
     const id = ctx.params.id;
 

@@ -1,4 +1,3 @@
-import { type RouteHandler } from 'fresh';
 import { z } from 'zod';
 import { predictionService } from '@shared/services/predictions.ts';
 import { fahrenheitToCelsius } from '@shared/utils/temperature.ts';
@@ -34,7 +33,7 @@ export const PredictRequestSchema = z.object({
   { message: 'At least one of waterTempF or airTempF is required' },
 );
 
-export const handler: RouteHandler = {
+export const handler = {
   async POST(ctx) {
     const contentType = ctx.req.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {

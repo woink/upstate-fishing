@@ -1,4 +1,4 @@
-import { type PageProps, type RouteHandler } from 'fresh';
+import { type PageProps } from 'fresh';
 import type { Stream } from '@shared/models/types.ts';
 import { filterStreamsByQuery } from '@shared/data/streams.ts';
 import StreamList from '../../islands/StreamList.tsx';
@@ -10,7 +10,7 @@ interface StreamsPageData {
   apiUrl: string;
 }
 
-export const handler: RouteHandler<StreamsPageData> = {
+export const handler = {
   GET(ctx) {
     const url = new URL(ctx.req.url);
     const { streams, region, state } = filterStreamsByQuery({

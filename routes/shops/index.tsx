@@ -1,4 +1,4 @@
-import { type PageProps, type RouteHandler } from 'fresh';
+import { type PageProps } from 'fresh';
 import type { FlyShop } from '@shared/models/types.ts';
 import { filterShopsByQuery } from '@shared/data/fly-shops.ts';
 
@@ -8,7 +8,7 @@ interface ShopsPageData {
   state?: string;
 }
 
-export const handler: RouteHandler<ShopsPageData> = {
+export const handler = {
   GET(ctx) {
     const url = new URL(ctx.req.url);
     const { shops, region, state } = filterShopsByQuery({
