@@ -6,6 +6,7 @@ import { cachedWeatherService } from '@shared/services/cached-weather.ts';
 import { predictionService } from '@shared/services/predictions.ts';
 import { logger } from '@shared/utils/logger.ts';
 import StreamConditionsCard from '../../islands/StreamConditionsCard.tsx';
+import HistoryChart from '../../islands/HistoryChart.tsx';
 
 interface StreamDetailData {
   conditions: StreamConditions | null;
@@ -83,6 +84,15 @@ export default function StreamDetail({ data }: PageProps<StreamDetailData>) {
       </a>
 
       <StreamConditionsCard conditions={conditions} apiUrl={apiUrl} />
+
+      {conditions.stationData[0] && (
+        <div class='mt-6'>
+          <HistoryChart
+            stationId={conditions.stationData[0].stationId}
+            apiUrl={apiUrl}
+          />
+        </div>
+      )}
     </div>
   );
 }
