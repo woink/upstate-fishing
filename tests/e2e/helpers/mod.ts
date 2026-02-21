@@ -34,7 +34,7 @@ export async function startServer(): Promise<ServerHandle> {
   }
 
   const command = new Deno.Command('deno', {
-    args: ['run', '-A', '--unstable-kv', 'main.ts'],
+    args: ['serve', '-A', '--unstable-kv', '--port=8000', 'main.ts'],
     cwd: new URL('../../../', import.meta.url).pathname,
     stdout: 'null',
     stderr: 'null',
@@ -70,7 +70,7 @@ export async function startServer(): Promise<ServerHandle> {
   } catch { /* already exited */ }
   await statusPromise.catch(() => {});
   throw new Error(
-    'Server failed to start within 15 seconds. Ensure _fresh/ exists (run `deno task build` first).',
+    'Server failed to start within 15 seconds. Run `deno task build` first if needed.',
   );
 }
 
