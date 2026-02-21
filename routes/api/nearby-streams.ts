@@ -1,6 +1,6 @@
 import { Handlers } from '$fresh/server.ts';
 import { STREAMS } from '@shared/data/streams.ts';
-import { apiError, apiSuccessList } from '@shared/http/api-response.ts';
+import { apiError, apiSuccessList, CACHE_DYNAMIC } from '@shared/http/api-response.ts';
 import { haversineDistance } from '@shared/utils/distance.ts';
 import type { NearbyStream } from '@shared/models/types.ts';
 
@@ -60,6 +60,6 @@ export const handler: Handlers = {
       .filter((s) => s.distanceMiles <= radius)
       .sort((a, b) => a.distanceMiles - b.distanceMiles);
 
-    return apiSuccessList(results);
+    return apiSuccessList(results, { 'Cache-Control': CACHE_DYNAMIC });
   },
 };
