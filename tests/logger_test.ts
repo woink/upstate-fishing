@@ -2,7 +2,7 @@
  * Logger utility tests
  */
 
-import { assertEquals, assertExists } from '@std/assert';
+import { assertEquals, assertExists, assertStringIncludes } from '@std/assert';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { logger } from '@shared/utils/logger.ts';
 
@@ -13,7 +13,9 @@ describe('logger', () => {
   const originalInfo = console.info;
   const originalDebug = console.debug;
 
+  // Force production mode (JSON output) for most tests
   beforeEach(() => {
+    Deno.env.set('DENO_DEPLOYMENT_ID', 'test-deployment');
     Deno.env.delete('LOG_LEVEL');
   });
 
@@ -23,6 +25,7 @@ describe('logger', () => {
     console.info = originalInfo;
     console.debug = originalDebug;
     captured = [];
+    Deno.env.delete('DENO_DEPLOYMENT_ID');
     Deno.env.delete('LOG_LEVEL');
   });
 
@@ -325,7 +328,8 @@ describe('logger', () => {
       assertEquals(captured.length, 1);
     });
 
-    it('defaults to info when LOG_LEVEL is not set', () => {
+    it('defaults to info in production mode', () => {
+      // DENO_DEPLOYMENT_ID is set (production mode), LOG_LEVEL not set
       console.debug = (...args: unknown[]) => {
         captured.push(String(args[0]));
       };
@@ -337,6 +341,68 @@ describe('logger', () => {
       logger.info('visible');
 
       assertEquals(captured.length, 1);
+    });
+
+    it('defaults to debug in dev mode', () => {
+      Deno.env.delete('DENO_DEPLOYMENT_ID');
+      console.debug = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+
+      logger.debug('visible in dev');
+
+      assertEquals(captured.length, 1);
+    });
+  });
+
+  describe('dev-mode pretty printing', () => {
+    it('outputs colored human-readable format when not deployed', () => {
+      Deno.env.delete('DENO_DEPLOYMENT_ID');
+      console.info = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+
+      logger.info('server started', { port: 8000 });
+
+      assertEquals(captured.length, 1);
+      // Should contain level, message, and key=value pairs
+      assertStringIncludes(captured[0], 'INFO');
+      assertStringIncludes(captured[0], 'server started');
+      assertStringIncludes(captured[0], 'port=8000');
+    });
+
+    it('uses HH:MM:SS time format', () => {
+      Deno.env.delete('DENO_DEPLOYMENT_ID');
+      console.warn = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+
+      logger.warn('test');
+
+      assertEquals(captured.length, 1);
+      // Strip ANSI codes and match [HH:MM:SS]
+      const stripped = captured[0].replace(/\x1b\[\d+m/g, '');
+      const timeMatch = stripped.match(/\[(\d{2}:\d{2}:\d{2})\]/);
+      assertExists(timeMatch, 'should contain HH:MM:SS timestamp');
+    });
+
+    it('does not output JSON in dev mode', () => {
+      Deno.env.delete('DENO_DEPLOYMENT_ID');
+      console.info = (...args: unknown[]) => {
+        captured.push(String(args[0]));
+      };
+
+      logger.info('hello');
+
+      assertEquals(captured.length, 1);
+      let isJson = false;
+      try {
+        JSON.parse(captured[0]);
+        isJson = true;
+      } catch {
+        // expected
+      }
+      assertEquals(isJson, false, 'dev mode should not output JSON');
     });
   });
 });
