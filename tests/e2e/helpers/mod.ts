@@ -34,7 +34,7 @@ export async function startServer(): Promise<ServerHandle> {
   }
 
   const command = new Deno.Command('deno', {
-    args: ['serve', '-A', '--unstable-kv', '--port=8000', 'main.ts'],
+    args: ['serve', '-A', '--unstable-kv', '--port=8000', '_fresh/server.js'],
     cwd: new URL('../../../', import.meta.url).pathname,
     stdout: 'null',
     stderr: 'null',
