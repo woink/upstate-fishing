@@ -10,6 +10,7 @@ import {
   getShopsByRegion,
   getShopsByState,
 } from '@shared/data/fly-shops.ts';
+import { apiSuccessList } from '@shared/http/api-response.ts';
 
 // ============================================================================
 // Route Parameter Tests
@@ -66,27 +67,26 @@ Deno.test('shops page title - no filter', () => {
 // API Response Handling Tests
 // ============================================================================
 
-Deno.test('shops API response - success structure', () => {
-  const response = {
-    success: true,
-    data: [{ id: 'beaverkill-angler', name: 'Beaverkill Angler' }],
-    count: 1,
-    timestamp: '2024-04-15T14:00:00Z',
-  };
+Deno.test('shops API response - success structure', async () => {
+  const catskillsShops = getShopsByRegion('catskills');
+  const response = apiSuccessList(catskillsShops);
+  const json = await response.json();
 
-  assertEquals(response.success, true);
-  assertExists(response.data);
-  assertEquals(Array.isArray(response.data), true);
-  assertEquals(response.count, 1);
+  assertEquals(json.success, true);
+  assertExists(json.data);
+  assertEquals(Array.isArray(json.data), true);
+  assertEquals(json.count, catskillsShops.length);
+  assertExists(json.timestamp);
 });
 
-Deno.test('shops API response - empty data for unknown region', () => {
-  const json = {
-    success: true,
-    data: [] as unknown[],
-    count: 0,
-  };
+Deno.test('shops API response - empty data for unknown region', async () => {
+  const response = apiSuccessList([]);
+  const json = await response.json();
+
+  assertEquals(json.success, true);
   assertEquals(json.data.length, 0);
+  assertEquals(json.count, 0);
+  assertExists(json.timestamp);
 });
 
 // ============================================================================
@@ -110,10 +110,12 @@ Deno.test('shops filter logic - getShopsByState returns correct shops', () => {
 });
 
 Deno.test('shops filter logic - region takes precedence over state', () => {
-  const region = 'catskills';
-  const state = 'NY';
-  const filterUsed = region ? 'region' : state ? 'state' : 'none';
-  assertEquals(filterUsed, 'region');
+  const result = filterShopsByQuery({ region: 'catskills', state: 'NJ' });
+  assertEquals(result.region, 'catskills');
+  assertEquals(result.state, undefined);
+  for (const s of result.shops) {
+    assertEquals(s.region, 'catskills');
+  }
 });
 
 // ============================================================================
