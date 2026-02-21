@@ -1,19 +1,6 @@
-import { type PageProps } from 'fresh';
 import TopPicks from '../islands/TopPicks.tsx';
 
-interface HomeData {
-  apiUrl: string;
-}
-
-export const handler = {
-  async GET(ctx) {
-    // Use empty string for relative URLs - the frontend proxies /api/* to backend
-    const apiUrl = '';
-    return ctx.render({ apiUrl });
-  },
-};
-
-export default function Home({ data }: PageProps<HomeData>) {
+export default function Home() {
   return (
     <div>
       <section class='mb-8'>
@@ -25,7 +12,7 @@ export default function Home({ data }: PageProps<HomeData>) {
         </p>
       </section>
 
-      <TopPicks apiUrl={data.apiUrl} />
+      <TopPicks apiUrl='' />
 
       <section class='mt-8 grid md:grid-cols-2 gap-6'>
         <div class='bg-white rounded-lg shadow p-6'>
