@@ -8,6 +8,7 @@ import * as $api_middleware from './routes/api/_middleware.ts';
 import * as $api_hatches_id_ from './routes/api/hatches/[id].ts';
 import * as $api_hatches_index from './routes/api/hatches/index.ts';
 import * as $api_predict from './routes/api/predict.ts';
+import * as $api_shops_index from './routes/api/shops/index.ts';
 import * as $api_stations_id_history from './routes/api/stations/[id]/history.ts';
 import * as $api_stations_id_index from './routes/api/stations/[id]/index.ts';
 import * as $api_stations_id_stats from './routes/api/stations/[id]/stats.ts';
@@ -18,6 +19,8 @@ import * as $api_top_picks from './routes/api/top-picks.ts';
 import * as $hatches_index from './routes/hatches/index.tsx';
 import * as $index from './routes/index.tsx';
 import * as $map from './routes/map.tsx';
+import * as $shops_id_ from './routes/shops/[id].tsx';
+import * as $shops_index from './routes/shops/index.tsx';
 import * as $streams_id_ from './routes/streams/[id].tsx';
 import * as $streams_index from './routes/streams/index.tsx';
 import * as $HatchChart from './islands/HatchChart.tsx';
@@ -36,6 +39,7 @@ const manifest = {
     './routes/api/hatches/[id].ts': $api_hatches_id_,
     './routes/api/hatches/index.ts': $api_hatches_index,
     './routes/api/predict.ts': $api_predict,
+    './routes/api/shops/index.ts': $api_shops_index,
     './routes/api/stations/[id]/history.ts': $api_stations_id_history,
     './routes/api/stations/[id]/index.ts': $api_stations_id_index,
     './routes/api/stations/[id]/stats.ts': $api_stations_id_stats,
@@ -46,6 +50,8 @@ const manifest = {
     './routes/hatches/index.tsx': $hatches_index,
     './routes/index.tsx': $index,
     './routes/map.tsx': $map,
+    './routes/shops/[id].tsx': $shops_id_,
+    './routes/shops/index.tsx': $shops_index,
     './routes/streams/[id].tsx': $streams_id_,
     './routes/streams/index.tsx': $streams_index,
   },
