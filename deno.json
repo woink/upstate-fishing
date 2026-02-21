@@ -48,13 +48,13 @@
     "lineWidth": 100,
     "indentWidth": 2,
     "singleQuote": true,
-    "exclude": ["README.md", ".agents", "static/leaflet/leaflet.js"]
+    "exclude": ["README.md", ".agents", "static/leaflet/"]
   },
   "lint": {
     "rules": {
       "tags": ["recommended"]
     },
-    "exclude": ["_fresh"]
+    "exclude": ["_fresh", "static/leaflet/"]
   },
   "nodeModulesDir": "none",
   "exclude": [
