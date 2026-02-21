@@ -4,13 +4,12 @@ import tailwindcss from 'tailwindcss';
 
 export default defineConfig({
   plugins: [fresh(), tailwindcss()],
-  environments: {
-    client: {
-      resolve: {
-        // Allow npm: specifiers (Deno-native) to be treated as externals
-        // so Vite doesn't attempt to bundle them via CommonJS resolution.
-        noExternal: false,
-      },
+  resolve: {
+    alias: {
+      // Map Deno-native npm: specifiers used by @fresh/core to their
+      // bare npm package names so Vite/Rollup can resolve them.
+      'npm:preact@^10.27.2': 'preact',
+      'npm:preact': 'preact',
     },
   },
 });
