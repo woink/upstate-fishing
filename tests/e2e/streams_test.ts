@@ -73,7 +73,7 @@ describe('Streams Page', () => {
     await assertTextContent(page, 'h1', 'Catskills Streams');
 
     // Catskills filter should be active
-    await assertHasClass(page, 'a[href="/streams?region=catskills"]', /bg-forest-600/);
+    await assertHasClass(page, 'a[href="/streams?region=catskills"]', /bg-stream-600/);
   });
 
   it('filters streams by Delaware region', async () => {
