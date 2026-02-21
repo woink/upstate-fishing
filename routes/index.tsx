@@ -1,4 +1,4 @@
-import { type FreshContext, type PageProps } from 'fresh';
+import { type PageProps } from 'fresh';
 import TopPicks from '../islands/TopPicks.tsx';
 
 interface HomeData {
@@ -6,7 +6,7 @@ interface HomeData {
 }
 
 export const handler = {
-  GET(ctx: FreshContext) {
+  async GET(ctx) {
     // Use empty string for relative URLs - the frontend proxies /api/* to backend
     const apiUrl = '';
     return ctx.render({ apiUrl });
