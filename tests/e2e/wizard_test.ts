@@ -157,7 +157,7 @@ describe('Nearby Streams API', () => {
   });
 
   it('returns nearby streams for valid coordinates', async () => {
-    await page.goto('http://localhost:8000/api/nearby-streams?lat=41.9&lon=-74.9&radius=50');
+    await navigateTo(page, '/api/nearby-streams?lat=41.9&lon=-74.9&radius=50');
     const bodyText = await page.evaluate(() => document.body.innerText);
     const json = JSON.parse(bodyText);
 
@@ -174,7 +174,7 @@ describe('Nearby Streams API', () => {
   });
 
   it('returns error for missing parameters', async () => {
-    await page.goto('http://localhost:8000/api/nearby-streams');
+    await navigateTo(page, '/api/nearby-streams');
     const bodyText = await page.evaluate(() => document.body.innerText);
     const json = JSON.parse(bodyText);
 
@@ -182,7 +182,7 @@ describe('Nearby Streams API', () => {
   });
 
   it('results are sorted by distance ascending', async () => {
-    await page.goto('http://localhost:8000/api/nearby-streams?lat=41.9&lon=-74.9&radius=500');
+    await navigateTo(page, '/api/nearby-streams?lat=41.9&lon=-74.9&radius=500');
     const bodyText = await page.evaluate(() => document.body.innerText);
     const json = JSON.parse(bodyText);
 
