@@ -296,6 +296,23 @@ export const TopPickScoreSchema = z.object({
 export type TopPickScore = z.infer<typeof TopPickScoreSchema>;
 
 // ============================================================================
+// Fly Shop Types
+// ============================================================================
+
+export const FlyShopSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  region: RegionSchema,
+  state: StateSchema,
+  address: z.string(),
+  coordinates: CoordinatesSchema,
+  phone: z.string(),
+  website: z.string().url().optional(),
+  description: z.string(),
+});
+export type FlyShop = z.infer<typeof FlyShopSchema>;
+
+// ============================================================================
 // Data Ingestion Types
 // ============================================================================
 
