@@ -39,13 +39,13 @@ export const qualityHexColors: Record<FishingQuality, string> = {
 };
 
 /**
- * Human-readable labels with emojis
+ * Human-readable labels for fishing quality
  */
 export const qualityLabels: Record<FishingQuality, string> = {
-  excellent: '🎯 Excellent',
-  good: '👍 Good',
-  fair: '⚠️ Fair',
-  poor: '❌ Poor',
+  excellent: 'Excellent',
+  good: 'Good',
+  fair: 'Fair',
+  poor: 'Poor',
 };
 
 /**
