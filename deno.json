@@ -55,6 +55,7 @@
     },
     "exclude": ["_fresh", "static/leaflet/"]
   },
+  "unstable": ["kv"],
   "nodeModulesDir": "none",
   "exclude": [
     "**/_fresh/*",
