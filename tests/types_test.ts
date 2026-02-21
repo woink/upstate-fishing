@@ -5,7 +5,10 @@
 
 import { assertEquals, assertThrows } from '@std/assert';
 import {
+  AccessPointSchema,
+  AccessPointTypeSchema,
   CoordinatesSchema,
+  DifficultyRatingSchema,
   FishingQualitySchema,
   FishingReportSchema,
   HatchSchema,
@@ -18,9 +21,12 @@ import {
   StationDataSchema,
   StationReadingSchema,
   StationStatsSchema,
+  StreamMetadataSchema,
+  StreamRegulationSchema,
   StreamSchema,
   TrendDirectionSchema,
   UserProfileSchema,
+  WadingSafetySchema,
   WeatherConditionsSchema,
   WeatherSnapshotSchema,
 } from '../src/models/types.ts';
@@ -719,4 +725,159 @@ Deno.test('FishingReportSchema - rejects confidence score out of range', () => {
       updatedAt: '2024-04-15T18:00:00Z',
     })
   );
+});
+
+// ============================================================================
+// AccessPointType Schema Tests
+// ============================================================================
+
+Deno.test('AccessPointTypeSchema - accepts valid types', () => {
+  assertEquals(AccessPointTypeSchema.parse('parking'), 'parking');
+  assertEquals(AccessPointTypeSchema.parse('bridge'), 'bridge');
+  assertEquals(AccessPointTypeSchema.parse('trail'), 'trail');
+  assertEquals(AccessPointTypeSchema.parse('put-in'), 'put-in');
+  assertEquals(AccessPointTypeSchema.parse('take-out'), 'take-out');
+});
+
+Deno.test('AccessPointTypeSchema - rejects invalid type', () => {
+  assertThrows(() => AccessPointTypeSchema.parse('campsite'));
+});
+
+// ============================================================================
+// AccessPoint Schema Tests
+// ============================================================================
+
+Deno.test('AccessPointSchema - accepts valid access point', () => {
+  const valid = {
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    streamId: 'beaverkill',
+    name: 'Cooks Falls Bridge',
+    type: 'bridge',
+    latitude: 41.9450,
+    longitude: -74.9780,
+    description: 'Good wading access below the bridge',
+    parkingAvailable: true,
+    handicapAccessible: false,
+    publicLand: true,
+    createdAt: '2024-04-01T00:00:00Z',
+    updatedAt: '2024-04-01T00:00:00Z',
+  };
+  const result = AccessPointSchema.parse(valid);
+  assertEquals(result.name, 'Cooks Falls Bridge');
+  assertEquals(result.type, 'bridge');
+});
+
+Deno.test('AccessPointSchema - rejects invalid coordinates', () => {
+  assertThrows(() =>
+    AccessPointSchema.parse({
+      id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+      streamId: 'beaverkill',
+      name: 'Test',
+      type: 'parking',
+      latitude: 91,
+      longitude: -74,
+      description: null,
+      parkingAvailable: false,
+      handicapAccessible: false,
+      publicLand: true,
+      createdAt: '2024-04-01T00:00:00Z',
+      updatedAt: '2024-04-01T00:00:00Z',
+    })
+  );
+});
+
+// ============================================================================
+// DifficultyRating & WadingSafety Schema Tests
+// ============================================================================
+
+Deno.test('DifficultyRatingSchema - accepts valid ratings', () => {
+  assertEquals(DifficultyRatingSchema.parse('easy'), 'easy');
+  assertEquals(DifficultyRatingSchema.parse('expert'), 'expert');
+});
+
+Deno.test('DifficultyRatingSchema - rejects invalid rating', () => {
+  assertThrows(() => DifficultyRatingSchema.parse('beginner'));
+});
+
+Deno.test('WadingSafetySchema - accepts valid safety levels', () => {
+  assertEquals(WadingSafetySchema.parse('safe'), 'safe');
+  assertEquals(WadingSafetySchema.parse('dangerous'), 'dangerous');
+});
+
+Deno.test('WadingSafetySchema - rejects invalid safety level', () => {
+  assertThrows(() => WadingSafetySchema.parse('extreme'));
+});
+
+// ============================================================================
+// StreamRegulation Schema Tests
+// ============================================================================
+
+Deno.test('StreamRegulationSchema - accepts valid regulation', () => {
+  const valid = {
+    id: 'c2ffbc99-9c0b-4ef8-bb6d-6bb9bd380c33',
+    streamId: 'beaverkill',
+    regulationType: 'catch_and_release',
+    seasonStart: '2024-04-01',
+    seasonEnd: '2024-09-30',
+    specialRules: 'Artificial lures only',
+    sourceUrl: 'https://dec.ny.gov/regulations',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  };
+  const result = StreamRegulationSchema.parse(valid);
+  assertEquals(result.regulationType, 'catch_and_release');
+});
+
+Deno.test('StreamRegulationSchema - rejects invalid regulation type', () => {
+  assertThrows(() =>
+    StreamRegulationSchema.parse({
+      id: 'c2ffbc99-9c0b-4ef8-bb6d-6bb9bd380c33',
+      streamId: 'beaverkill',
+      regulationType: 'barbless',
+      seasonStart: null,
+      seasonEnd: null,
+      specialRules: null,
+      sourceUrl: null,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    })
+  );
+});
+
+// ============================================================================
+// StreamMetadata Schema Tests
+// ============================================================================
+
+Deno.test('StreamMetadataSchema - accepts valid metadata', () => {
+  const valid = {
+    id: 'd3ffbc99-9c0b-4ef8-bb6d-6bb9bd380d44',
+    streamId: 'beaverkill',
+    difficultyRating: 'moderate',
+    wadingSafety: 'safe',
+    bestSeasons: ['spring', 'fall'],
+    fishSpecies: ['brown trout', 'rainbow trout'],
+    stockingInfo: 'Stocked annually',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  };
+  const result = StreamMetadataSchema.parse(valid);
+  assertEquals(result.bestSeasons.length, 2);
+  assertEquals(result.fishSpecies.length, 2);
+});
+
+Deno.test('StreamMetadataSchema - accepts nullable optional fields', () => {
+  const valid = {
+    id: 'd3ffbc99-9c0b-4ef8-bb6d-6bb9bd380d44',
+    streamId: 'beaverkill',
+    difficultyRating: null,
+    wadingSafety: null,
+    bestSeasons: [],
+    fishSpecies: [],
+    stockingInfo: null,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  };
+  const result = StreamMetadataSchema.parse(valid);
+  assertEquals(result.difficultyRating, null);
+  assertEquals(result.wadingSafety, null);
 });
