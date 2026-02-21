@@ -4,15 +4,17 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { loadSync } from '$std/dotenv/mod.ts';
+import { loadSync } from '@std/dotenv';
 try {
   loadSync({ export: true, examplePath: null });
 } catch {
   // .env file absent (e.g. Deno Deploy) — env vars set via dashboard
 }
 
-import { start } from '$fresh/server.ts';
-import manifest from './fresh.gen.ts';
-import config from './fresh.config.ts';
+import { App, staticFiles } from 'fresh';
 
-await start(manifest, config);
+export const app = new App()
+  .use(staticFiles())
+  .fsRoutes();
+
+export default app;
