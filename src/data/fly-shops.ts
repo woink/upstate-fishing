@@ -70,6 +70,7 @@ export const FLY_SHOPS: readonly FlyShop[] = [
     id: 'al-caucci-fly-shop',
     name: "Al Caucci's Delaware River Club Fly Shop",
     region: 'delaware',
+    // Physically in PA but serves the NY Delaware River region; PA is not in StateSchema
     state: 'NY',
     address: '1264 Winterdale Rd, Starlight, PA 18461',
     coordinates: { latitude: 41.9100, longitude: -75.0300 },
@@ -134,7 +135,7 @@ export const FLY_SHOPS: readonly FlyShop[] = [
       'Dedicated fly shop serving central NJ. Expert knowledge of the South Branch Raritan, Musconetcong, and Pequest rivers.',
   },
   {
-    id: 'nj-trout-unlimited',
+    id: 'tight-lines-fly-fishing',
     name: 'Tight Lines Fly Fishing',
     region: 'raritan',
     state: 'NJ',
