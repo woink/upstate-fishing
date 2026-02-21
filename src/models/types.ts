@@ -313,6 +313,44 @@ export const FlyShopSchema = z.object({
 export type FlyShop = z.infer<typeof FlyShopSchema>;
 
 // ============================================================================
+// Fishing Report Types (Supabase)
+// ============================================================================
+
+export const ReportSourceTypeSchema = z.enum(['rss', 'scrape', 'api', 'manual']);
+export type ReportSourceType = z.infer<typeof ReportSourceTypeSchema>;
+
+export const ReportSourceSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  type: ReportSourceTypeSchema,
+  url: z.string().nullable(),
+  scrapeConfig: z.record(z.unknown()).optional(),
+  lastFetchedAt: z.string().datetime().nullable(),
+  fetchFrequencyMinutes: z.number().int().positive(),
+  active: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type ReportSource = z.infer<typeof ReportSourceSchema>;
+
+export const FishingReportSchema = z.object({
+  id: z.string().uuid(),
+  streamId: z.string(),
+  sourceId: z.string().uuid().nullable(),
+  sourceUrl: z.string().nullable(),
+  reportDate: z.string(), // date string YYYY-MM-DD
+  rawText: z.string(),
+  extractedConditions: z.record(z.unknown()).optional(),
+  extractedFlies: z.array(z.string()).optional(),
+  waterTempMentioned: z.number().nullable(),
+  flowMentioned: z.number().nullable(),
+  confidenceScore: z.number().min(0).max(1).nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type FishingReport = z.infer<typeof FishingReportSchema>;
+
+// ============================================================================
 // Data Ingestion Types
 // ============================================================================
 
