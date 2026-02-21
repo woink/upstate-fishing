@@ -1,3 +1,4 @@
+import { type FreshContext } from 'fresh';
 import { z } from 'zod';
 import { predictionService } from '@shared/services/predictions.ts';
 import { fahrenheitToCelsius } from '@shared/utils/temperature.ts';
@@ -34,7 +35,7 @@ export const PredictRequestSchema = z.object({
 );
 
 export const handler = {
-  async POST(ctx) {
+  async POST(ctx: FreshContext) {
     const contentType = ctx.req.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
       return apiError('Content-Type must be application/json', 'INVALID_CONTENT_TYPE', 415);
