@@ -11,12 +11,13 @@ export const handler = [
 
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://unpkg.com",
-      "style-src 'self' 'unsafe-inline' https://unpkg.com",
+      "script-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https://*.tile.openstreetmap.org",
       "connect-src 'self'",
       "font-src 'self'",
       "frame-ancestors 'none'",
+      "worker-src 'self'",
     ].join('; ');
     resp.headers.set('Content-Security-Policy', csp);
 

@@ -62,12 +62,20 @@ Deno.test('security headers - CSP allows unsafe-inline for Fresh hydration', asy
   assertEquals(csp.includes("'unsafe-inline'"), true);
 });
 
-Deno.test('security headers - CSP allows unpkg.com for Leaflet CSS and JS', async () => {
+Deno.test('security headers - CSP uses self-hosted Leaflet (no unpkg)', async () => {
   const { req, ctx } = createMockContext();
   const resp = await handler[0](req, ctx as MockContext);
   const csp = resp.headers.get('Content-Security-Policy')!;
-  assertEquals(csp.includes("style-src 'self' 'unsafe-inline' https://unpkg.com"), true);
-  assertEquals(csp.includes("script-src 'self' 'unsafe-inline' https://unpkg.com"), true);
+  assertEquals(csp.includes("style-src 'self' 'unsafe-inline'"), true);
+  assertEquals(csp.includes("script-src 'self' 'unsafe-inline'"), true);
+  assertEquals(csp.includes('unpkg.com'), false, 'Leaflet is now self-hosted');
+});
+
+Deno.test('security headers - CSP allows service workers', async () => {
+  const { req, ctx } = createMockContext();
+  const resp = await handler[0](req, ctx as MockContext);
+  const csp = resp.headers.get('Content-Security-Policy')!;
+  assertEquals(csp.includes("worker-src 'self'"), true);
 });
 
 Deno.test('security headers - CSP allows OpenStreetMap tiles', async () => {

@@ -104,22 +104,14 @@ Deno.test('map - default center for upstate NY', () => {
 // Leaflet Script Loading Tests
 // ============================================================================
 
-Deno.test('map - leaflet CDN URL is valid', () => {
-  const leafletUrl = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+Deno.test('map - self-hosted leaflet paths are valid', () => {
+  const leafletJs = '/leaflet/leaflet.js';
+  const leafletCss = '/leaflet/leaflet.css';
 
-  assertEquals(leafletUrl.startsWith('https://'), true);
-  assertEquals(leafletUrl.includes('leaflet'), true);
-  assertEquals(leafletUrl.includes('1.9.4'), true);
-});
-
-Deno.test('map - leaflet CSS URL matches JS version', () => {
-  const jsUrl = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-  const cssUrl = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-
-  const jsVersion = jsUrl.match(/@([0-9.]+)/)?.[1];
-  const cssVersion = cssUrl.match(/@([0-9.]+)/)?.[1];
-
-  assertEquals(jsVersion, cssVersion, 'JS and CSS versions should match');
+  assertEquals(leafletJs.startsWith('/leaflet/'), true);
+  assertEquals(leafletCss.startsWith('/leaflet/'), true);
+  assertEquals(leafletJs.endsWith('.js'), true);
+  assertEquals(leafletCss.endsWith('.css'), true);
 });
 
 // ============================================================================

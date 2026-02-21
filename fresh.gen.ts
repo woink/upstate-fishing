@@ -8,16 +8,20 @@ import * as $api_middleware from './routes/api/_middleware.ts';
 import * as $api_hatches_id_ from './routes/api/hatches/[id].ts';
 import * as $api_hatches_index from './routes/api/hatches/index.ts';
 import * as $api_predict from './routes/api/predict.ts';
-import * as $api_stations_id_ from './routes/api/stations/[id].ts';
+import * as $api_stations_id_history from './routes/api/stations/[id]/history.ts';
+import * as $api_stations_id_index from './routes/api/stations/[id]/index.ts';
+import * as $api_stations_id_stats from './routes/api/stations/[id]/stats.ts';
 import * as $api_streams_id_conditions from './routes/api/streams/[id]/conditions.ts';
 import * as $api_streams_id_index from './routes/api/streams/[id]/index.ts';
 import * as $api_streams_index from './routes/api/streams/index.ts';
+import * as $api_top_picks from './routes/api/top-picks.ts';
 import * as $hatches_index from './routes/hatches/index.tsx';
 import * as $index from './routes/index.tsx';
 import * as $map from './routes/map.tsx';
 import * as $streams_id_ from './routes/streams/[id].tsx';
 import * as $streams_index from './routes/streams/index.tsx';
 import * as $HatchChart from './islands/HatchChart.tsx';
+import * as $HistoryChart from './islands/HistoryChart.tsx';
 import * as $StationMap from './islands/StationMap.tsx';
 import * as $StreamConditionsCard from './islands/StreamConditionsCard.tsx';
 import * as $StreamList from './islands/StreamList.tsx';
@@ -32,10 +36,13 @@ const manifest = {
     './routes/api/hatches/[id].ts': $api_hatches_id_,
     './routes/api/hatches/index.ts': $api_hatches_index,
     './routes/api/predict.ts': $api_predict,
-    './routes/api/stations/[id].ts': $api_stations_id_,
+    './routes/api/stations/[id]/history.ts': $api_stations_id_history,
+    './routes/api/stations/[id]/index.ts': $api_stations_id_index,
+    './routes/api/stations/[id]/stats.ts': $api_stations_id_stats,
     './routes/api/streams/[id]/conditions.ts': $api_streams_id_conditions,
     './routes/api/streams/[id]/index.ts': $api_streams_id_index,
     './routes/api/streams/index.ts': $api_streams_index,
+    './routes/api/top-picks.ts': $api_top_picks,
     './routes/hatches/index.tsx': $hatches_index,
     './routes/index.tsx': $index,
     './routes/map.tsx': $map,
@@ -44,6 +51,7 @@ const manifest = {
   },
   islands: {
     './islands/HatchChart.tsx': $HatchChart,
+    './islands/HistoryChart.tsx': $HistoryChart,
     './islands/StationMap.tsx': $StationMap,
     './islands/StreamConditionsCard.tsx': $StreamConditionsCard,
     './islands/StreamList.tsx': $StreamList,

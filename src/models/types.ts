@@ -277,6 +277,25 @@ export const StationStatsSchema = z.object({
 export type StationStats = z.infer<typeof StationStatsSchema>;
 
 // ============================================================================
+// Top Picks Scoring Types
+// ============================================================================
+
+export const TopPickScoreSchema = z.object({
+  stream: StreamSchema,
+  score: z.number().min(0).max(100),
+  fishingQuality: FishingQualitySchema,
+  waterTempF: z.number().nullable(),
+  airTempF: z.number().nullable(),
+  dischargeCfs: z.number().nullable(),
+  topHatches: z.array(z.object({
+    name: z.string(),
+    probability: z.number().min(0).max(1),
+  })),
+  summary: z.string(),
+});
+export type TopPickScore = z.infer<typeof TopPickScoreSchema>;
+
+// ============================================================================
 // Data Ingestion Types
 // ============================================================================
 

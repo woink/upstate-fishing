@@ -5,7 +5,11 @@
 /// <reference lib="deno.ns" />
 
 import { loadSync } from '$std/dotenv/mod.ts';
-loadSync({ export: true, examplePath: null });
+try {
+  loadSync({ export: true, examplePath: null });
+} catch {
+  // .env file absent (e.g. Deno Deploy) — env vars set via dashboard
+}
 
 import { start } from '$fresh/server.ts';
 import manifest from './fresh.gen.ts';

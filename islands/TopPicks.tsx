@@ -1,39 +1,18 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
-import type { StreamConditions } from '@shared/models/types.ts';
-import {
-  parameterStatusDisplay,
-  qualityClasses,
-  qualityLabels,
-  qualityOrder,
-} from '@shared/lib/colors.ts';
+import type { TopPickScore } from '@shared/models/types.ts';
+import { qualityClasses, qualityLabels } from '@shared/lib/colors.ts';
 
-function renderStationSummary(cond: StreamConditions) {
-  const station = cond.stationData[0];
-  const tempStatus = station?.dataAvailability?.waterTemp ?? 'no_data';
-  const tempDisplay = parameterStatusDisplay[tempStatus] ??
-    parameterStatusDisplay.no_data;
-  const flowStatus = station?.dataAvailability?.discharge ?? 'no_data';
-  const flowDisplay = parameterStatusDisplay[flowStatus] ??
-    parameterStatusDisplay.no_data;
-
+function renderStationSummary(pick: TopPickScore) {
   return (
     <div class='text-sm space-y-1 mb-3'>
-      {station?.waterTempF != null
-        ? <p>💧 Water: {station.waterTempF}°F</p>
-        : (
-          <p class={tempDisplay.classes} title={tempDisplay.title}>
-            💧 Water: {tempDisplay.text}
-          </p>
-        )}
-      {cond.weather && <p>🌡️ Air: {cond.weather.airTempF}°F</p>}
-      {station?.dischargeCfs != null
-        ? <p>🌊 Flow: {station.dischargeCfs} cfs</p>
-        : (
-          <p class={flowDisplay.classes} title={flowDisplay.title}>
-            🌊 Flow: {flowDisplay.text}
-          </p>
-        )}
+      {pick.waterTempF != null
+        ? <p>💧 Water: {pick.waterTempF}°F</p>
+        : <p class='text-slate-400' title='Not monitored at this station'>💧 Water: N/A</p>}
+      {pick.airTempF != null && <p>🌡️ Air: {pick.airTempF}°F</p>}
+      {pick.dischargeCfs != null
+        ? <p>🌊 Flow: {pick.dischargeCfs} cfs</p>
+        : <p class='text-slate-400' title='Not monitored at this station'>🌊 Flow: N/A</p>}
     </div>
   );
 }
@@ -43,45 +22,24 @@ interface TopPicksProps {
 }
 
 export default function TopPicks({ apiUrl }: TopPicksProps) {
-  const conditions = useSignal<StreamConditions[]>([]);
+  const picks = useSignal<TopPickScore[]>([]);
   const loading = useSignal(true);
   const error = useSignal<string | null>(null);
 
   useEffect(() => {
-    async function fetchConditions() {
+    async function fetchTopPicks() {
       loading.value = true;
       error.value = null;
 
       try {
-        // Fetch all streams first
-        const streamsRes = await fetch(`${apiUrl}/api/streams`);
-        const streamsJson = await streamsRes.json();
+        const res = await fetch(`${apiUrl}/api/top-picks?count=3`);
+        const json = await res.json();
 
-        if (!streamsJson.success || !streamsJson.data) {
-          throw new Error('Failed to fetch streams');
+        if (!json.success || !json.data) {
+          throw new Error('Failed to fetch top picks');
         }
 
-        // Fetch conditions for each stream (in parallel, limited)
-        const streams = streamsJson.data.slice(0, 6); // Limit to 6 for speed
-        const conditionPromises = streams.map(async (stream: { id: string }) => {
-          try {
-            const res = await fetch(`${apiUrl}/api/streams/${stream.id}/conditions`);
-            const json = await res.json();
-            return json.success ? json.data : null;
-          } catch {
-            return null;
-          }
-        });
-
-        const results = await Promise.all(conditionPromises);
-        const validConditions = results.filter((c): c is StreamConditions => c !== null);
-
-        // Sort by fishing quality
-        validConditions.sort((a, b) =>
-          qualityOrder[a.fishingQuality] - qualityOrder[b.fishingQuality]
-        );
-
-        conditions.value = validConditions.slice(0, 3); // Top 3
+        picks.value = json.data;
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'Failed to load';
       } finally {
@@ -89,7 +47,7 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
       }
     }
 
-    fetchConditions();
+    fetchTopPicks();
   }, [apiUrl]);
 
   if (loading.value) {
@@ -119,7 +77,7 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
     );
   }
 
-  if (conditions.value.length === 0) {
+  if (picks.value.length === 0) {
     return (
       <div class='bg-slate-100 rounded-lg p-6 text-center'>
         <p class='text-slate-600'>No conditions data available</p>
@@ -131,33 +89,33 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
     <div>
       <h2 class='text-xl font-semibold text-slate-800 mb-4'>🎣 Today's Top Picks</h2>
       <div class='grid md:grid-cols-3 gap-4'>
-        {conditions.value.map((cond, i) => (
+        {picks.value.map((pick, i) => (
           <a
-            key={cond.stream.id}
-            href={`/streams/${cond.stream.id}`}
+            key={pick.stream.id}
+            href={`/streams/${pick.stream.id}`}
             class={`block rounded-lg border-l-4 p-4 shadow hover:shadow-md transition ${
-              qualityClasses[cond.fishingQuality]
+              qualityClasses[pick.fishingQuality]
             }`}
           >
             <div class='flex items-start justify-between mb-2'>
-              <h3 class='font-semibold'>{cond.stream.name}</h3>
+              <h3 class='font-semibold'>{pick.stream.name}</h3>
               {i === 0 && <span class='text-lg'>⭐</span>}
             </div>
 
-            {renderStationSummary(cond)}
+            {renderStationSummary(pick)}
 
-            {cond.predictedHatches.length > 0 && (
+            {pick.topHatches.length > 0 && (
               <div class='text-xs'>
                 <span class='font-medium'>Likely hatches:</span>
-                {cond.predictedHatches
+                {pick.topHatches
                   .slice(0, 2)
-                  .map((p) => p.hatch.commonName)
+                  .map((h) => h.name)
                   .join(', ')}
               </div>
             )}
 
             <div class='mt-2 text-xs font-medium'>
-              {qualityLabels[cond.fishingQuality]}
+              {qualityLabels[pick.fishingQuality]}
             </div>
           </a>
         ))}

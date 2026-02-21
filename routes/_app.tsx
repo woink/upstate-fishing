@@ -7,18 +7,17 @@ export default function App({ Component }: PageProps) {
         <meta charset='utf-8' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0' />
         <title>Upstate Fishing</title>
+        <meta
+          name='description'
+          content='Real-time fishing conditions and hatch predictions for NY, NJ, CT, and NC trout streams.'
+        />
+        <meta name='theme-color' content='#15803d' />
+        <link rel='manifest' href='/manifest.json' />
+        <link rel='apple-touch-icon' href='/icons/icon-192.png' />
+        <meta name='apple-mobile-web-app-capable' content='yes' />
+        <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
+        <meta name='apple-mobile-web-app-title' content='Upstate Fishing' />
         <link rel='stylesheet' href='/styles.css' />
-        <link
-          rel='stylesheet'
-          href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
-          integrity='sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='
-          crossorigin=''
-        />
-        <script
-          src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
-          integrity='sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='
-          crossorigin=''
-        />
       </head>
       <body class='bg-slate-50 min-h-screen'>
         <nav class='bg-forest-700 text-white shadow-lg'>
@@ -44,6 +43,12 @@ export default function App({ Component }: PageProps) {
             Data from USGS and Weather.gov
           </div>
         </footer>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){})}`,
+          }}
+        />
       </body>
     </html>
   );
