@@ -5,6 +5,7 @@
 
 import { z } from 'zod';
 import type { DataAvailability, DataCompleteness, StationData } from '../models/types.ts';
+import { logger } from '../utils/logger.ts';
 import { celsiusToFahrenheit } from '../utils/temperature.ts';
 
 // ============================================================================
@@ -156,6 +157,7 @@ export class USGSService {
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    const start = performance.now();
 
     try {
       const response = await fetch(url.toString(), {
@@ -171,8 +173,22 @@ export class USGSService {
 
       const raw = await response.json();
       const parsed = USGSResponseSchema.parse(raw);
+      const durationMs = Math.round(performance.now() - start);
+
+      logger.info('USGS fetch complete', {
+        stations: stationIds.length,
+        durationMs,
+      });
 
       return this.transformResponse(parsed);
+    } catch (error) {
+      const durationMs = Math.round(performance.now() - start);
+      logger.error('USGS fetch failed', {
+        stations: stationIds.length,
+        durationMs,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
     } finally {
       clearTimeout(timeoutId);
     }
