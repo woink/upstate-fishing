@@ -1,7 +1,7 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
 import type { TopPickScore } from '@shared/models/types.ts';
-import { qualityClasses, qualityLabels, qualityOrder } from '@shared/lib/colors.ts';
+import { qualityClasses, qualityLabels } from '@shared/lib/colors.ts';
 
 function renderStationSummary(pick: TopPickScore) {
   return (
@@ -39,13 +39,7 @@ export default function TopPicks({ apiUrl }: TopPicksProps) {
           throw new Error('Failed to fetch top picks');
         }
 
-        // Already sorted by score server-side, but apply quality tiebreaker
-        const sorted = [...json.data].sort((a: TopPickScore, b: TopPickScore) => {
-          if (b.score !== a.score) return b.score - a.score;
-          return qualityOrder[a.fishingQuality] - qualityOrder[b.fishingQuality];
-        });
-
-        picks.value = sorted;
+        picks.value = json.data;
       } catch (err) {
         error.value = err instanceof Error ? err.message : 'Failed to load';
       } finally {
