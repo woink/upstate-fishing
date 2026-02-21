@@ -31,6 +31,8 @@ export interface TimeSeriesPoint {
  * Fetch historical readings for a station over the last N days.
  * Returns chronologically ordered time-series data.
  */
+const MAX_HISTORY_ROWS = 2000;
+
 export async function getStationHistory(
   stationId: string,
   days: number = 7,
@@ -49,7 +51,8 @@ export async function getStationHistory(
       .select('recorded_at, water_temp_f, discharge_cfs, gage_height_ft')
       .eq('station_id', stationId)
       .gte('recorded_at', since.toISOString())
-      .order('recorded_at', { ascending: true });
+      .order('recorded_at', { ascending: false })
+      .limit(MAX_HISTORY_ROWS);
 
     if (error) {
       logger.error('Failed to query station history', {
@@ -64,7 +67,7 @@ export async function getStationHistory(
       waterTempF: row.water_temp_f,
       dischargeCfs: row.discharge_cfs,
       gageHeightFt: row.gage_height_ft,
-    }));
+    })).reverse();
   } catch (err) {
     logger.error('Station history query failed', {
       stationId,
