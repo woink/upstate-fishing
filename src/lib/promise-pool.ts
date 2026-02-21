@@ -14,6 +14,7 @@ export async function promisePool<T>(
 
   async function runNext(): Promise<void> {
     while (nextIndex < tasks.length) {
+      // Safe without locks: JS is single-threaded, so read + increment is atomic
       const i = nextIndex++;
       try {
         const value = await tasks[i]();

@@ -65,6 +65,13 @@ export function makeWeatherKey(latitude: number, longitude: number): string[] {
 // Cache Service Interface (for dependency injection / testing)
 // ============================================================================
 
+/**
+ * Minimal cache contract for dependency injection and testing.
+ * `get` returns `null` on both cache miss and error — callers treat
+ * both as "data not cached" and fall through to the live API.
+ * This keeps the interface simple and enables graceful degradation
+ * when the KV store is unavailable.
+ */
 export interface CacheLike {
   get<T>(key: string[]): Promise<CacheResult<T> | null>;
   set<T>(key: string[], data: T, ttlMs: number): Promise<void>;
