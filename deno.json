@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "exports": "./src/mod.ts",
   "tasks": {
-    "dev": "deno run -A npm:vite@6",
-    "build": "deno run -A npm:vite@6 build",
+    "dev": "deno run -A npm:vite@7",
+    "build": "deno run -A npm:vite@7 build",
     "preview": "deno serve -A --unstable-kv _fresh/server.js",
     "test": "deno test --env-file --allow-net --allow-env --allow-read --allow-write --unstable-kv --ignore=tests/e2e/ tests/",
     "check": "deno check --unstable-kv **/*.ts **/*.tsx",
@@ -23,6 +23,7 @@
     "preact/": "npm:preact@10.27.2/",
     "@preact/signals": "npm:@preact/signals@2.8.1",
     "@preact/signals-core": "npm:@preact/signals-core@1.13.0",
+    "preact-render-to-string": "npm:preact-render-to-string@^6.6.3",
     "tailwindcss": "npm:@tailwindcss/vite@^4",
     "@std/assert": "jsr:@std/assert@1",
     "@std/dotenv": "jsr:@std/dotenv@^0.225",
