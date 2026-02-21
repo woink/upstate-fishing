@@ -1,4 +1,4 @@
-import { type Handlers } from 'fresh';
+import { type RouteHandler } from 'fresh';
 import { STREAMS } from '@shared/data/streams.ts';
 import { apiError, apiSuccessList, CACHE_DYNAMIC } from '@shared/http/api-response.ts';
 import { haversineDistance } from '@shared/utils/distance.ts';
@@ -7,7 +7,7 @@ import type { NearbyStream } from '@shared/models/types.ts';
 const DEFAULT_RADIUS_MILES = 50;
 const MAX_RADIUS_MILES = 500;
 
-export const handler: Handlers = {
+export const handler: RouteHandler = {
   GET(ctx) {
     const url = new URL(ctx.req.url);
 

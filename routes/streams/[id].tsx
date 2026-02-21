@@ -1,4 +1,4 @@
-import { type Handlers, type PageProps } from 'fresh';
+import { type PageProps, type RouteHandler } from 'fresh';
 import type { StreamConditions } from '@shared/models/types.ts';
 import { getStreamById } from '@shared/data/streams.ts';
 import { cachedUSGSService } from '@shared/services/cached-usgs.ts';
@@ -14,7 +14,7 @@ interface StreamDetailData {
   apiUrl: string;
 }
 
-export const handler: Handlers<StreamDetailData> = {
+export const handler: RouteHandler<StreamDetailData> = {
   async GET(ctx) {
     const { id } = ctx.params;
     const stream = getStreamById(id);

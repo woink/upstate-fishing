@@ -1,11 +1,11 @@
-import { type Handlers, type PageProps } from 'fresh';
+import { type PageProps, type RouteHandler } from 'fresh';
 import TopPicks from '../islands/TopPicks.tsx';
 
 interface HomeData {
   apiUrl: string;
 }
 
-export const handler: Handlers<HomeData> = {
+export const handler: RouteHandler<HomeData> = {
   GET(ctx) {
     // Use empty string for relative URLs - the frontend proxies /api/* to backend
     const apiUrl = '';

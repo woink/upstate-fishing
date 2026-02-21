@@ -1,4 +1,4 @@
-import { type Handlers, type PageProps } from 'fresh';
+import { type PageProps, type RouteHandler } from 'fresh';
 import type { Hatch, InsectOrder } from '@shared/models/types.ts';
 import { filterHatchesByQuery } from '@shared/data/hatches.ts';
 import HatchChart from '../../islands/HatchChart.tsx';
@@ -10,7 +10,7 @@ interface HatchesPageData {
   error: string | null;
 }
 
-export const handler: Handlers<HatchesPageData> = {
+export const handler: RouteHandler<HatchesPageData> = {
   GET(ctx) {
     const url = new URL(ctx.req.url);
     const { hatches, order: filterOrder, month: filterMonth } = filterHatchesByQuery({

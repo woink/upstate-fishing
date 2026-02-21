@@ -1,9 +1,9 @@
-import { type Handlers } from 'fresh';
+import { type RouteHandler } from 'fresh';
 import { getTopPicks } from '@shared/services/top-picks.ts';
 import { logger } from '@shared/utils/logger.ts';
 import { apiError, CACHE_DYNAMIC } from '@shared/http/api-response.ts';
 
-export const handler: Handlers = {
+export const handler: RouteHandler = {
   async GET(ctx) {
     const url = new URL(ctx.req.url);
     const countParam = url.searchParams.get('count');
