@@ -1,11 +1,11 @@
-import { Handlers } from '$fresh/server.ts';
+import { type Handlers } from 'fresh';
 import { getTopPicks } from '@shared/services/top-picks.ts';
 import { logger } from '@shared/utils/logger.ts';
 import { apiError, CACHE_DYNAMIC } from '@shared/http/api-response.ts';
 
 export const handler: Handlers = {
-  async GET(req) {
-    const url = new URL(req.url);
+  async GET(ctx) {
+    const url = new URL(ctx.req.url);
     const countParam = url.searchParams.get('count');
     const count = countParam ? Math.min(Math.max(parseInt(countParam, 10) || 5, 1), 10) : 5;
 

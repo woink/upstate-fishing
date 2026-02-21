@@ -1,13 +1,13 @@
-import { FreshContext } from '$fresh/server.ts';
+import { type FreshContext } from 'fresh';
 
 export const handler = [
-  async function corsMiddleware(req: Request, ctx: FreshContext) {
-    const origin = req.headers.get('origin');
+  async function corsMiddleware(ctx: FreshContext) {
+    const origin = ctx.req.headers.get('origin');
     const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') ?? 'http://localhost:8000')
       .split(',')
       .map((o) => o.trim());
 
-    if (req.method === 'OPTIONS') {
+    if (ctx.req.method === 'OPTIONS') {
       return new Response(null, {
         status: 204,
         headers: {

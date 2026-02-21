@@ -1,7 +1,7 @@
-import { FreshContext } from '$fresh/server.ts';
+import { type FreshContext } from 'fresh';
 
 export const handler = [
-  async function securityHeaders(req: Request, ctx: FreshContext) {
+  async function securityHeaders(ctx: FreshContext) {
     const resp = await ctx.next();
 
     resp.headers.set('X-Content-Type-Options', 'nosniff');
@@ -21,8 +21,8 @@ export const handler = [
     ].join('; ');
     resp.headers.set('Content-Security-Policy', csp);
 
-    const isHttps = req.headers.get('x-forwarded-proto') === 'https' ||
-      req.url.startsWith('https:');
+    const isHttps = ctx.req.headers.get('x-forwarded-proto') === 'https' ||
+      ctx.req.url.startsWith('https:');
     if (isHttps) {
       resp.headers.set(
         'Strict-Transport-Security',

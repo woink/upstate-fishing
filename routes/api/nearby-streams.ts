@@ -1,4 +1,4 @@
-import { Handlers } from '$fresh/server.ts';
+import { type Handlers } from 'fresh';
 import { STREAMS } from '@shared/data/streams.ts';
 import { apiError, apiSuccessList, CACHE_DYNAMIC } from '@shared/http/api-response.ts';
 import { haversineDistance } from '@shared/utils/distance.ts';
@@ -8,8 +8,8 @@ const DEFAULT_RADIUS_MILES = 50;
 const MAX_RADIUS_MILES = 500;
 
 export const handler: Handlers = {
-  GET(req, _ctx) {
-    const url = new URL(req.url);
+  GET(ctx) {
+    const url = new URL(ctx.req.url);
 
     const latStr = url.searchParams.get('lat');
     const lonStr = url.searchParams.get('lon');

@@ -1,4 +1,4 @@
-import { Handlers } from '$fresh/server.ts';
+import { type Handlers } from 'fresh';
 import { z } from 'zod';
 import { predictionService } from '@shared/services/predictions.ts';
 import { fahrenheitToCelsius } from '@shared/utils/temperature.ts';
@@ -35,15 +35,15 @@ export const PredictRequestSchema = z.object({
 );
 
 export const handler: Handlers = {
-  async POST(req, _ctx) {
-    const contentType = req.headers.get('content-type');
+  async POST(ctx) {
+    const contentType = ctx.req.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
       return apiError('Content-Type must be application/json', 'INVALID_CONTENT_TYPE', 415);
     }
 
     let body;
     try {
-      body = await req.json();
+      body = await ctx.req.json();
     } catch {
       return apiError('Invalid JSON in request body', 'INVALID_JSON', 400);
     }
