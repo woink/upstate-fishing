@@ -46,6 +46,9 @@ const regionLabels: Record<string, string> = {
   delaware: 'Delaware System',
   croton: 'Croton Watershed',
   raritan: 'Raritan / NJ',
+  connecticut: 'Connecticut',
+  'nc-highcountry': 'NC High Country',
+  'nc-foothills': 'NC Foothills',
 };
 
 Deno.test('regionLabels - has all regions', () => {
@@ -53,26 +56,17 @@ Deno.test('regionLabels - has all regions', () => {
   assertEquals('delaware' in regionLabels, true);
   assertEquals('croton' in regionLabels, true);
   assertEquals('raritan' in regionLabels, true);
+  assertEquals('connecticut' in regionLabels, true);
+  assertEquals('nc-highcountry' in regionLabels, true);
+  assertEquals('nc-foothills' in regionLabels, true);
 });
 
 Deno.test('regionLabels - has human-readable names', () => {
   assertEquals(regionLabels.catskills, 'Catskills');
   assertEquals(regionLabels.delaware, 'Delaware System');
-});
-
-Deno.test('regionLabels - connecticut is NOT present', () => {
-  // Documents gap -- see issue #49 for region navigation improvements
-  assertEquals('connecticut' in regionLabels, false);
-});
-
-Deno.test('regionLabels - nc-highcountry is NOT present', () => {
-  // Documents gap -- see issue #49 for region navigation improvements
-  assertEquals('nc-highcountry' in regionLabels, false);
-});
-
-Deno.test('regionLabels - nc-foothills is NOT present', () => {
-  // Documents gap -- see issue #49 for region navigation improvements
-  assertEquals('nc-foothills' in regionLabels, false);
+  assertEquals(regionLabels.connecticut, 'Connecticut');
+  assertEquals(regionLabels['nc-highcountry'], 'NC High Country');
+  assertEquals(regionLabels['nc-foothills'], 'NC Foothills');
 });
 
 // ============================================================================

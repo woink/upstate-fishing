@@ -21,7 +21,7 @@ export default function Home({ data }: PageProps<HomeData>) {
           Where should I fish today?
         </h1>
         <p class='text-slate-600'>
-          Real-time conditions and hatch predictions for upstate NY and NJ streams.
+          Real-time conditions and hatch predictions for NY, NJ, CT, and NC streams.
         </p>
       </section>
 
@@ -49,6 +49,16 @@ export default function Home({ data }: PageProps<HomeData>) {
             <li>
               <a href='/streams?state=NJ' class='text-stream-600 hover:underline'>
                 New Jersey Waters
+              </a>
+            </li>
+            <li>
+              <a href='/streams?state=CT' class='text-stream-600 hover:underline'>
+                Connecticut Waters
+              </a>
+            </li>
+            <li>
+              <a href='/streams?state=NC' class='text-stream-600 hover:underline'>
+                NC Streams
               </a>
             </li>
           </ul>

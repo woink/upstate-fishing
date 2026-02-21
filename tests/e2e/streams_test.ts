@@ -40,12 +40,21 @@ describe('Streams Page', () => {
   it('displays the page title and filter buttons', async () => {
     await assertTextContent(page, 'h1', 'All Streams');
 
-    // Region filter buttons
+    // State tabs
     await assertVisible(page, 'a[href="/streams"]');
+    await assertVisible(page, 'a[href="/streams?state=NY"]');
+    await assertVisible(page, 'a[href="/streams?state=NJ"]');
+    await assertVisible(page, 'a[href="/streams?state=CT"]');
+    await assertVisible(page, 'a[href="/streams?state=NC"]');
+
+    // Region filter buttons (all visible when "All" is selected)
     await assertVisible(page, 'a[href="/streams?region=catskills"]');
     await assertVisible(page, 'a[href="/streams?region=delaware"]');
     await assertVisible(page, 'a[href="/streams?region=croton"]');
     await assertVisible(page, 'a[href="/streams?region=raritan"]');
+    await assertVisible(page, 'a[href="/streams?region=connecticut"]');
+    await assertVisible(page, 'a[href="/streams?region=nc-highcountry"]');
+    await assertVisible(page, 'a[href="/streams?region=nc-foothills"]');
   });
 
   it('"All" filter is active by default', async () => {
@@ -138,5 +147,30 @@ describe('Streams Page - State Filtering', () => {
   it('filters streams by NY state', async () => {
     await navigateTo(page, '/streams?state=NY');
     await assertTextContent(page, 'h1', 'NY Streams');
+  });
+
+  it('filters streams by CT state', async () => {
+    await navigateTo(page, '/streams?state=CT');
+    await assertTextContent(page, 'h1', 'CT Streams');
+  });
+
+  it('filters streams by NC state', async () => {
+    await navigateTo(page, '/streams?state=NC');
+    await assertTextContent(page, 'h1', 'NC Streams');
+  });
+
+  it('filters by Connecticut region', async () => {
+    await navigateTo(page, '/streams?region=connecticut');
+    await assertTextContent(page, 'h1', 'Connecticut Streams');
+  });
+
+  it('filters by NC High Country region', async () => {
+    await navigateTo(page, '/streams?region=nc-highcountry');
+    await assertTextContent(page, 'h1', 'NC High Country Streams');
+  });
+
+  it('filters by NC Foothills region', async () => {
+    await navigateTo(page, '/streams?region=nc-foothills');
+    await assertTextContent(page, 'h1', 'NC Foothills Streams');
   });
 });
