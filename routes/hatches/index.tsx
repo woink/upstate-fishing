@@ -1,4 +1,4 @@
-import { Handlers, PageProps } from '$fresh/server.ts';
+import { type Handlers, type PageProps } from 'fresh';
 import type { Hatch, InsectOrder } from '@shared/models/types.ts';
 import { filterHatchesByQuery } from '@shared/data/hatches.ts';
 import HatchChart from '../../islands/HatchChart.tsx';
@@ -11,8 +11,8 @@ interface HatchesPageData {
 }
 
 export const handler: Handlers<HatchesPageData> = {
-  GET(req, ctx) {
-    const url = new URL(req.url);
+  GET(ctx) {
+    const url = new URL(ctx.req.url);
     const { hatches, order: filterOrder, month: filterMonth } = filterHatchesByQuery({
       order: url.searchParams.get('order'),
       month: url.searchParams.get('month'),

@@ -1,4 +1,4 @@
-import { Handlers, PageProps } from '$fresh/server.ts';
+import { type Handlers, type PageProps } from 'fresh';
 import type { Stream } from '@shared/models/types.ts';
 import { filterStreamsByQuery } from '@shared/data/streams.ts';
 import StreamList from '../../islands/StreamList.tsx';
@@ -11,8 +11,8 @@ interface StreamsPageData {
 }
 
 export const handler: Handlers<StreamsPageData> = {
-  GET(req, ctx) {
-    const url = new URL(req.url);
+  GET(ctx) {
+    const url = new URL(ctx.req.url);
     const { streams, region, state } = filterStreamsByQuery({
       region: url.searchParams.get('region'),
       state: url.searchParams.get('state'),

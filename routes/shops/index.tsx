@@ -1,4 +1,4 @@
-import { Handlers, PageProps } from '$fresh/server.ts';
+import { type Handlers, type PageProps } from 'fresh';
 import type { FlyShop } from '@shared/models/types.ts';
 import { filterShopsByQuery } from '@shared/data/fly-shops.ts';
 
@@ -9,8 +9,8 @@ interface ShopsPageData {
 }
 
 export const handler: Handlers<ShopsPageData> = {
-  GET(req, ctx) {
-    const url = new URL(req.url);
+  GET(ctx) {
+    const url = new URL(ctx.req.url);
     const { shops, region, state } = filterShopsByQuery({
       region: url.searchParams.get('region'),
       state: url.searchParams.get('state'),

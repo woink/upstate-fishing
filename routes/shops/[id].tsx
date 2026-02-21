@@ -1,4 +1,4 @@
-import { Handlers, PageProps } from '$fresh/server.ts';
+import { type Handlers, type PageProps } from 'fresh';
 import type { FlyShop, Stream } from '@shared/models/types.ts';
 import { getShopById } from '@shared/data/fly-shops.ts';
 import { STREAMS } from '@shared/data/streams.ts';
@@ -27,7 +27,7 @@ function distanceMiles(
 }
 
 export const handler: Handlers<ShopDetailData> = {
-  GET(_req, ctx) {
+  GET(ctx) {
     const { id } = ctx.params;
     const shop = getShopById(id);
 

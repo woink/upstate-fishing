@@ -1,4 +1,4 @@
-import { Handlers, PageProps } from '$fresh/server.ts';
+import { type Handlers, type PageProps } from 'fresh';
 import TopPicks from '../islands/TopPicks.tsx';
 
 interface HomeData {
@@ -6,7 +6,7 @@ interface HomeData {
 }
 
 export const handler: Handlers<HomeData> = {
-  GET(_req, ctx) {
+  GET(ctx) {
     // Use empty string for relative URLs - the frontend proxies /api/* to backend
     const apiUrl = '';
     return ctx.render({ apiUrl });
