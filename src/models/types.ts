@@ -253,7 +253,7 @@ export const NearbyStreamSchema = z.object({
   state: StateSchema,
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
-  distanceMiles: z.number().positive(),
+  distanceMiles: z.number().nonnegative(),
 });
 export type NearbyStream = z.infer<typeof NearbyStreamSchema>;
 
