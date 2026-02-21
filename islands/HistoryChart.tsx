@@ -1,12 +1,6 @@
 import { useSignal } from '@preact/signals';
 import { useEffect } from 'preact/hooks';
-
-interface TimeSeriesPoint {
-  timestamp: string;
-  waterTempF: number | null;
-  dischargeCfs: number | null;
-  gageHeightFt: number | null;
-}
+import type { TimeSeriesPoint } from '@shared/services/historical.ts';
 
 interface HistoryChartProps {
   stationId: string;
