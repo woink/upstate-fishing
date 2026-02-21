@@ -20,11 +20,14 @@ import * as $index from './routes/index.tsx';
 import * as $map from './routes/map.tsx';
 import * as $streams_id_ from './routes/streams/[id].tsx';
 import * as $streams_index from './routes/streams/index.tsx';
+import * as $wizard from './routes/wizard.tsx';
+import * as $api_nearby_streams from './routes/api/nearby-streams.ts';
 import * as $HatchChart from './islands/HatchChart.tsx';
 import * as $HistoryChart from './islands/HistoryChart.tsx';
 import * as $StationMap from './islands/StationMap.tsx';
 import * as $StreamConditionsCard from './islands/StreamConditionsCard.tsx';
 import * as $StreamList from './islands/StreamList.tsx';
+import * as $StreamWizard from './islands/StreamWizard.tsx';
 import * as $TopPicks from './islands/TopPicks.tsx';
 import type { Manifest } from '$fresh/server.ts';
 
@@ -48,6 +51,8 @@ const manifest = {
     './routes/map.tsx': $map,
     './routes/streams/[id].tsx': $streams_id_,
     './routes/streams/index.tsx': $streams_index,
+    './routes/wizard.tsx': $wizard,
+    './routes/api/nearby-streams.ts': $api_nearby_streams,
   },
   islands: {
     './islands/HatchChart.tsx': $HatchChart,
@@ -55,6 +60,7 @@ const manifest = {
     './islands/StationMap.tsx': $StationMap,
     './islands/StreamConditionsCard.tsx': $StreamConditionsCard,
     './islands/StreamList.tsx': $StreamList,
+    './islands/StreamWizard.tsx': $StreamWizard,
     './islands/TopPicks.tsx': $TopPicks,
   },
   baseUrl: import.meta.url,
