@@ -19,7 +19,7 @@ function denoNpmSpecifiers(): Plugin {
     // intercept npm: specifiers from JSR-loaded @fresh/core source before
     // Vite's built-in vite:resolve can reject them as built-in modules.
     enforce: 'pre',
-    resolveId(id) {
+    resolveId(id, importer) {
       if (!id.startsWith('npm:')) return null;
       const spec = id.slice(4); // strip "npm:"
       let bare: string;
@@ -38,7 +38,7 @@ function denoNpmSpecifiers(): Plugin {
         const slashAfterAt = spec.indexOf('/', atIdx > 0 ? atIdx : 0);
         if (slashAfterAt > 0) bare += spec.slice(slashAfterAt);
       }
-      return this.resolve(bare, undefined, { skipSelf: true });
+      return this.resolve(bare, importer, { skipSelf: true });
     },
   };
 }
