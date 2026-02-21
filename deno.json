@@ -17,6 +17,7 @@
     "fresh": "jsr:@fresh/core@^2",
     "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^2",
     "preact": "npm:preact@10.27.2",
+    "preact/jsx-runtime": "npm:preact@10.27.2/jsx-runtime",
     "preact/": "npm:preact@10.27.2/",
     "@preact/signals": "npm:@preact/signals@2.8.1",
     "@preact/signals-core": "npm:@preact/signals-core@1.13.0",
