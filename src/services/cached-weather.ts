@@ -39,6 +39,7 @@ export class CachedWeatherService {
       logger.warn('Cache read failed, falling back to API', {
         key: key.join('/'),
         error: err instanceof Error ? err.message : String(err),
+        errorType: err instanceof Error ? err.constructor.name : typeof err,
       });
     }
 
@@ -60,6 +61,7 @@ export class CachedWeatherService {
       logger.warn('Cache write failed', {
         key: key.join('/'),
         error: err instanceof Error ? err.message : String(err),
+        errorType: err instanceof Error ? err.constructor.name : typeof err,
       });
     }
 

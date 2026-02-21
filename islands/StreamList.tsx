@@ -81,7 +81,8 @@ export default function StreamList({ streams, apiUrl }: StreamListProps) {
       const newErrors = new Set(errorIds.value);
       const doneIds = new Set(loadingIds.value);
 
-      for (const result of results) {
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
         if (result.status === 'fulfilled') {
           const { streamId, json } = result.value;
           doneIds.delete(streamId);
@@ -92,9 +93,8 @@ export default function StreamList({ streams, apiUrl }: StreamListProps) {
             newErrors.add(streamId);
           }
         } else {
-          // Rejected — find the stream ID from the task index
-          const idx = results.indexOf(result);
-          const streamId = streamsToLoad[idx]?.id;
+          // Rejected — use loop index (promisePool preserves task order)
+          const streamId = streamsToLoad[i]?.id;
           if (streamId) {
             doneIds.delete(streamId);
             newErrors.add(streamId);

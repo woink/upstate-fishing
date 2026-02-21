@@ -30,8 +30,19 @@ declare namespace L {
     fillOpacity?: number;
   }
 
+  interface FitBoundsOptions {
+    padding?: [number, number];
+    maxZoom?: number;
+  }
+
+  interface LatLngBounds {
+    extend(latlng: [number, number]): this;
+    isValid(): boolean;
+  }
+
   interface Map {
     setView(center: [number, number], zoom: number): this;
+    fitBounds(bounds: LatLngBounds, options?: FitBoundsOptions): this;
     invalidateSize(): this;
     remove(): void;
     addLayer(layer: Layer): this;
@@ -57,4 +68,5 @@ declare namespace L {
   function map(element: unknown, options?: MapOptions): Map;
   function tileLayer(urlTemplate: string, options?: TileLayerOptions): TileLayer;
   function circleMarker(latlng: [number, number], options?: CircleMarkerOptions): CircleMarker;
+  function latLngBounds(latlngs: [number, number][]): LatLngBounds;
 }

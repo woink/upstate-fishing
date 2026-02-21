@@ -28,8 +28,11 @@ export function createServerSupabaseClient(req: Request, resHeaders: Headers) {
       getAll() {
         const cookieHeader = req.headers.get('cookie') ?? '';
         return cookieHeader.split(';').filter(Boolean).map((c) => {
-          const [name, ...rest] = c.trim().split('=');
-          return { name, value: rest.join('=') };
+          const [rawName, ...rest] = c.trim().split('=');
+          const name = rawName.trim();
+          // Strip optional double-quote wrappers per RFC 6265 §4.1.1
+          const value = rest.join('=').replace(/^"(.*)"$/, '$1');
+          return { name, value };
         });
       },
       setAll(cookies) {

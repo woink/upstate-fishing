@@ -52,10 +52,10 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
         // Prevent double initialization
         if (mapInstance.current) return;
 
-        // Center on upstate NY
+        // Initial center — will be overridden by fitBounds once markers are added
         const map = L.map(mapRef.current, {
-          center: [41.8, -74.5],
-          zoom: 8,
+          center: [39.0, -78.0],
+          zoom: 6,
         });
         mapInstance.current = map;
 
@@ -120,9 +120,17 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
       `);
     });
 
+    // Fit map to all stream markers
+    const streamsWithCoords = streams.filter((s) => s.coordinates);
+    if (streamsWithCoords.length > 0) {
+      const bounds = L.latLngBounds(
+        streamsWithCoords.map((s) => [s.coordinates!.latitude, s.coordinates!.longitude]),
+      );
+      map.fitBounds(bounds, { padding: [20, 20] });
+    }
+
     // Fetch conditions with concurrency limiting
-    const tasks = streams
-      .filter((s) => s.coordinates)
+    const tasks = streamsWithCoords
       .map((stream) => async () => {
         const res = await fetch(`${apiUrl}/api/streams/${stream.id}/conditions`);
         const json = await res.json();
@@ -134,7 +142,9 @@ export default function StationMap({ streams, apiUrl }: StationMapProps) {
 
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
-        const stream = streams.filter((s) => s.coordinates)[i];
+
+        // Use the stream from the task result (fulfilled) or the parallel array (rejected)
+        const stream = result.status === 'fulfilled' ? result.value.stream : streamsWithCoords[i];
         if (!stream) continue;
 
         const marker = markers.get(stream.id);

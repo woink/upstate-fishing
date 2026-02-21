@@ -58,6 +58,8 @@ describe('Homepage', () => {
     await assertVisible(page, 'a[href="/streams?region=delaware"]');
     await assertVisible(page, 'a[href="/streams?region=croton"]');
     await assertVisible(page, 'a[href="/streams?state=NJ"]');
+    await assertVisible(page, 'a[href="/streams?state=CT"]');
+    await assertVisible(page, 'a[href="/streams?state=NC"]');
   });
 
   it('shows hatch calendar section with link', async () => {
