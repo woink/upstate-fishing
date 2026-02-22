@@ -6,7 +6,7 @@ import { cn } from '@shared/lib/cn.ts';
 export interface DialogProps {
   open: Signal<boolean>;
   onClose: () => void;
-  title?: string;
+  title: string;
   class?: string;
   children: ComponentChildren;
 }
@@ -26,6 +26,24 @@ export function Dialog({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
+      }
+      if (e.key === 'Tab') {
+        const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        if (!focusable || focusable.length === 0) {
+          e.preventDefault();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
 
@@ -61,11 +79,9 @@ export function Dialog({
           className,
         )}
       >
-        {title && (
-          <h2 class='text-lg font-semibold leading-none tracking-tight mb-4'>
-            {title}
-          </h2>
-        )}
+        <h2 class='text-lg font-semibold leading-none tracking-tight mb-4'>
+          {title}
+        </h2>
         {children}
       </div>
     </div>
