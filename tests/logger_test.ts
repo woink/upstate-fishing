@@ -4,7 +4,7 @@
 
 import { assertEquals, assertExists, assertStringIncludes } from '@std/assert';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
-import { createRequestLogger, logger } from '@shared/utils/logger.ts';
+import { _resetMinLevel, createRequestLogger, logger } from '@shared/utils/logger.ts';
 
 describe('logger', () => {
   let captured: string[] = [];
@@ -17,6 +17,7 @@ describe('logger', () => {
   beforeEach(() => {
     Deno.env.set('DENO_DEPLOYMENT_ID', 'test-deployment');
     Deno.env.delete('LOG_LEVEL');
+    _resetMinLevel();
   });
 
   afterEach(() => {
@@ -170,6 +171,7 @@ describe('logger', () => {
   describe('debug()', () => {
     it('writes JSON to console.debug with correct level and message', () => {
       Deno.env.set('LOG_LEVEL', 'debug');
+      _resetMinLevel();
       console.debug = (...args: unknown[]) => {
         captured.push(String(args[0]));
       };
@@ -185,6 +187,7 @@ describe('logger', () => {
 
     it('spreads context keys into the log entry', () => {
       Deno.env.set('LOG_LEVEL', 'debug');
+      _resetMinLevel();
       console.debug = (...args: unknown[]) => {
         captured.push(String(args[0]));
       };
@@ -249,6 +252,7 @@ describe('logger', () => {
 
     it('debug() writes to console.debug, not other methods', () => {
       Deno.env.set('LOG_LEVEL', 'debug');
+      _resetMinLevel();
       const infoCalls: string[] = [];
       const warnCalls: string[] = [];
       const errorCalls: string[] = [];
@@ -277,6 +281,7 @@ describe('logger', () => {
   describe('log level filtering', () => {
     it('suppresses debug logs when LOG_LEVEL=info', () => {
       Deno.env.set('LOG_LEVEL', 'info');
+      _resetMinLevel();
       console.debug = (...args: unknown[]) => {
         captured.push(String(args[0]));
       };
@@ -288,6 +293,7 @@ describe('logger', () => {
 
     it('suppresses debug and info logs when LOG_LEVEL=warn', () => {
       Deno.env.set('LOG_LEVEL', 'warn');
+      _resetMinLevel();
       console.debug = (...args: unknown[]) => {
         captured.push(String(args[0]));
       };
@@ -307,6 +313,7 @@ describe('logger', () => {
 
     it('only allows error logs when LOG_LEVEL=error', () => {
       Deno.env.set('LOG_LEVEL', 'error');
+      _resetMinLevel();
       console.debug = (...args: unknown[]) => {
         captured.push(String(args[0]));
       };
@@ -345,6 +352,7 @@ describe('logger', () => {
 
     it('defaults to debug in dev mode', () => {
       Deno.env.delete('DENO_DEPLOYMENT_ID');
+      _resetMinLevel();
       console.debug = (...args: unknown[]) => {
         captured.push(String(args[0]));
       };
@@ -443,6 +451,7 @@ describe('logger', () => {
 
     it('has all four log level methods', () => {
       Deno.env.set('LOG_LEVEL', 'debug');
+      _resetMinLevel();
       console.debug = (...args: unknown[]) => {
         captured.push(String(args[0]));
       };

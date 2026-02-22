@@ -28,16 +28,21 @@ export function isDevMode(): boolean {
   return !Deno.env.get('DENO_DEPLOYMENT_ID');
 }
 
-function getMinLevel(): LogLevel {
+function resolveMinLevel(): LogLevel {
   const envLevel = Deno.env.get('LOG_LEVEL')?.toLowerCase();
-  if (envLevel && envLevel in LOG_LEVEL_ORDER) {
-    return envLevel as LogLevel;
-  }
+  if (envLevel && envLevel in LOG_LEVEL_ORDER) return envLevel as LogLevel;
   return isDevMode() ? 'debug' : 'info';
 }
 
+let MIN_LEVEL: LogLevel = resolveMinLevel();
+
 function shouldLog(level: LogLevel): boolean {
-  return LOG_LEVEL_ORDER[level] >= LOG_LEVEL_ORDER[getMinLevel()];
+  return LOG_LEVEL_ORDER[level] >= LOG_LEVEL_ORDER[MIN_LEVEL];
+}
+
+/** Re-read LOG_LEVEL from the environment. Test-only. */
+export function _resetMinLevel(): void {
+  MIN_LEVEL = resolveMinLevel();
 }
 
 // ANSI color codes for dev-mode pretty printing
