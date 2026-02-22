@@ -11,6 +11,7 @@ export interface InputProps {
   error?: string;
   disabled?: boolean;
   required?: boolean;
+  onInput?: (e: Event) => void;
   class?: string;
 }
 
@@ -25,6 +26,7 @@ export function Input({
   error,
   disabled,
   required,
+  onInput,
   class: className,
 }: InputProps) {
   const inputId = id || name;
@@ -48,6 +50,7 @@ export function Input({
         value={value}
         disabled={disabled}
         required={required}
+        onInput={onInput}
         class={cn(
           'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm',
           'ring-offset-background placeholder:text-muted-foreground',

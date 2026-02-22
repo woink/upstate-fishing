@@ -70,5 +70,30 @@ describe('Input component', () => {
       const classStr = String(vnode.props.class || '');
       assert(classStr.includes('custom-input'), 'should include custom class on wrapper');
     });
+
+    it('passes onInput handler to the input element', () => {
+      const handler = (_e: Event) => {};
+      const vnode = Input({ onInput: handler });
+      const children = Array.isArray(vnode.props.children)
+        ? vnode.props.children
+        : [vnode.props.children];
+      const inputChild = children.find(
+        (c: VNode) => c && typeof c === 'object' && c.type === 'input',
+      );
+      assert(inputChild, 'should contain an input element');
+      assertEquals(inputChild.props.onInput, handler, 'onInput should be passed to input element');
+    });
+
+    it('does not set onInput when not provided', () => {
+      const vnode = Input({});
+      const children = Array.isArray(vnode.props.children)
+        ? vnode.props.children
+        : [vnode.props.children];
+      const inputChild = children.find(
+        (c: VNode) => c && typeof c === 'object' && c.type === 'input',
+      );
+      assert(inputChild, 'should contain an input element');
+      assertEquals(inputChild.props.onInput, undefined, 'onInput should be undefined');
+    });
   });
 });
