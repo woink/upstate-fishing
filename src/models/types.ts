@@ -312,6 +312,131 @@ export const FlyShopSchema = z.object({
 });
 export type FlyShop = z.infer<typeof FlyShopSchema>;
 
+/** Extended fly shop schema for Supabase-persisted records. */
+export const FlyShopSupabaseSchema = FlyShopSchema.extend({
+  id: z.string().uuid(),
+  slug: z.string(),
+  hours: z.record(z.string()).nullable().optional(),
+  services: z.array(z.string()).optional(),
+  brandsCarried: z.array(z.string()).optional(),
+  guideService: z.boolean(),
+  onlineStoreUrl: z.string().nullable().optional(),
+  reportSourceId: z.string().uuid().nullable().optional(),
+  rating: z.number().min(0).max(5).nullable().optional(),
+  verified: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type FlyShopSupabase = z.infer<typeof FlyShopSupabaseSchema>;
+
+// ============================================================================
+// Fishing Report Types (Supabase)
+// ============================================================================
+
+export const ReportSourceTypeSchema = z.enum(['rss', 'scrape', 'api', 'manual']);
+export type ReportSourceType = z.infer<typeof ReportSourceTypeSchema>;
+
+export const ReportSourceSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  type: ReportSourceTypeSchema,
+  url: z.string().nullable(),
+  scrapeConfig: z.record(z.unknown()).optional(),
+  lastFetchedAt: z.string().datetime().nullable(),
+  fetchFrequencyMinutes: z.number().int().positive(),
+  active: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type ReportSource = z.infer<typeof ReportSourceSchema>;
+
+export const FishingReportSchema = z.object({
+  id: z.string().uuid(),
+  streamId: z.string(),
+  sourceId: z.string().uuid().nullable(),
+  sourceUrl: z.string().nullable(),
+  reportDate: z.string(), // date string YYYY-MM-DD
+  rawText: z.string(),
+  extractedConditions: z.record(z.unknown()).optional(),
+  extractedFlies: z.array(z.string()).optional(),
+  waterTempMentioned: z.number().nullable(),
+  flowMentioned: z.number().nullable(),
+  confidenceScore: z.number().min(0).max(1).nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type FishingReport = z.infer<typeof FishingReportSchema>;
+
+// ============================================================================
+// Access Point & Stream Metadata Types (Supabase)
+// ============================================================================
+
+export const AccessPointTypeSchema = z.enum([
+  'parking',
+  'bridge',
+  'trail',
+  'put-in',
+  'take-out',
+]);
+export type AccessPointType = z.infer<typeof AccessPointTypeSchema>;
+
+export const AccessPointSchema = z.object({
+  id: z.string().uuid(),
+  streamId: z.string(),
+  name: z.string(),
+  type: AccessPointTypeSchema,
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  description: z.string().nullable(),
+  parkingAvailable: z.boolean(),
+  handicapAccessible: z.boolean(),
+  publicLand: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type AccessPoint = z.infer<typeof AccessPointSchema>;
+
+export const RegulationTypeSchema = z.enum([
+  'catch_and_release',
+  'trophy',
+  'general',
+  'delayed_harvest',
+  'special',
+]);
+export type RegulationType = z.infer<typeof RegulationTypeSchema>;
+
+export const DifficultyRatingSchema = z.enum(['easy', 'moderate', 'difficult', 'expert']);
+export type DifficultyRating = z.infer<typeof DifficultyRatingSchema>;
+
+export const WadingSafetySchema = z.enum(['safe', 'moderate', 'caution', 'dangerous']);
+export type WadingSafety = z.infer<typeof WadingSafetySchema>;
+
+export const StreamRegulationSchema = z.object({
+  id: z.string().uuid(),
+  streamId: z.string(),
+  regulationType: RegulationTypeSchema,
+  seasonStart: z.string().nullable(),
+  seasonEnd: z.string().nullable(),
+  specialRules: z.string().nullable(),
+  sourceUrl: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type StreamRegulation = z.infer<typeof StreamRegulationSchema>;
+
+export const StreamMetadataSchema = z.object({
+  id: z.string().uuid(),
+  streamId: z.string(),
+  difficultyRating: DifficultyRatingSchema.nullable(),
+  wadingSafety: WadingSafetySchema.nullable(),
+  bestSeasons: z.array(z.string()),
+  fishSpecies: z.array(z.string()),
+  stockingInfo: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+});
+export type StreamMetadata = z.infer<typeof StreamMetadataSchema>;
+
 // ============================================================================
 // Data Ingestion Types
 // ============================================================================

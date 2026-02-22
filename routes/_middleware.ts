@@ -1,6 +1,29 @@
 import { FreshContext } from '$fresh/server.ts';
+import { createRequestLogger } from '@shared/utils/logger.ts';
 
 export const handler = [
+  async function requestLogger(req: Request, ctx: FreshContext) {
+    const requestId = crypto.randomUUID();
+    const log = createRequestLogger(requestId);
+    const url = new URL(req.url);
+    const start = performance.now();
+
+    log.info('request start', { method: req.method, path: url.pathname });
+
+    const resp = await ctx.next();
+    const durationMs = Math.round(performance.now() - start);
+
+    log.info('request end', {
+      method: req.method,
+      path: url.pathname,
+      status: resp.status,
+      durationMs,
+    });
+
+    resp.headers.set('X-Request-Id', requestId);
+    return resp;
+  },
+
   async function securityHeaders(req: Request, ctx: FreshContext) {
     const resp = await ctx.next();
 

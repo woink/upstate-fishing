@@ -5,6 +5,7 @@
 
 import { z } from 'zod';
 import type { Coordinates, HourlyForecast, WeatherConditions } from '../models/types.ts';
+import { logger } from '../utils/logger.ts';
 import { celsiusToFahrenheit } from '../utils/temperature.ts';
 
 // ============================================================================
@@ -176,6 +177,7 @@ export class WeatherService {
   private async fetch(url: string): Promise<unknown> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    const start = performance.now();
 
     try {
       const response = await fetch(url, {
@@ -190,7 +192,20 @@ export class WeatherService {
         throw new Error(`NWS API error: ${response.status} ${response.statusText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      const durationMs = Math.round(performance.now() - start);
+
+      logger.info('NWS fetch complete', { url, durationMs });
+
+      return data;
+    } catch (error) {
+      const durationMs = Math.round(performance.now() - start);
+      logger.error('NWS fetch failed', {
+        url,
+        durationMs,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
     } finally {
       clearTimeout(timeoutId);
     }

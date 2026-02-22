@@ -17,10 +17,10 @@ const qualityColors: Record<string, string> = {
 };
 
 const qualityLabels: Record<string, string> = {
-  excellent: '🎯 Excellent',
-  good: '👍 Good',
-  fair: '⚠️ Fair',
-  poor: '❌ Poor',
+  excellent: 'Excellent',
+  good: 'Good',
+  fair: 'Fair',
+  poor: 'Poor',
 };
 
 Deno.test('qualityColors - has all fishing quality levels', () => {
@@ -30,11 +30,11 @@ Deno.test('qualityColors - has all fishing quality levels', () => {
   assertEquals('poor' in qualityColors, true);
 });
 
-Deno.test('qualityLabels - has emoji labels for all levels', () => {
-  assertEquals(qualityLabels.excellent.includes('🎯'), true);
-  assertEquals(qualityLabels.good.includes('👍'), true);
-  assertEquals(qualityLabels.fair.includes('⚠️'), true);
-  assertEquals(qualityLabels.poor.includes('❌'), true);
+Deno.test('qualityLabels - has text labels for all levels', () => {
+  assertEquals(qualityLabels.excellent, 'Excellent');
+  assertEquals(qualityLabels.good, 'Good');
+  assertEquals(qualityLabels.fair, 'Fair');
+  assertEquals(qualityLabels.poor, 'Poor');
 });
 
 // ============================================================================

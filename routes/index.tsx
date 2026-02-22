@@ -1,5 +1,6 @@
 import { Handlers, PageProps } from '$fresh/server.ts';
 import TopPicks from '../islands/TopPicks.tsx';
+import { Icon } from '../components/ui/Icon.tsx';
 
 interface HomeData {
   apiUrl: string;
@@ -29,7 +30,9 @@ export default function Home({ data }: PageProps<HomeData>) {
 
       <section class='mt-8 grid md:grid-cols-2 gap-6'>
         <div class='bg-white rounded-lg shadow p-6'>
-          <h2 class='text-xl font-semibold text-slate-800 mb-3'>📍 Quick Links</h2>
+          <h2 class='text-xl font-semibold text-slate-800 mb-3'>
+            <Icon name='map-pin' size='md' class='inline-block' /> Quick Links
+          </h2>
           <ul class='space-y-2'>
             <li>
               <a href='/streams?region=catskills' class='text-stream-600 hover:underline'>
@@ -65,7 +68,9 @@ export default function Home({ data }: PageProps<HomeData>) {
         </div>
 
         <div class='bg-white rounded-lg shadow p-6'>
-          <h2 class='text-xl font-semibold text-slate-800 mb-3'>🪰 Hatch Calendar</h2>
+          <h2 class='text-xl font-semibold text-slate-800 mb-3'>
+            <Icon name='bug' size='md' class='inline-block' /> Hatch Calendar
+          </h2>
           <p class='text-slate-600 text-sm mb-3'>
             Current month's expected hatches based on typical emergence timing.
           </p>

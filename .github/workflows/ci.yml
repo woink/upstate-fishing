@@ -47,6 +47,16 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Cache Deno dependencies
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            ~/.cache/deno
+            ~/.deno
+          key: deno-${{ runner.os }}-${{ hashFiles('deno.json', 'deno.lock') }}
+          restore-keys: |
+            deno-${{ runner.os }}-
+
       - name: Format check
         run: deno fmt --check
 
@@ -56,8 +66,21 @@ jobs:
       - name: Type check
         run: deno check --unstable-kv **/*.ts **/*.tsx
 
-      - name: Test
-        run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv --ignore=tests/e2e/,tests/supabase/ tests/
+      - name: Backend unit tests
+        run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv --ignore=tests/e2e/,tests/supabase/,tests/frontend/ tests/
+
+      - name: Frontend unit tests
+        run: deno test --allow-net --allow-env --allow-read --allow-write --unstable-kv tests/frontend/
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: test-results
+          path: |
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
 
       - name: Install browser dependencies
         if: needs.changes.outputs.e2e == 'true'
@@ -84,6 +107,16 @@ jobs:
         uses: denoland/setup-deno@e95548e56dfa95d4e1a28d6f422fafe75c4c26fb # v2
         with:
           deno-version: v2.x
+
+      - name: Cache Deno dependencies
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            ~/.cache/deno
+            ~/.deno
+          key: deno-${{ runner.os }}-${{ hashFiles('deno.json', 'deno.lock') }}
+          restore-keys: |
+            deno-${{ runner.os }}-
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@b60b5899c73b63a2d2d651b1e90db8d4c9392f51 # v1.6.0

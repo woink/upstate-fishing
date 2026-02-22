@@ -9,6 +9,8 @@ import { handler } from '../../routes/_middleware.ts';
 // deno-lint-ignore no-explicit-any
 type MockContext = any;
 
+const securityHeaders = handler.find((h) => h.name === 'securityHeaders')!;
+
 function createMockContext(reqHeaders?: HeadersInit): { req: Request; ctx: MockContext } {
   const req = new Request('http://localhost:8000/', { headers: reqHeaders });
   const ctx = {
@@ -23,31 +25,31 @@ function createMockContext(reqHeaders?: HeadersInit): { req: Request; ctx: MockC
 
 Deno.test('security headers - sets X-Content-Type-Options', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   assertEquals(resp.headers.get('X-Content-Type-Options'), 'nosniff');
 });
 
 Deno.test('security headers - sets X-Frame-Options', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   assertEquals(resp.headers.get('X-Frame-Options'), 'DENY');
 });
 
 Deno.test('security headers - sets Referrer-Policy', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   assertEquals(resp.headers.get('Referrer-Policy'), 'strict-origin-when-cross-origin');
 });
 
 Deno.test('security headers - sets X-DNS-Prefetch-Control', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   assertEquals(resp.headers.get('X-DNS-Prefetch-Control'), 'off');
 });
 
 Deno.test('security headers - sets Content-Security-Policy', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   assertEquals(resp.headers.has('Content-Security-Policy'), true);
 });
 
@@ -57,14 +59,14 @@ Deno.test('security headers - sets Content-Security-Policy', async () => {
 
 Deno.test('security headers - CSP allows unsafe-inline for Fresh hydration', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   const csp = resp.headers.get('Content-Security-Policy')!;
   assertEquals(csp.includes("'unsafe-inline'"), true);
 });
 
 Deno.test('security headers - CSP uses self-hosted Leaflet (no unpkg)', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   const csp = resp.headers.get('Content-Security-Policy')!;
   assertEquals(csp.includes("style-src 'self' 'unsafe-inline'"), true);
   assertEquals(csp.includes("script-src 'self' 'unsafe-inline'"), true);
@@ -73,21 +75,21 @@ Deno.test('security headers - CSP uses self-hosted Leaflet (no unpkg)', async ()
 
 Deno.test('security headers - CSP allows service workers', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   const csp = resp.headers.get('Content-Security-Policy')!;
   assertEquals(csp.includes("worker-src 'self'"), true);
 });
 
 Deno.test('security headers - CSP allows OpenStreetMap tiles', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   const csp = resp.headers.get('Content-Security-Policy')!;
   assertEquals(csp.includes('tile.openstreetmap.org'), true);
 });
 
 Deno.test('security headers - CSP denies framing', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   const csp = resp.headers.get('Content-Security-Policy')!;
   assertEquals(csp.includes("frame-ancestors 'none'"), true);
 });
@@ -98,13 +100,13 @@ Deno.test('security headers - CSP denies framing', async () => {
 
 Deno.test('security headers - no HSTS on plain HTTP', async () => {
   const { req, ctx } = createMockContext();
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   assertEquals(resp.headers.has('Strict-Transport-Security'), false);
 });
 
 Deno.test('security headers - HSTS set when x-forwarded-proto is https', async () => {
   const { req, ctx } = createMockContext({ 'x-forwarded-proto': 'https' });
-  const resp = await handler[0](req, ctx as MockContext);
+  const resp = await securityHeaders(req, ctx as MockContext);
   assertEquals(resp.headers.has('Strict-Transport-Security'), true);
   assertEquals(
     resp.headers.get('Strict-Transport-Security')?.includes('max-age='),

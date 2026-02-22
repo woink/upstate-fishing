@@ -1,4 +1,5 @@
 import { type PageProps } from '$fresh/server.ts';
+import { Icon } from '../components/ui/Icon.tsx';
 
 export default function App({ Component }: PageProps) {
   return (
@@ -24,7 +25,7 @@ export default function App({ Component }: PageProps) {
           <div class='max-w-6xl mx-auto px-4 py-3'>
             <div class='flex items-center justify-between'>
               <a href='/' class='text-xl font-bold flex items-center gap-2'>
-                🎣 Upstate Fishing
+                <Icon name='fish' size='md' class='text-forest-200' /> Upstate Fishing
               </a>
               <div class='flex gap-4'>
                 <a href='/' class='hover:text-forest-200 transition'>Today</a>

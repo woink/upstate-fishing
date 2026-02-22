@@ -1,4 +1,5 @@
 import { Component, type ComponentChildren } from 'preact';
+import { Icon } from './ui/Icon.tsx';
 
 interface ErrorBoundaryProps {
   /** Content to render when no error */
@@ -64,7 +65,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         <div class='bg-red-50 border border-red-200 rounded-lg p-6'>
           <div class='flex items-start gap-3'>
-            <span class='text-2xl'>⚠️</span>
+            <Icon name='alert-triangle' size='lg' class='text-red-500' />
             <div class='flex-1'>
               <h3 class='font-semibold text-red-800'>
                 {this.props.name ? `${this.props.name} failed to load` : 'Something went wrong'}

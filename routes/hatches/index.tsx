@@ -1,4 +1,5 @@
 import { Handlers, PageProps } from '$fresh/server.ts';
+import { Icon } from '../../components/ui/Icon.tsx';
 import type { Hatch, InsectOrder } from '@shared/models/types.ts';
 import { filterHatchesByQuery } from '@shared/data/hatches.ts';
 import HatchChart from '../../islands/HatchChart.tsx';
@@ -190,11 +191,11 @@ export default function HatchesPage({ data }: PageProps<HatchesPageData>) {
             <span>Current month</span>
           </div>
           <div class='flex items-center gap-2'>
-            <span>☀️</span>
+            <Icon name='sun' size='sm' />
             <span>Prefers sunny</span>
           </div>
           <div class='flex items-center gap-2'>
-            <span>☁️</span>
+            <Icon name='cloud' size='sm' />
             <span>Prefers overcast</span>
           </div>
         </div>

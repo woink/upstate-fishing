@@ -31,7 +31,8 @@
     "@shared/": "./src/",
     "@supabase/supabase-js": "jsr:@supabase/supabase-js@^2",
     "@supabase/ssr": "npm:@supabase/ssr@^0",
-    "zod": "npm:zod@^3.23"
+    "zod": "npm:zod@^3.23",
+    "tailwind-merge": "npm:tailwind-merge@^2"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

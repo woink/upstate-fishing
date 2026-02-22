@@ -5,19 +5,28 @@
 
 import { assertEquals, assertThrows } from '@std/assert';
 import {
+  AccessPointSchema,
+  AccessPointTypeSchema,
   CoordinatesSchema,
+  DifficultyRatingSchema,
   FishingQualitySchema,
+  FishingReportSchema,
   HatchSchema,
   NearbyStreamSchema,
   NotificationPreferencesSchema,
   RegionSchema,
+  ReportSourceSchema,
+  ReportSourceTypeSchema,
   SavedStreamSchema,
   StationDataSchema,
   StationReadingSchema,
   StationStatsSchema,
+  StreamMetadataSchema,
+  StreamRegulationSchema,
   StreamSchema,
   TrendDirectionSchema,
   UserProfileSchema,
+  WadingSafetySchema,
   WeatherConditionsSchema,
   WeatherSnapshotSchema,
 } from '../src/models/types.ts';
@@ -623,4 +632,252 @@ Deno.test('StationStatsSchema - requires positive days', () => {
       gageHeight: { min: null, max: null, avg: null, trend: 'unknown' },
     });
   });
+});
+
+// ============================================================================
+// ReportSourceType Schema Tests
+// ============================================================================
+
+Deno.test('ReportSourceTypeSchema - accepts valid source types', () => {
+  assertEquals(ReportSourceTypeSchema.parse('rss'), 'rss');
+  assertEquals(ReportSourceTypeSchema.parse('scrape'), 'scrape');
+  assertEquals(ReportSourceTypeSchema.parse('api'), 'api');
+  assertEquals(ReportSourceTypeSchema.parse('manual'), 'manual');
+});
+
+Deno.test('ReportSourceTypeSchema - rejects invalid type', () => {
+  assertThrows(() => ReportSourceTypeSchema.parse('email'));
+});
+
+// ============================================================================
+// ReportSource Schema Tests
+// ============================================================================
+
+Deno.test('ReportSourceSchema - accepts valid report source', () => {
+  const valid = {
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    name: 'Beaverkill Angler Reports',
+    type: 'rss',
+    url: 'https://beaverkillangler.com/feed',
+    lastFetchedAt: '2024-04-15T14:00:00Z',
+    fetchFrequencyMinutes: 60,
+    active: true,
+    createdAt: '2024-04-01T00:00:00Z',
+    updatedAt: '2024-04-15T14:00:00Z',
+  };
+  const result = ReportSourceSchema.parse(valid);
+  assertEquals(result.name, 'Beaverkill Angler Reports');
+  assertEquals(result.type, 'rss');
+});
+
+Deno.test('ReportSourceSchema - rejects non-positive fetch frequency', () => {
+  assertThrows(() =>
+    ReportSourceSchema.parse({
+      id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+      name: 'Test',
+      type: 'rss',
+      url: null,
+      lastFetchedAt: null,
+      fetchFrequencyMinutes: 0,
+      active: true,
+      createdAt: '2024-04-01T00:00:00Z',
+      updatedAt: '2024-04-01T00:00:00Z',
+    })
+  );
+});
+
+// ============================================================================
+// FishingReport Schema Tests
+// ============================================================================
+
+Deno.test('FishingReportSchema - accepts valid fishing report', () => {
+  const valid = {
+    id: 'b1ffbc99-9c0b-4ef8-bb6d-6bb9bd380b22',
+    streamId: 'beaverkill',
+    sourceId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    sourceUrl: 'https://example.com/report/123',
+    reportDate: '2024-04-15',
+    rawText: 'Good fishing today.',
+    waterTempMentioned: 54.5,
+    flowMentioned: 200,
+    confidenceScore: 0.85,
+    createdAt: '2024-04-15T18:00:00Z',
+    updatedAt: '2024-04-15T18:00:00Z',
+  };
+  const result = FishingReportSchema.parse(valid);
+  assertEquals(result.streamId, 'beaverkill');
+  assertEquals(result.confidenceScore, 0.85);
+});
+
+Deno.test('FishingReportSchema - rejects confidence score out of range', () => {
+  assertThrows(() =>
+    FishingReportSchema.parse({
+      id: 'b1ffbc99-9c0b-4ef8-bb6d-6bb9bd380b22',
+      streamId: 'beaverkill',
+      sourceId: null,
+      sourceUrl: null,
+      reportDate: '2024-04-15',
+      rawText: 'Text',
+      waterTempMentioned: null,
+      flowMentioned: null,
+      confidenceScore: 1.5,
+      createdAt: '2024-04-15T18:00:00Z',
+      updatedAt: '2024-04-15T18:00:00Z',
+    })
+  );
+});
+
+// ============================================================================
+// AccessPointType Schema Tests
+// ============================================================================
+
+Deno.test('AccessPointTypeSchema - accepts valid types', () => {
+  assertEquals(AccessPointTypeSchema.parse('parking'), 'parking');
+  assertEquals(AccessPointTypeSchema.parse('bridge'), 'bridge');
+  assertEquals(AccessPointTypeSchema.parse('trail'), 'trail');
+  assertEquals(AccessPointTypeSchema.parse('put-in'), 'put-in');
+  assertEquals(AccessPointTypeSchema.parse('take-out'), 'take-out');
+});
+
+Deno.test('AccessPointTypeSchema - rejects invalid type', () => {
+  assertThrows(() => AccessPointTypeSchema.parse('campsite'));
+});
+
+// ============================================================================
+// AccessPoint Schema Tests
+// ============================================================================
+
+Deno.test('AccessPointSchema - accepts valid access point', () => {
+  const valid = {
+    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+    streamId: 'beaverkill',
+    name: 'Cooks Falls Bridge',
+    type: 'bridge',
+    latitude: 41.9450,
+    longitude: -74.9780,
+    description: 'Good wading access below the bridge',
+    parkingAvailable: true,
+    handicapAccessible: false,
+    publicLand: true,
+    createdAt: '2024-04-01T00:00:00Z',
+    updatedAt: '2024-04-01T00:00:00Z',
+  };
+  const result = AccessPointSchema.parse(valid);
+  assertEquals(result.name, 'Cooks Falls Bridge');
+  assertEquals(result.type, 'bridge');
+});
+
+Deno.test('AccessPointSchema - rejects invalid coordinates', () => {
+  assertThrows(() =>
+    AccessPointSchema.parse({
+      id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+      streamId: 'beaverkill',
+      name: 'Test',
+      type: 'parking',
+      latitude: 91,
+      longitude: -74,
+      description: null,
+      parkingAvailable: false,
+      handicapAccessible: false,
+      publicLand: true,
+      createdAt: '2024-04-01T00:00:00Z',
+      updatedAt: '2024-04-01T00:00:00Z',
+    })
+  );
+});
+
+// ============================================================================
+// DifficultyRating & WadingSafety Schema Tests
+// ============================================================================
+
+Deno.test('DifficultyRatingSchema - accepts valid ratings', () => {
+  assertEquals(DifficultyRatingSchema.parse('easy'), 'easy');
+  assertEquals(DifficultyRatingSchema.parse('expert'), 'expert');
+});
+
+Deno.test('DifficultyRatingSchema - rejects invalid rating', () => {
+  assertThrows(() => DifficultyRatingSchema.parse('beginner'));
+});
+
+Deno.test('WadingSafetySchema - accepts valid safety levels', () => {
+  assertEquals(WadingSafetySchema.parse('safe'), 'safe');
+  assertEquals(WadingSafetySchema.parse('dangerous'), 'dangerous');
+});
+
+Deno.test('WadingSafetySchema - rejects invalid safety level', () => {
+  assertThrows(() => WadingSafetySchema.parse('extreme'));
+});
+
+// ============================================================================
+// StreamRegulation Schema Tests
+// ============================================================================
+
+Deno.test('StreamRegulationSchema - accepts valid regulation', () => {
+  const valid = {
+    id: 'c2ffbc99-9c0b-4ef8-bb6d-6bb9bd380c33',
+    streamId: 'beaverkill',
+    regulationType: 'catch_and_release',
+    seasonStart: '2024-04-01',
+    seasonEnd: '2024-09-30',
+    specialRules: 'Artificial lures only',
+    sourceUrl: 'https://dec.ny.gov/regulations',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  };
+  const result = StreamRegulationSchema.parse(valid);
+  assertEquals(result.regulationType, 'catch_and_release');
+});
+
+Deno.test('StreamRegulationSchema - rejects invalid regulation type', () => {
+  assertThrows(() =>
+    StreamRegulationSchema.parse({
+      id: 'c2ffbc99-9c0b-4ef8-bb6d-6bb9bd380c33',
+      streamId: 'beaverkill',
+      regulationType: 'barbless',
+      seasonStart: null,
+      seasonEnd: null,
+      specialRules: null,
+      sourceUrl: null,
+      createdAt: '2024-01-01T00:00:00Z',
+      updatedAt: '2024-01-01T00:00:00Z',
+    })
+  );
+});
+
+// ============================================================================
+// StreamMetadata Schema Tests
+// ============================================================================
+
+Deno.test('StreamMetadataSchema - accepts valid metadata', () => {
+  const valid = {
+    id: 'd3ffbc99-9c0b-4ef8-bb6d-6bb9bd380d44',
+    streamId: 'beaverkill',
+    difficultyRating: 'moderate',
+    wadingSafety: 'safe',
+    bestSeasons: ['spring', 'fall'],
+    fishSpecies: ['brown trout', 'rainbow trout'],
+    stockingInfo: 'Stocked annually',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  };
+  const result = StreamMetadataSchema.parse(valid);
+  assertEquals(result.bestSeasons.length, 2);
+  assertEquals(result.fishSpecies.length, 2);
+});
+
+Deno.test('StreamMetadataSchema - accepts nullable optional fields', () => {
+  const valid = {
+    id: 'd3ffbc99-9c0b-4ef8-bb6d-6bb9bd380d44',
+    streamId: 'beaverkill',
+    difficultyRating: null,
+    wadingSafety: null,
+    bestSeasons: [],
+    fishSpecies: [],
+    stockingInfo: null,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  };
+  const result = StreamMetadataSchema.parse(valid);
+  assertEquals(result.difficultyRating, null);
+  assertEquals(result.wadingSafety, null);
 });

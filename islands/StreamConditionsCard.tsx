@@ -1,4 +1,5 @@
 import { useSignal } from '@preact/signals';
+import { Icon } from '../components/ui/Icon.tsx';
 import type { DataAvailability, StationData, StreamConditions } from '@shared/models/types.ts';
 import {
   completenessDisplay,
@@ -86,7 +87,9 @@ export default function StreamConditionsCard({
             class='p-2 rounded-full hover:bg-white/50 transition disabled:opacity-50'
             title='Refresh conditions'
           >
-            <span class={refreshing.value ? 'animate-spin inline-block' : ''}>🔄</span>
+            <span class={refreshing.value ? 'animate-spin inline-block' : ''}>
+              <Icon name='refresh-cw' size='md' />
+            </span>
           </button>
         </div>
 
@@ -105,7 +108,9 @@ export default function StreamConditionsCard({
         <div class='grid md:grid-cols-2 gap-6'>
           {/* Water Data */}
           <div class='space-y-3'>
-            <h3 class='font-medium text-slate-700'>💧 Water Conditions</h3>
+            <h3 class='font-medium text-slate-700 flex items-center gap-1'>
+              <Icon name='droplets' size='sm' /> Water Conditions
+            </h3>
             {cond.stationData.map((station) => (
               <div key={station.stationId} class='bg-slate-50 rounded p-3 text-sm'>
                 <p class='text-slate-500 text-xs mb-2'>{station.stationName}</p>
@@ -121,7 +126,9 @@ export default function StreamConditionsCard({
           {/* Weather */}
           {cond.weather && (
             <div class='space-y-3'>
-              <h3 class='font-medium text-slate-700'>🌤️ Weather</h3>
+              <h3 class='font-medium text-slate-700 flex items-center gap-1'>
+                <Icon name='cloud-sun' size='sm' /> Weather
+              </h3>
               <div class='bg-slate-50 rounded p-3'>
                 <p class='font-semibold'>{cond.weather.shortForecast}</p>
                 <div class='grid grid-cols-2 gap-2 mt-2 text-sm'>
@@ -151,7 +158,9 @@ export default function StreamConditionsCard({
       {/* Hatch Predictions */}
       {cond.predictedHatches.length > 0 && (
         <div class='p-6 border-t border-slate-200'>
-          <h2 class='text-lg font-semibold text-slate-800 mb-4'>🪰 Predicted Hatches</h2>
+          <h2 class='text-lg font-semibold text-slate-800 mb-4 flex items-center gap-1'>
+            <Icon name='bug' size='md' /> Predicted Hatches
+          </h2>
           <div class='space-y-3'>
             {cond.predictedHatches.map((pred) => (
               <div

@@ -216,15 +216,15 @@ Deno.test('hatches page - formats temperature range', () => {
 
 Deno.test('hatches page - time of day labels', () => {
   const timeLabels: Record<string, string> = {
-    morning: '🌅 Morning',
-    midday: '☀️ Midday',
-    afternoon: '🌤️ Afternoon',
-    evening: '🌆 Evening',
-    any: '🕐 Any time',
+    morning: 'Morning',
+    midday: 'Midday',
+    afternoon: 'Afternoon',
+    evening: 'Evening',
+    any: 'Any time',
   };
 
-  assertEquals(timeLabels['afternoon'], '🌤️ Afternoon');
-  assertEquals(timeLabels['any'], '🕐 Any time');
+  assertEquals(timeLabels['afternoon'], 'Afternoon');
+  assertEquals(timeLabels['any'], 'Any time');
 });
 
 // ============================================================================

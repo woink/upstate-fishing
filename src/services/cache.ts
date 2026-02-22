@@ -7,6 +7,8 @@
  * and avoid rate limits.
  */
 
+import { logger } from '../utils/logger.ts';
+
 // ============================================================================
 // TTL Constants
 // ============================================================================
@@ -120,18 +122,21 @@ export class CacheService implements CacheLike {
 
     if (!result.value) {
       this.stats.misses++;
+      logger.debug('cache miss', { key: key.join(':') });
       return null;
     }
 
     // Check if expired
     if (Date.now() > result.value.expiresAt) {
       this.stats.misses++;
+      logger.debug('cache expired', { key: key.join(':') });
       // Delete expired entry
       await this.kv!.delete(key);
       return null;
     }
 
     this.stats.hits++;
+    logger.debug('cache hit', { key: key.join(':') });
     return {
       data: result.value.data,
       hit: true,
