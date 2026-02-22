@@ -1,4 +1,4 @@
-import { type PageProps } from 'fresh';
+import { page, type PageProps } from 'fresh';
 import type { Hatch, InsectOrder } from '@shared/models/types.ts';
 import { filterHatchesByQuery } from '@shared/data/hatches.ts';
 import HatchChart from '../../islands/HatchChart.tsx';
@@ -18,7 +18,7 @@ export const handler = {
       month: url.searchParams.get('month'),
     });
 
-    return ctx.render({ hatches, filterOrder, filterMonth, error: null });
+    return page({ hatches, filterOrder, filterMonth, error: null });
   },
 };
 

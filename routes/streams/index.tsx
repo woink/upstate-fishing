@@ -1,4 +1,4 @@
-import { type PageProps } from 'fresh';
+import { page, type PageProps } from 'fresh';
 import type { Stream } from '@shared/models/types.ts';
 import { filterStreamsByQuery } from '@shared/data/streams.ts';
 import StreamList from '../../islands/StreamList.tsx';
@@ -18,7 +18,7 @@ export const handler = {
       state: url.searchParams.get('state'),
     });
 
-    return ctx.render({ streams, region, state, apiUrl: '' });
+    return page({ streams, region, state, apiUrl: '' });
   },
 };
 

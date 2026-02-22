@@ -1,4 +1,4 @@
-import { type PageProps } from 'fresh';
+import { page, type PageProps } from 'fresh';
 import type { FlyShop, Stream } from '@shared/models/types.ts';
 import { getShopById } from '@shared/data/fly-shops.ts';
 import { STREAMS } from '@shared/data/streams.ts';
@@ -32,7 +32,7 @@ export const handler = {
     const shop = getShopById(id);
 
     if (!shop) {
-      return ctx.render(
+      return page(
         { shop: null, nearbyStreams: [], error: 'Fly shop not found' },
         { status: 404 },
       );
@@ -53,7 +53,7 @@ export const handler = {
       .filter((entry) => entry.distanceMiles <= 50)
       .sort((a, b) => a.distanceMiles - b.distanceMiles);
 
-    return ctx.render({ shop, nearbyStreams });
+    return page({ shop, nearbyStreams });
   },
 };
 

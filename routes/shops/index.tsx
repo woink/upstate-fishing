@@ -1,4 +1,4 @@
-import { type PageProps } from 'fresh';
+import { page, type PageProps } from 'fresh';
 import type { FlyShop } from '@shared/models/types.ts';
 import { filterShopsByQuery } from '@shared/data/fly-shops.ts';
 
@@ -16,7 +16,7 @@ export const handler = {
       state: url.searchParams.get('state'),
     });
 
-    return ctx.render({ shops, region, state });
+    return page({ shops, region, state });
   },
 };
 

@@ -1,4 +1,4 @@
-import { type PageProps } from 'fresh';
+import { page, type PageProps } from 'fresh';
 import type { StreamConditions } from '@shared/models/types.ts';
 import { getStreamById } from '@shared/data/streams.ts';
 import { cachedUSGSService } from '@shared/services/cached-usgs.ts';
@@ -20,7 +20,7 @@ export const handler = {
     const stream = getStreamById(id);
 
     if (!stream) {
-      return ctx.render({ conditions: null, error: 'Stream not found', apiUrl: '' });
+      return page({ conditions: null, error: 'Stream not found', apiUrl: '' });
     }
 
     try {
@@ -41,7 +41,7 @@ export const handler = {
 
       const conditions = predictionService.generateConditions(stream, usgsResult.data, weather);
 
-      return ctx.render({ conditions, apiUrl: '' });
+      return page({ conditions, apiUrl: '' });
     } catch (error) {
       logger.error('Failed to fetch stream conditions', {
         streamId: stream.id,
@@ -50,7 +50,7 @@ export const handler = {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       });
-      return ctx.render({ conditions: null, error: 'Failed to fetch conditions', apiUrl: '' });
+      return page({ conditions: null, error: 'Failed to fetch conditions', apiUrl: '' });
     }
   },
 };
