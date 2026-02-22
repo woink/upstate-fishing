@@ -20,7 +20,7 @@ create table public.report_sources (
 -- Fishing reports: extracted from sources
 create table public.fishing_reports (
   id uuid primary key default gen_random_uuid(),
-  stream_id text not null,
+  stream_id text not null, -- references id field in data/streams.ts (no FK; streams live in code)
   source_id uuid references public.report_sources(id) on delete set null,
   source_url text,
   report_date date not null,

@@ -9,7 +9,7 @@ create extension if not exists postgis;
 -- Access points for stream entry/exit
 create table public.access_points (
   id uuid primary key default gen_random_uuid(),
-  stream_id text not null,
+  stream_id text not null, -- references id field in data/streams.ts (no FK; streams live in code)
   name text not null,
   type text not null check (type in ('parking', 'bridge', 'trail', 'put-in', 'take-out')),
   location geography(Point, 4326) not null,
@@ -24,7 +24,7 @@ create table public.access_points (
 -- Stream regulations
 create table public.stream_regulations (
   id uuid primary key default gen_random_uuid(),
-  stream_id text not null,
+  stream_id text not null, -- references id field in data/streams.ts (no FK; streams live in code)
   regulation_type text not null check (regulation_type in (
     'catch_and_release', 'trophy', 'general', 'delayed_harvest', 'special'
   )),
@@ -39,7 +39,7 @@ create table public.stream_regulations (
 -- Stream metadata (one row per stream)
 create table public.stream_metadata (
   id uuid primary key default gen_random_uuid(),
-  stream_id text not null unique,
+  stream_id text not null unique, -- references id field in data/streams.ts (no FK; streams live in code)
   difficulty_rating text check (difficulty_rating in ('easy', 'moderate', 'difficult', 'expert')),
   wading_safety text check (wading_safety in ('safe', 'moderate', 'caution', 'dangerous')),
   best_seasons text[] default '{}',
