@@ -21,7 +21,6 @@ export type ButtonSize = keyof typeof sizeClasses;
 export interface ButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
-  asChild?: boolean;
   href?: string;
   class?: string;
   type?: 'button' | 'submit' | 'reset';
@@ -33,7 +32,6 @@ export interface ButtonProps {
 export function Button({
   variant = 'primary',
   size = 'md',
-  asChild = false,
   href,
   class: className,
   type = 'button',
@@ -50,9 +48,9 @@ export function Button({
     className,
   );
 
-  if (asChild) {
+  if (href) {
     return (
-      <a href={href} class={classes}>
+      <a href={href} class={classes} onClick={onClick}>
         {children}
       </a>
     );

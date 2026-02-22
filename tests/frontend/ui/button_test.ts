@@ -70,15 +70,45 @@ describe('Button component', () => {
       assertEquals(vnode.type, 'button');
     });
 
-    it('renders as anchor when asChild is true', () => {
-      const vnode = Button({ asChild: true, href: '/test', children: 'Link' });
+    it('renders as anchor when href is provided', () => {
+      const vnode = Button({ href: '/test', children: 'Link' });
       assertEquals(vnode.type, 'a');
+      assertEquals(vnode.props.href, '/test');
     });
 
     it('passes through additional class names', () => {
       const vnode = Button({ class: 'extra-class', children: 'Click' });
       const classStr = String(vnode.props.class || '');
       assert(classStr.includes('extra-class'), 'should include extra-class');
+    });
+
+    it('passes disabled prop to button element', () => {
+      const vnode = Button({ disabled: true, children: 'Click' });
+      assertEquals(vnode.props.disabled, true);
+    });
+
+    it('passes type prop to button element', () => {
+      const vnode = Button({ type: 'submit', children: 'Submit' });
+      assertEquals(vnode.props.type, 'submit');
+    });
+
+    it('renders button type by default', () => {
+      const vnode = Button({ children: 'Click' });
+      assertEquals(vnode.props.type, 'button');
+    });
+
+    it('passes onClick to button element', () => {
+      let clicked = false;
+      const vnode = Button({ onClick: () => clicked = true, children: 'Click' });
+      vnode.props.onClick();
+      assert(clicked, 'onClick should have been called');
+    });
+
+    it('passes onClick to anchor element', () => {
+      let clicked = false;
+      const vnode = Button({ href: '/test', onClick: () => clicked = true, children: 'Link' });
+      vnode.props.onClick();
+      assert(clicked, 'onClick should have been called on anchor');
     });
   });
 });
