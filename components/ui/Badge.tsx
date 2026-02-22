@@ -8,7 +8,7 @@ const variantClasses = {
   outline: 'border border-border text-foreground bg-transparent',
   excellent: 'bg-quality-excellent text-white',
   good: 'bg-quality-good text-white',
-  fair: 'bg-quality-fair text-white',
+  fair: 'bg-quality-fair text-foreground',
   poor: 'bg-quality-poor text-white',
 } as const;
 

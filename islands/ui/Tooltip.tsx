@@ -15,12 +15,12 @@ export function Tooltip({
   children,
 }: TooltipProps) {
   const visible = useSignal(false);
-  const triggerRef = useRef<HTMLSpanElement>(null);
+  const idRef = useRef('tooltip-' + crypto.randomUUID().slice(0, 8));
 
   return (
     <span
-      ref={triggerRef}
       class={cn('relative inline-block', className)}
+      aria-describedby={visible.value ? idRef.current : undefined}
       onMouseEnter={() => {
         visible.value = true;
       }}
@@ -37,6 +37,7 @@ export function Tooltip({
       {children}
       {visible.value && (
         <span
+          id={idRef.current}
           role='tooltip'
           class={cn(
             'absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5',

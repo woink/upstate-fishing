@@ -79,6 +79,16 @@ describe('Progress component', () => {
       assertEquals(vnode.props.role, 'progressbar');
     });
 
+    it('sets aria-label when label prop is provided', () => {
+      const vnode = Progress({ value: 50, label: 'Loading progress' });
+      assertEquals(vnode.props['aria-label'], 'Loading progress');
+    });
+
+    it('aria-label is undefined when no label prop', () => {
+      const vnode = Progress({ value: 50 });
+      assertEquals(vnode.props['aria-label'], undefined);
+    });
+
     it('accepts additional class names', () => {
       const vnode = Progress({ value: 50, class: 'mt-4' });
       const classStr = String(vnode.props.class || '');

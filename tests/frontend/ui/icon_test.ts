@@ -52,6 +52,16 @@ describe('Icon component', () => {
       assertEquals(vnode.props['aria-label'], 'Fish icon');
     });
 
+    it('sets role=img when aria-label is provided', () => {
+      const vnode = Icon({ name: 'fish', 'aria-label': 'Fish icon' });
+      assertEquals(vnode.props.role, 'img');
+    });
+
+    it('does not set role when no aria-label', () => {
+      const vnode = Icon({ name: 'fish' });
+      assertEquals(vnode.props.role, undefined);
+    });
+
     it('sets aria-hidden when no aria-label', () => {
       const vnode = Icon({ name: 'fish' });
       assertEquals(vnode.props['aria-hidden'], 'true');

@@ -192,6 +192,7 @@ export function Icon({
       stroke-linecap='round'
       stroke-linejoin='round'
       class={cn('inline-block shrink-0', className)}
+      role={ariaLabel ? 'img' : undefined}
       aria-label={ariaLabel}
       aria-hidden={ariaLabel ? undefined : 'true'}
     >

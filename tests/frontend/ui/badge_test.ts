@@ -47,6 +47,14 @@ describe('Badge component', () => {
       const vnode = Badge({ variant: 'fair', children: 'Fair' });
       const classStr = String(vnode.props.class || '');
       assert(classStr.includes('quality-fair'), 'should use quality-fair token');
+      assert(
+        classStr.includes('text-foreground'),
+        'fair variant should use text-foreground for WCAG contrast',
+      );
+      assert(
+        !classStr.includes('text-white'),
+        'fair variant should NOT use text-white (fails WCAG AA on yellow)',
+      );
     });
 
     it('applies poor quality styling', () => {
