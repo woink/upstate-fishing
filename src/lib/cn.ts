@@ -1,7 +1,10 @@
+import { twMerge } from 'tailwind-merge';
+
 /**
- * Simple class name merge utility.
- * Joins truthy class name strings, filtering out undefined/null/false.
+ * Merge class names with Tailwind conflict resolution.
+ * Filters falsy values, then uses tailwind-merge to deduplicate
+ * conflicting utilities (e.g., bg-red-500 + bg-blue-500 → bg-blue-500).
  */
 export function cn(...inputs: (string | undefined | null | false)[]): string {
-  return inputs.filter(Boolean).join(' ');
+  return twMerge(inputs.filter(Boolean).join(' '));
 }

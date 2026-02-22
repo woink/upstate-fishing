@@ -39,4 +39,38 @@ describe('cn() class name utility', () => {
   it('filters out empty string inputs', () => {
     assertEquals(cn('foo', '', 'bar'), 'foo bar');
   });
+
+  describe('Tailwind conflict resolution', () => {
+    it('resolves background color conflicts (last wins)', () => {
+      assertEquals(cn('bg-red-500', 'bg-blue-500'), 'bg-blue-500');
+    });
+
+    it('resolves padding conflicts', () => {
+      assertEquals(cn('px-4', 'px-8'), 'px-8');
+    });
+
+    it('resolves text size conflicts', () => {
+      assertEquals(cn('text-sm', 'text-lg'), 'text-lg');
+    });
+
+    it('preserves non-conflicting classes', () => {
+      assertEquals(cn('bg-red-500', 'text-white', 'bg-blue-500'), 'text-white bg-blue-500');
+    });
+
+    it('resolves conflicts from conditional classes', () => {
+      const override = true;
+      assertEquals(
+        cn('bg-red-500', override && 'bg-green-500'),
+        'bg-green-500',
+      );
+    });
+
+    it('resolves height conflicts', () => {
+      assertEquals(cn('h-10', 'h-11'), 'h-11');
+    });
+
+    it('resolves border-radius conflicts', () => {
+      assertEquals(cn('rounded-md', 'rounded-lg'), 'rounded-lg');
+    });
+  });
 });

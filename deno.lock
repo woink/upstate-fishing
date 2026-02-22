@@ -36,6 +36,7 @@
     "npm:autoprefixer@10.4.17": "10.4.17_postcss@8.4.35",
     "npm:cssnano@6.0.3": "6.0.3_postcss@8.4.35",
     "npm:postcss@8.4.35": "8.4.35",
+    "npm:tailwind-merge@2": "2.6.1",
     "npm:tailwindcss@3.4.16": "3.4.16_postcss@8.5.6",
     "npm:zod@^3.23.0": "3.25.76"
   },
@@ -988,6 +989,9 @@
       ],
       "bin": true
     },
+    "tailwind-merge@2.6.1": {
+      "integrity": "sha512-Oo6tHdpZsGpkKG88HJ8RR1rg/RdnEkQEfMoEk2x1XRI3F1AxeU+ijRXpiVUF4UbLfcxxRGw6TbUINKYdWVsQTQ=="
+    },
     "tailwindcss@3.4.16_postcss@8.5.6": {
       "integrity": "sha512-TI4Cyx7gDiZ6r44ewaJmt0o6BrMCT5aK5e0rmJ/G9Xq3w7CX/5VXl/zIPEJZFUK5VEqwByyhqNPycPlvcK4ZNw==",
       "dependencies": [
@@ -1360,6 +1364,7 @@
     "https://deno.land/x/fresh@1.7.3/plugins/tailwind.ts": "0e5451ce2845c869e0c4e5744505e3bff179ff2ef51356326ba24aeeeb88b05c",
     "https://deno.land/x/fresh@1.7.3/plugins/tailwind/compiler.ts": "9658827e8717076e6d1f7815c081ef6a93bdca409640cd55b6cc171435cd189c",
     "https://deno.land/x/fresh@1.7.3/plugins/tailwind/types.ts": "745dded1323498ebd8c439a8975dfcaae3db376566f2ab47b82a34643da85898",
+    "https://deno.land/x/fresh@1.7.3/runtime.ts": "49f4f70c24d14c5d5e112a671ef0314e438e5cd83eacb4f75c6db2fbdc22b540",
     "https://deno.land/x/fresh@1.7.3/server.ts": "d5817615a3ac822d422627f2cd6f850a31e11f7e73b328a79807f722e6519bac",
     "https://deno.land/x/fresh@1.7.3/src/build/aot_snapshot.ts": "4ac6330e5325dd9411fa2a46e97bb289f910fde4be82dc349d3e2b4bb1a7c07d",
     "https://deno.land/x/fresh@1.7.3/src/build/deps.ts": "03f73580f7e1ccf2027cb45357bfb82c73c3971876680ea8b44666bcbcd1a9f0",
@@ -1444,6 +1449,7 @@
       "jsr:@std/testing@1",
       "jsr:@supabase/supabase-js@2",
       "npm:@supabase/ssr@0",
+      "npm:tailwind-merge@2",
       "npm:tailwindcss@3.4.16",
       "npm:zod@^3.23.0"
     ]
